@@ -7,7 +7,6 @@
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-
         gtag('config', 'G-0M7YNWC9WW');
     </script>
     <meta charset="UTF-8">
@@ -21,9 +20,7 @@
 <div id="header">
     <div class="container">
         <nav>
-            <img src="images/Logo3.png" class="logo">
             <ul id="sidemenu">
-                <li><a href="#header">Home</a></li>
                 <li><a href="#about">About</a></li>
                 <li><a href="#portfolio">Projects</a></li>
                 <li><a href="#contact">Contact</a></li>
@@ -32,7 +29,6 @@
             <i class="fa-solid fa-bars" onclick="openmenu()"></i>
         </nav>
         <div class="header-text">
-            <!-- <p>AI Researcher, Developer, and Innovator</p> -->
             <h1>Hi, I'm <span>Rishi Shah</span></h1>
             <h2>Creating Cutting-Edge Solutions in Machine Learning,<br> Robotics, and Computer Vision</h2>
         </div>
@@ -48,7 +44,13 @@
             </div>
             <div class="about-col-2">
                 <h1 class="sub-title">About Me</h1>
-                <p> I am an AI researcher, developer, and innovator with a passion for machine learning, computer vision, and hardware development. I've worked on various projects, including conducting research on adversarial attacks on machine learning models, developing robotic systems, and delving into the field of medical artificial intelligence. </p>
+                <ul class="about-points">
+                    <li>Schulich Leader Scholar at McMaster Engineering</li>
+                    <li>Machine learning researcher focused on adversarial robustness</li>
+                    <li>Developer of medical AI tools and 3D-printed robotics</li>
+                    <li>Founder of 3D Forge and Co-founder of Hack49 Global</li>
+                    <li>Experience with U-Net segmentation, AR, and real-time systems</li>
+                </ul>
 
                 <div class="tab-titles">
                     <p class="tab-links active-link" onclick="opentab('skills')">Skills</p>
@@ -56,11 +58,12 @@
 
                 <div class="tab-contents active-tab" id="skills">
                     <ul>
-                        <li><span>Machine Learning</span><br>Model Development with PyTorch and Keras</li>
-                        <li><span>Computer Vision</span><br>OpenCV, pose estimation, and image segmentation</li>
-                        <li><span>Hardware Development</span><br>Arduino, Raspberry Pi</li>
-                        <li><span>Programming Languages </span><br>Java, Python, C#</li>
-                        <li><span>Technologies</span><br>Sketchup, Blender, CURA, Unity, MS Office, Git/GitHub, Fusion 360</li>
+                        <li><span>Machine Learning</span><br>PyTorch, Keras, Adversarial Robustness</li>
+                        <li><span>Computer Vision</span><br>OpenCV, ITK SNAP</li>
+                        <li><span>Embedded Systems</span><br>Arduino, Raspberry Pi</li>
+                        <li><span>Programming Languages</span><br>Python, Java, C#, C++</li>
+                        <li><span>Tools & Platforms</span><br>Unity, Git/GitHub, VS Code</li>
+                        <li><span>3D Modeling</span><br>Fusion 360, Blender, SketchUp, CURA</li>
                     </ul>
                 </div>
             </div>
@@ -97,54 +100,48 @@
     <div class="container">
         <h1 class="sub-title">My Work</h1>
         <div class="work-list">
-            <div class="work">
+            <div class="work" onclick="window.open('https://projectboard.world/ysc/project/from-pixels-to-precision', '_blank')">
                 <img src="images/project-1.png" alt="Work 1">
                 <div class="layer">
                     <h3>From Pixels to Precision</h3>
                     <p>Developed a neural network that segments surgical tools from minimally invasive surgical videos.</p>
-                    <a href="https://projectboard.world/ysc/project/from-pixels-to-precision"><i class="fa-solid fa-code"></i></a>
                 </div>
             </div>
-            <div class="work">
+            <div class="work" onclick="window.open('https://github.com/RishiShah99/imagenet100-resnet18-pgd-attacks', '_blank')">
                 <img src="images/project-2.png" alt="Work 2">
                 <div class="layer">
-                    <h3>Adversarial Attacks of ImageNet100, MNIST, CIFAR100</h3>
+                    <h3>Adversarial Attacks</h3>
                     <p>Conducted adversarial attacks of AlexNet, CORnet-S, and ResNet18 trained on ImageNet100, MNIST, and CIFAR100</p>
-                    <a href="https://github.com/RishiShah99/imagenet100-resnet18-pgd-attacks"><i class="fa-solid fa-code"></i></a>
                 </div>
             </div>
-            <div class="work">
+            <div class="work" onclick="window.open('https://github.com/RishiShah99/GestureControlledRoboticArm', '_blank')">
                 <img src="images/project-3.png" alt="Work 3">
                 <div class="layer">
                     <h3>Gesture Controlled Robotic Arm</h3>
                     <p>Developed a robotic arm controlled by hand gestures using computer vision and Arduino.</p>
-                    <a href="https://github.com/RishiShah99/GestureControlledRoboticArm"><i class="fa-solid fa-code"></i></a>
                 </div>
             </div>
         </div>
         <div class="work-list">
-            <div class="work">
+            <div class="work" onclick="window.open('https://github.com/RishiShah99/SecurityFootageTracker', '_blank')">
                 <img src="images/project-4.jpg" alt="Work 1">
                 <div class="layer">
                     <h3>Pose Estimation Model</h3>
                     <p>Takes an input video and performs pose estimation through a Keypoint R-CNN model and OpenCV</p>
-                    <a href="https://github.com/RishiShah99/SecurityFootageTracker"><i class="fa-solid fa-code"></i></a>
                 </div>
             </div>
-            <div class="work">
+            <div class="work" onclick="window.open('https://github.com/RishiShah99/Zephyr', '_blank')">
                 <img src="images/project-5.png" alt="Work 2">
                 <div class="layer">
                     <h3>Zephyr</h3>
                     <p>Developed a Gemini-trained voice assistant integrating Spotify, calendar, weather, and personalized news.</p>
-                    <a href="https://github.com/RishiShah99/Zephyr"><i class="fa-solid fa-code"></i></a>
                 </div>
             </div>
-            <div class="work">
+            <div class="work" onclick="window.open('https://devpost.com/software/skinvis-using-vgg-16-cnn-for-early-skin-cancer-detection', '_blank')">
                 <img src="images/project-6.png" alt="Work 3">
                 <div class="layer">
                     <h3>SkinVis</h3>
                     <p>Using VGG-16 CNN for Early Skin Cancer Detection.</p>
-                    <a href="https://devpost.com/software/skinvis-using-vgg-16-cnn-for-early-skin-cancer-detection"><i class="fa-solid fa-code"></i></a>
                 </div>
             </div>
         </div>
@@ -158,22 +155,18 @@
         <div class="row">
             <div class="contact-left">
                 <h1 class="sub-title">Contact Me</h1>
-                <p><i class="fa-solid fa-envelope"></i> rishishah994@gmail.com</p>
+                <p>
+                    <a href="mailto:rishishah994@gmail.com" style="color: inherit; text-decoration: none;">
+                        <i class="fa-solid fa-envelope"></i>
+                        rishishah994@gmail.com
+                    </a>
+                </p>
                 <div class="social-icons">
                     <a href="https://github.com/RishiShah99"><i class="fa-brands fa-github"></i></a>
                     <a href="https://www.linkedin.com/in/rishi-shah-7915a7309/"><i class="fa-brands fa-linkedin"></i></a>
                     <a href="https://www.kaggle.com/shahrish99"><i class="fa-brands fa-kaggle"></i></a>
                 </div>
-                <a href="images/Rishi's Resume.pdf" class="btn btn2">Download Resume</a>
-            </div>
-            <div class="contact-right">
-                <form name="submit-to-google-sheet">
-                    <input type="text" name="Name" placeholder="Your Name" required>
-                    <input type="email" name="Email" placeholder="Your Email" required>
-                    <textarea name="Message" rows="6" placeholder="Your Message"></textarea>
-                    <button type="submit" class="btn btn2">Send</button>
-                </form>
-                <span id="msg"></span>
+                <a href="images/Rishi's Resume.pdf" download="Rishi's Resume.pdf" class="btn btn2">Download Resume</a>
             </div>
         </div>
     </div>
@@ -223,5 +216,37 @@
         .catch(error => console.error('Error!', error.message))
     })
   </script>
+<script>
+    // Custom cursor
+    const cursor = document.createElement('div');
+    cursor.classList.add('cursor');
+    document.body.appendChild(cursor);
+
+    const cursorGlow = document.createElement('div');
+    cursorGlow.classList.add('cursor-glow');
+    document.body.appendChild(cursorGlow);
+
+    document.addEventListener('mousemove', (e) => {
+        cursor.style.left = e.clientX + 'px';
+        cursor.style.top = e.clientY + 'px';
+        
+        cursorGlow.style.left = e.clientX + 'px';
+        cursorGlow.style.top = e.clientY + 'px';
+    });
+
+    // Add hover effect to interactive elements
+    const interactiveElements = document.querySelectorAll('a, button, .btn, .work, .services-list div, .tab-links, .tab-contents ul li, .tab-contents ul li span');
+    interactiveElements.forEach(element => {
+        element.addEventListener('mouseenter', () => {
+            cursor.style.transform = 'translate(-50%, -50%) scale(1.5)';
+            cursorGlow.style.transform = 'translate(-50%, -50%) scale(1.5)';
+        });
+        
+        element.addEventListener('mouseleave', () => {
+            cursor.style.transform = 'translate(-50%, -50%) scale(1)';
+            cursorGlow.style.transform = 'translate(-50%, -50%) scale(1)';
+        });
+    });
+</script>
 </body>
 </html>
