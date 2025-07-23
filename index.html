@@ -17,6 +17,7 @@
     <script src="https://kit.fontawesome.com/17ea408dcc.js" crossorigin="anonymous"></script>
 </head>
 <body>
+    <canvas id="particles-bg"></canvas>
 <div id="header">
     <div class="container">
         <nav>
@@ -117,7 +118,7 @@
             <div class="work" onclick="window.open('https://github.com/RishiShah99/GestureControlledRoboticArm', '_blank')">
                 <img src="images/project-3.png" alt="Work 3">
                 <div class="layer">
-                    <h3>Gesture Controlled Robotic Arm</h3>
+                     <h3>Gesture Controlled Robotic Arm</h3>
                     <p>Developed a robotic arm controlled by hand gestures using computer vision and Arduino.</p>
                 </div>
             </div>
@@ -137,11 +138,11 @@
                     <p>Developed a Gemini-trained voice assistant integrating Spotify, calendar, weather, and personalized news.</p>
                 </div>
             </div>
-            <div class="work" onclick="window.open('https://devpost.com/software/skinvis-using-vgg-16-cnn-for-early-skin-cancer-detection', '_blank')">
-                <img src="images/project-6.png" alt="Work 3">
+            <div class="work" onclick="window.open('https://github.com/RishiShah99/DermAI', '_blank')">
+                <img src="images/project-6.jpg" alt="Work 3">
                 <div class="layer">
-                    <h3>SkinVis</h3>
-                    <p>Using VGG-16 CNN for Early Skin Cancer Detection.</p>
+                    <h3>DermAI</h3>
+                    <p>Developed a DenseNet121 model trained on 19,000+ DermNet images with integrated RAG chatbot for triage assessment.</p>
                 </div>
             </div>
         </div>
@@ -248,5 +249,76 @@
         });
     });
 </script>
+<script>
+    // --- Floating Blue Particles BG ---
+    const particles = document.getElementById('particles-bg');
+    const ctx = particles.getContext('2d');
+    function resizeParticles() {
+        particles.width = window.innerWidth;
+        particles.height = window.innerHeight;
+    }
+    resizeParticles();
+    window.addEventListener('resize', resizeParticles);
+    let w = () => particles.width, h = () => particles.height;
+    const dots = Array.from({length: 32}, () => ({
+        x: Math.random()*window.innerWidth, y: Math.random()*window.innerHeight, r: Math.random()*2+2, dx: (Math.random()-0.5)*0.5, dy: (Math.random()-0.5)*0.5
+    }));
+    function drawParticles() {
+        ctx.clearRect(0,0,w(),h());
+        for (const d of dots) {
+            ctx.beginPath();
+            ctx.arc(d.x, d.y, d.r, 0, 2*Math.PI);
+            ctx.fillStyle = '#87CEEB99';
+            ctx.shadowColor = '#87CEEB';
+            ctx.shadowBlur = 12;
+            ctx.fill();
+            d.x += d.dx; d.y += d.dy;
+            if (d.x<0||d.x>w()) d.dx*=-1;
+            if (d.y<0||d.y>h()) d.dy*=-1;
+        }
+        ctx.shadowBlur = 0;
+        requestAnimationFrame(drawParticles);
+    }
+    drawParticles();
+    // --- Click Ripple Effect ---
+    function createRipple(x, y) {
+        const ripple = document.createElement('div');
+        ripple.className = 'cursor-ripple';
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+        ripple.style.width = ripple.style.height = '60px';
+        document.body.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 500);
+    }
+    document.addEventListener('mousedown', e => {
+        createRipple(e.clientX, e.clientY);
+    });
+    </script>
+    <style>
+    #particles-bg {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: -1;
+        pointer-events: none;
+    }
+    .cursor-ripple {
+        position: fixed;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 9997;
+        border: 3px solid #fff;
+        opacity: 0.7;
+        background: rgba(255,255,255,0.15);
+        transform: translate(-50%, -50%);
+        animation: ripple-anim 0.5s linear forwards;
+    }
+    @keyframes ripple-anim {
+        0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0.7; }
+        100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+    }
+    </style>
 </body>
 </html>
