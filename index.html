@@ -17,33 +17,43 @@
     <script src="https://kit.fontawesome.com/17ea408dcc.js" crossorigin="anonymous"></script>
 </head>
 <body>
-    <canvas id="particles-bg"></canvas>
-<div id="header">
-    <div class="container">
-        <nav>
-            <ul id="sidemenu">
-                <li><a href="#about">About</a></li>
-                <li><a href="#portfolio">Projects</a></li>
-                <li><a href="#contact">Contact</a></li>
-                <i class="fa-solid fa-xmark" onclick="closemenu()"></i>
-            </ul>
-            <i class="fa-solid fa-bars" onclick="openmenu()"></i>
-        </nav>
-        <div class="header-text">
-            <h1>Hi, I'm <span>Rishi Shah</span></h1>
-            <h2>Creating Cutting-Edge Solutions in Machine Learning,<br> Robotics, and Computer Vision</h2>
+    <!-- Header Section -->
+    <div id="header">
+        <div class="container">
+            <nav>
+                <a href="#" class="logo">
+                    <span class="logo-text">RS</span>
+                </a>
+                <ul id="sidemenu">
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#services">Interests</a></li>
+                    <li><a href="#portfolio">Projects</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                    <i class="fa-solid fa-xmark" onclick="closemenu()"></i>
+                </ul>
+                <i class="fa-solid fa-bars" onclick="openmenu()"></i>
+            </nav>
+            <div class="header-content">
+                <div class="header-text">
+                    <div class="intro">Hello, I'm</div>
+                    <h1>Rishi Shah</h1>
+                    <h2>Creating cutting-edge solutions in machine learning, robotics, and computer vision.</h2>
+                    <div class="cta-buttons">
+                        <a href="#portfolio" class="primary">View My Work</a>
+                        <a href="#contact" class="secondary">Get In Touch</a>
+                    </div>
+                </div>
+                <div class="header-image">
+                    <img src="images/user.jpg" alt="Rishi Shah">
+                </div>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- About Section -->
-<div id="about">
-    <div class="container">
-        <div class="row">
-            <div class="about-col-1">
-                <img src="images/user.jpeg" alt="Rishi Shah">
-            </div>
-            <div class="about-col-2">
+    <!-- About Section -->
+    <div id="about">
+        <div class="container">
+            <div class="about-content">
                 <h1 class="sub-title">About Me</h1>
                 <ul class="about-points">
                     <li>Schulich Leader Scholar at McMaster Engineering</li>
@@ -53,257 +63,221 @@
                     <li>Experience with U-Net segmentation, AR, and real-time systems</li>
                 </ul>
 
-                <div class="tab-titles">
-                    <p class="tab-links active-link" onclick="opentab('skills')">Skills</p>
-                </div>
-
-                <div class="tab-contents active-tab" id="skills">
-                    <ul>
-                        <li><span>Machine Learning</span><br>PyTorch, Keras, Adversarial Robustness</li>
-                        <li><span>Computer Vision</span><br>OpenCV, ITK SNAP</li>
-                        <li><span>Embedded Systems</span><br>Arduino, Raspberry Pi</li>
-                        <li><span>Programming Languages</span><br>Python, Java, C#, C++</li>
-                        <li><span>Tools & Platforms</span><br>Unity, Git/GitHub, VS Code</li>
-                        <li><span>3D Modeling</span><br>Fusion 360, Blender, SketchUp, CURA</li>
-                    </ul>
+                <div class="skills-section">
+                    <h2>Technical Skills</h2>
+                    <div class="skills-grid">
+                        <div class="skill-category">
+                            <h3>Machine Learning</h3>
+                            <p>PyTorch, Keras, Adversarial Robustness</p>
+                        </div>
+                        <div class="skill-category">
+                            <h3>Computer Vision</h3>
+                            <p>OpenCV, ITK SNAP, Image Processing, Object Detection</p>
+                        </div>
+                        <div class="skill-category">
+                            <h3>Embedded Systems</h3>
+                            <p>Arduino, Raspberry Pi, IoT</p>
+                        </div>
+                        <div class="skill-category">
+                            <h3>Programming</h3>
+                            <p>Python, Java, C#, C++</p>
+                        </div>
+                        <div class="skill-category">
+                            <h3>Tools & Platforms</h3>
+                            <p>Unity, Git/GitHub, VS Code</p>
+                        </div>
+                        <div class="skill-category">
+                            <h3>3D & Design</h3>
+                            <p>Fusion 360, Blender, SketchUp, CURA</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Interests Section -->
-<div id="services">
-    <div class="container">
-        <h1 class="sub-title">Interests</h1>
-        <div class="services-list">
-            <div>
-                <i class="fa-solid fa-code"></i>
-                <h2>Medical AI</h2>
-                <p> Developing machine learning models to enhance diagnostic accuracy and predictive analytics in healthcare.</p>
+    <!-- Interests Section -->
+    <div id="services">
+        <div class="container">
+            <div class="services-header">
+                <h2>Areas of Interest</h2>
+                <p>Exploring the intersection of AI, healthcare, and robotics to create innovative solutions.</p>
             </div>
-            <div>
-                <i class="fa-solid fa-code"></i>
-                <h2>Cyber Security</h2>
-                <p> Researching adversarial attacks on machine learning models to enhance AI security and developing a robust CV model of my own. </p>
-            </div>
-            <div>
-                <i class="fa-solid fa-code"></i>
-                <h2>Mechatronics</h2>
-                <p> Combining mechanical engineering, electronics, and computer science to create innovative solutions.</p>
+            <div class="services-list">
+                <div>
+                    <i class="fa-solid fa-heartbeat"></i>
+                    <h2>Medical AI</h2>
+                    <p>Developing machine learning models to enhance diagnostic accuracy and predictive analytics in healthcare.</p>
+                </div>
+                <div>
+                    <i class="fa-solid fa-shield-alt"></i>
+                    <h2>Cyber Security</h2>
+                    <p>Researching adversarial attacks on machine learning models to enhance AI security and robustness.</p>
+                </div>
+                <div>
+                    <i class="fa-solid fa-robot"></i>
+                    <h2>Mechatronics</h2>
+                    <p>Combining mechanical engineering, electronics, and computer science to create innovative robotic solutions.</p>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Portfolio Section -->
-<div id="portfolio">
-    <div class="container">
-        <h1 class="sub-title">My Work</h1>
-        <div class="work-list">
-            <div class="work" onclick="window.open('https://projectboard.world/ysc/project/from-pixels-to-precision', '_blank')">
-                <img src="images/project-1.png" alt="Work 1">
-                <div class="layer">
-                    <h3>From Pixels to Precision</h3>
-                    <p>Developed a neural network that segments surgical tools from minimally invasive surgical videos.</p>
+    <!-- Portfolio Section -->
+    <div id="portfolio">
+        <div class="container">
+            <div class="portfolio-header">
+                <h2>Featured Projects</h2>
+                <p>A showcase of my latest work in machine learning, computer vision, and robotics.</p>
+            </div>
+            <div class="work-grid">
+                <div class="work" onclick="window.open('https://projectboard.world/ysc/project/from-pixels-to-precision', '_blank')">
+                    <img src="images/project-1.png" alt="From Pixels to Precision">
+                    <div class="work-content">
+                        <h3>From Pixels to Precision</h3>
+                        <p>Developed a neural network that segments surgical tools from minimally invasive surgical videos, improving surgical precision and safety.</p>
+                    </div>
+                </div>
+                <div class="work" onclick="window.open('https://github.com/RishiShah99/imagenet100-resnet18-pgd-attacks', '_blank')">
+                    <img src="images/project-2.png" alt="Adversarial Attacks">
+                    <div class="work-content">
+                        <h3>Adversarial Attacks Research</h3>
+                        <p>Conducted comprehensive adversarial attacks on AlexNet, CORnet-S, and ResNet18 trained on ImageNet100, MNIST, and CIFAR100 datasets.</p>
+                    </div>
+                </div>
+                <div class="work" onclick="window.open('https://github.com/RishiShah99/GestureControlledRoboticArm', '_blank')">
+                    <img src="images/project-3.png" alt="Gesture Controlled Robotic Arm">
+                    <div class="work-content">
+                        <h3>Gesture Controlled Robotic Arm</h3>
+                        <p>Developed a robotic arm controlled by hand gestures using computer vision and Arduino, demonstrating real-time human-robot interaction.</p>
+                    </div>
+                </div>
+                <div class="work" onclick="window.open('https://github.com/RishiShah99/SecurityFootageTracker', '_blank')">
+                    <img src="images/project-4.jpg" alt="Pose Estimation Model">
+                    <div class="work-content">
+                        <h3>Pose Estimation Model</h3>
+                        <p>Implemented a Keypoint R-CNN model with OpenCV for real-time pose estimation in security footage and surveillance applications.</p>
+                    </div>
+                </div>
+                <div class="work" onclick="window.open('https://github.com/RishiShah99/Zephyr', '_blank')">
+                    <img src="images/project-5.png" alt="Zephyr">
+                    <div class="work-content">
+                        <h3>Zephyr Voice Assistant</h3>
+                        <p>Developed a Gemini-trained voice assistant integrating Spotify, calendar, weather, and personalized news for seamless daily management.</p>
+                    </div>
+                </div>
+                <div class="work" onclick="window.open('https://github.com/RishiShah99/DermAI', '_blank')">
+                    <img src="images/project-6.jpg" alt="DermAI">
+                    <div class="work-content">
+                        <h3>DermAI Medical Assistant</h3>
+                        <p>Built a DenseNet121 model trained on 19,000+ DermNet images with integrated RAG chatbot for dermatological triage assessment.</p>
+                    </div>
                 </div>
             </div>
-            <div class="work" onclick="window.open('https://github.com/RishiShah99/imagenet100-resnet18-pgd-attacks', '_blank')">
-                <img src="images/project-2.png" alt="Work 2">
-                <div class="layer">
-                    <h3>Adversarial Attacks</h3>
-                    <p>Conducted adversarial attacks of AlexNet, CORnet-S, and ResNet18 trained on ImageNet100, MNIST, and CIFAR100</p>
-                </div>
-            </div>
-            <div class="work" onclick="window.open('https://github.com/RishiShah99/GestureControlledRoboticArm', '_blank')">
-                <img src="images/project-3.png" alt="Work 3">
-                <div class="layer">
-                     <h3>Gesture Controlled Robotic Arm</h3>
-                    <p>Developed a robotic arm controlled by hand gestures using computer vision and Arduino.</p>
-                </div>
-            </div>
-        </div>
-        <div class="work-list">
-            <div class="work" onclick="window.open('https://github.com/RishiShah99/SecurityFootageTracker', '_blank')">
-                <img src="images/project-4.jpg" alt="Work 1">
-                <div class="layer">
-                    <h3>Pose Estimation Model</h3>
-                    <p>Takes an input video and performs pose estimation through a Keypoint R-CNN model and OpenCV</p>
-                </div>
-            </div>
-            <div class="work" onclick="window.open('https://github.com/RishiShah99/Zephyr', '_blank')">
-                <img src="images/project-5.png" alt="Work 2">
-                <div class="layer">
-                    <h3>Zephyr</h3>
-                    <p>Developed a Gemini-trained voice assistant integrating Spotify, calendar, weather, and personalized news.</p>
-                </div>
-            </div>
-            <div class="work" onclick="window.open('https://github.com/RishiShah99/DermAI', '_blank')">
-                <img src="images/project-6.jpg" alt="Work 3">
-                <div class="layer">
-                    <h3>DermAI</h3>
-                    <p>Developed a DenseNet121 model trained on 19,000+ DermNet images with integrated RAG chatbot for triage assessment.</p>
-                </div>
-            </div>
-        </div>
-        <a href="https://github.com/RishiShah99" class="btn">See More</a>
-    </div>
-</div>
-
-<!-- Contact Section -->
-<div id="contact">
-    <div class="container">
-        <div class="row">
-            <div class="contact-left">
-                <h1 class="sub-title">Contact Me</h1>
-                <p>
-                    <a href="mailto:rishishah994@gmail.com" style="color: inherit; text-decoration: none;">
-                        <i class="fa-solid fa-envelope"></i>
-                        rishishah994@gmail.com
-                    </a>
-                </p>
-                <div class="social-icons">
-                    <a href="https://github.com/RishiShah99"><i class="fa-brands fa-github"></i></a>
-                    <a href="https://www.linkedin.com/in/rishi-shah-7915a7309/"><i class="fa-brands fa-linkedin"></i></a>
-                    <a href="https://www.kaggle.com/shahrish99"><i class="fa-brands fa-kaggle"></i></a>
-                </div>
-                <a href="images/Rishi's Resume.pdf" download="Rishi's Resume.pdf" class="btn btn2">Download Resume</a>
-            </div>
+            <a href="https://github.com/RishiShah99" class="see-more-btn">View More Projects</a>
         </div>
     </div>
-    <div class="copyright">
-        <p>Copyright © 2024 Rishi Shah. All rights reserved.</p>
-    </div>
-</div>
-<script>
-    var tablinks = document.getElementsByClassName('tab-links');
-    var tabcontents = document.getElementsByClassName('tab-contents');
-    function opentab(tabname){
-        for(tablink of tablinks){
-            tablink.classList.remove('active-link');
-        }
-        for(tabcontent of tabcontents){
-            tabcontent.classList.remove('active-tab');
-        }
-        event.currentTarget.classList.add('active-link');
-        document.getElementById(tabname).classList.add('active-tab');
-    }
-</script>
 
-<script>
-    var sidemenu = document.getElementById('sidemenu');
-    function openmenu(){
-        sidemenu.style.right = '0';
-    }
-    function closemenu(){
-        sidemenu.style.right = '-200px';
-    }
-</script>
-<script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbxC0rr_LEcOME2-r56QzTmZVva9c5OjHduGFJmBh8-Bfb16Y5zrl4YJymQUaugEQPKc6w/exec'
-    const form = document.forms['submit-to-google-sheet']
-    const msg = document.getElementById('msg')
+    <!-- Contact Section -->
+    <div id="contact">
+        <div class="container">
+            <div class="contact-header">
+                <h2>Let's Connect</h2>
+                <p>I'm always interested in new opportunities, collaborations, and interesting projects. Feel free to reach out!</p>
+            </div>
+            <div class="contact-info">
+                <a href="mailto:rishishah994@gmail.com">
+                    <i class="fa-solid fa-envelope"></i>
+                    rishishah994@gmail.com
+                </a>
+            </div>
+            <div class="social-icons">
+                <a href="https://github.com/RishiShah99"><i class="fa-brands fa-github"></i></a>
+                <a href="https://www.linkedin.com/in/rishi-shah-7915a7309/"><i class="fa-brands fa-linkedin"></i></a>
+                <a href="https://www.kaggle.com/shahrish99"><i class="fa-brands fa-kaggle"></i></a>
+            </div>
+            <a href="images/Rishi's Resume.pdf" download="Rishi's Resume.pdf" class="download-resume">Download Resume</a>
+        </div>
+    </div>
     
-    form.addEventListener('submit', e => {
-      e.preventDefault()
-      fetch(scriptURL, { method: 'POST', body: new FormData(form)})
-        .then(response => {
-            msg.innerHTML = "Message Sent Successfully";
-            setTimeout(function(){
-                msg.innerHTML = "";
-            }, 5000);
-            form.reset();
-        })
-        .catch(error => console.error('Error!', error.message))
-    })
-  </script>
-<script>
-    // Custom cursor
-    const cursor = document.createElement('div');
-    cursor.classList.add('cursor');
-    document.body.appendChild(cursor);
+    <div class="copyright">
+        <p>Copyright © 2025 Rishi Shah. All rights reserved.</p>
+    </div>
 
-    const cursorGlow = document.createElement('div');
-    cursorGlow.classList.add('cursor-glow');
-    document.body.appendChild(cursorGlow);
+    <script>
+        var sidemenu = document.getElementById('sidemenu');
+        function openmenu(){
+            sidemenu.style.right = '0';
+        }
+        function closemenu(){
+            sidemenu.style.right = '-200px';
+        }
+    </script>
+    
+    <script>
+        // Custom cursor - Much better responsiveness
+        const cursor = document.createElement('div');
+        cursor.classList.add('cursor');
+        document.body.appendChild(cursor);
 
-    document.addEventListener('mousemove', (e) => {
-        cursor.style.left = e.clientX + 'px';
-        cursor.style.top = e.clientY + 'px';
-        
-        cursorGlow.style.left = e.clientX + 'px';
-        cursorGlow.style.top = e.clientY + 'px';
-    });
+        const cursorGlow = document.createElement('div');
+        cursorGlow.classList.add('cursor-glow');
+        document.body.appendChild(cursorGlow);
 
-    // Add hover effect to interactive elements
-    const interactiveElements = document.querySelectorAll('a, button, .btn, .work, .services-list div, .tab-links, .tab-contents ul li, .tab-contents ul li span');
-    interactiveElements.forEach(element => {
-        element.addEventListener('mouseenter', () => {
-            cursor.style.transform = 'translate(-50%, -50%) scale(1.5)';
-            cursorGlow.style.transform = 'translate(-50%, -50%) scale(1.5)';
+        let isMouseDown = false;
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            
+            cursorGlow.style.left = e.clientX + 'px';
+            cursorGlow.style.top = e.clientY + 'px';
         });
-        
-        element.addEventListener('mouseleave', () => {
+
+        document.addEventListener('mousedown', (e) => {
+            isMouseDown = true;
+            cursor.style.transform = 'translate(-50%, -50%) scale(0.8)';
+            cursorGlow.style.transform = 'translate(-50%, -50%) scale(0.8)';
+            createRipple(e.clientX, e.clientY);
+        });
+
+        document.addEventListener('mouseup', () => {
+            isMouseDown = false;
             cursor.style.transform = 'translate(-50%, -50%) scale(1)';
             cursorGlow.style.transform = 'translate(-50%, -50%) scale(1)';
         });
-    });
-</script>
-<script>
-    // --- Floating Blue Particles BG ---
-    const particles = document.getElementById('particles-bg');
-    const ctx = particles.getContext('2d');
-    function resizeParticles() {
-        particles.width = window.innerWidth;
-        particles.height = window.innerHeight;
-    }
-    resizeParticles();
-    window.addEventListener('resize', resizeParticles);
-    let w = () => particles.width, h = () => particles.height;
-    const dots = Array.from({length: 32}, () => ({
-        x: Math.random()*window.innerWidth, y: Math.random()*window.innerHeight, r: Math.random()*2+2, dx: (Math.random()-0.5)*0.5, dy: (Math.random()-0.5)*0.5
-    }));
-    function drawParticles() {
-        ctx.clearRect(0,0,w(),h());
-        for (const d of dots) {
-            ctx.beginPath();
-            ctx.arc(d.x, d.y, d.r, 0, 2*Math.PI);
-            ctx.fillStyle = '#87CEEB99';
-            ctx.shadowColor = '#87CEEB';
-            ctx.shadowBlur = 12;
-            ctx.fill();
-            d.x += d.dx; d.y += d.dy;
-            if (d.x<0||d.x>w()) d.dx*=-1;
-            if (d.y<0||d.y>h()) d.dy*=-1;
+
+        // Add hover effect to interactive elements
+        const interactiveElements = document.querySelectorAll('a, button, .work, .services-list div, .about-points li, .skill-category');
+        interactiveElements.forEach(element => {
+            element.addEventListener('mouseenter', () => {
+                if (!isMouseDown) {
+                    cursor.style.transform = 'translate(-50%, -50%) scale(1.5)';
+                    cursorGlow.style.transform = 'translate(-50%, -50%) scale(1.5)';
+                }
+            });
+            
+            element.addEventListener('mouseleave', () => {
+                if (!isMouseDown) {
+                    cursor.style.transform = 'translate(-50%, -50%) scale(1)';
+                    cursorGlow.style.transform = 'translate(-50%, -50%) scale(1)';
+                }
+            });
+        });
+        
+        // Click Ripple Effect
+        function createRipple(x, y) {
+            const ripple = document.createElement('div');
+            ripple.className = 'cursor-ripple';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            ripple.style.width = ripple.style.height = '60px';
+            document.body.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 500);
         }
-        ctx.shadowBlur = 0;
-        requestAnimationFrame(drawParticles);
-    }
-    drawParticles();
-    // --- Click Ripple Effect ---
-    function createRipple(x, y) {
-        const ripple = document.createElement('div');
-        ripple.className = 'cursor-ripple';
-        ripple.style.left = x + 'px';
-        ripple.style.top = y + 'px';
-        ripple.style.width = ripple.style.height = '60px';
-        document.body.appendChild(ripple);
-        setTimeout(() => ripple.remove(), 500);
-    }
-    document.addEventListener('mousedown', e => {
-        createRipple(e.clientX, e.clientY);
-    });
     </script>
+    
     <style>
-    #particles-bg {
-        position: fixed;
-        left: 0;
-        top: 0;
-        width: 100vw;
-        height: 100vh;
-        z-index: -1;
-        pointer-events: none;
-    }
     .cursor-ripple {
         position: fixed;
         border-radius: 50%;
