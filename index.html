@@ -17,8 +17,12 @@
     <title>Rishi Shah</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://kit.fontawesome.com/17ea408dcc.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 </head>
 <body>
+    <!-- Particles Background -->
+    <div id="particles-js"></div>
+    
     <!-- Header Section -->
     <div id="header">
         <div class="container">
@@ -28,7 +32,6 @@
                 </a>
                 <ul id="sidemenu">
                     <li><a href="#about">About</a></li>
-                    <li><a href="#services">Interests</a></li>
                     <li><a href="#portfolio">Projects</a></li>
                     <li><a href="#contact">Contact</a></li>
                 </ul>                
@@ -91,33 +94,6 @@
                             <p>Fusion 360, Blender, SketchUp, CURA</p>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Interests Section -->
-    <div id="services">
-        <div class="container">
-            <div class="services-header">
-                <h2>Areas of Interest</h2>
-                <p>Exploring the intersection of AI, healthcare, and robotics to create innovative solutions.</p>
-            </div>
-            <div class="services-list">
-                <div>
-                    <i class="fa-solid fa-heartbeat"></i>
-                    <h2>Medical AI</h2>
-                    <p>Developing machine learning models to enhance diagnostic accuracy and predictive analytics in healthcare.</p>
-                </div>
-                <div>
-                    <i class="fa-solid fa-shield-alt"></i>
-                    <h2>Cyber Security</h2>
-                    <p>Researching adversarial attacks on machine learning models to enhance AI security and robustness.</p>
-                </div>
-                <div>
-                    <i class="fa-solid fa-robot"></i>
-                    <h2>Mechatronics</h2>
-                    <p>Combining mechanical engineering, electronics, and computer science to create innovative robotic solutions.</p>
                 </div>
             </div>
         </div>
@@ -248,17 +224,13 @@
         const interactiveElements = document.querySelectorAll('a, button, .work, .services-list div, .about-points li, .skill-category');
         interactiveElements.forEach(element => {
             element.addEventListener('mouseenter', () => {
-                if (!isMouseDown) {
-                    cursor.style.transform = 'translate(-50%, -50%) scale(1.5)';
-                    cursorGlow.style.transform = 'translate(-50%, -50%) scale(1.5)';
-                }
+                cursor.classList.add('hover');
+                cursorGlow.classList.add('hover');
             });
             
             element.addEventListener('mouseleave', () => {
-                if (!isMouseDown) {
-                    cursor.style.transform = 'translate(-50%, -50%) scale(1)';
-                    cursorGlow.style.transform = 'translate(-50%, -50%) scale(1)';
-                }
+                cursor.classList.remove('hover');
+                cursorGlow.classList.remove('hover');
             });
         });
         
@@ -272,6 +244,87 @@
             document.body.appendChild(ripple);
             setTimeout(() => ripple.remove(), 500);
         }
+
+        // Neural Circuit Board Particles - Embedded Systems Theme
+        particlesJS('particles-js', {
+            particles: {
+                number: {
+                    value: 70,
+                    density: {
+                        enable: true,
+                        value_area: 900
+                    }
+                },
+                color: {
+                    value: '#00b4d8'
+                },
+                shape: {
+                    type: 'circle'
+                },
+                opacity: {
+                    value: 0.4,
+                    random: true,
+                    anim: {
+                        enable: true,
+                        speed: 0.8,
+                        opacity_min: 0.1,
+                        sync: false
+                    }
+                },
+                size: {
+                    value: 3,
+                    random: true,
+                    anim: {
+                        enable: true,
+                        speed: 1.5,
+                        size_min: 0.1,
+                        sync: false
+                    }
+                },
+                line_linked: {
+                    enable: true,
+                    distance: 140,
+                    color: '#00b4d8',
+                    opacity: 0.3,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 1.5,
+                    direction: 'none',
+                    random: false,
+                    straight: false,
+                    out_mode: 'out',
+                    bounce: false
+                }
+            },
+            interactivity: {
+                detect_on: 'canvas',
+                events: {
+                    onhover: {
+                        enable: true,
+                        mode: 'grab'
+                    },
+                    onclick: {
+                        enable: true,
+                        mode: 'push'
+                    },
+                    resize: true
+                },
+                modes: {
+                    grab: {
+                        distance: 140,
+                        line_linked: {
+                            opacity: 0.5
+                        }
+                    },
+                    push: {
+                        particles_nb: 4
+                    }
+                }
+            },
+            retina_detect: true
+        });
     </script>
     
     <style>
@@ -280,14 +333,14 @@
         border-radius: 50%;
         pointer-events: none;
         z-index: 9997;
-        border: 3px solid #fff;
-        opacity: 0.7;
-        background: rgba(255,255,255,0.15);
+        border: 2px solid #00b4d8;
+        opacity: 0.6;
+        background: rgba(0, 180, 220, 0.15);
         transform: translate(-50%, -50%);
-        animation: ripple-anim 0.5s linear forwards;
+        animation: ripple-anim 0.6s linear forwards;
     }
     @keyframes ripple-anim {
-        0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0.7; }
+        0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0.6; }
         100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
     }
     </style>
