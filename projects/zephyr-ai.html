@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zephyr AI - Keyboard-Activated Personal Assistant | Rishi Shah</title>
+    <meta name="description" content="Deep dive into building a local-first, privacy-conscious AI assistant powered by Groq's Llama 3.1 with sub-second response times and keyboard activation.">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/17ea408dcc.js" crossorigin="anonymous"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #00b4d8;
+            --secondary: #5EEAD4;
+            --dark: #020510;
+            --darker: #0a1628;
+            --light: #e0f2fe;
+            --accent: #38bdf8;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
+            color: var(--light);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            cursor: none !important;
+        }
+
+        * {
+            cursor: none !important;
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            z-index: 10001;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 180, 216, 0.1);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            text-decoration: none;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .back-button.hidden {
+            opacity: 0;
+            transform: translateX(-20px);
+            pointer-events: none;
+        }
+
+        .back-button:hover {
+            background: rgba(0, 180, 216, 0.2);
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(0, 180, 216, 0.4);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 6rem 2rem 4rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .project-header {
+            text-align: center;
+            margin-bottom: 4rem;
+            padding: 3rem 2rem;
+            background: rgba(10, 22, 40, 0.5);
+            border-radius: 16px;
+            border: 1px solid rgba(0, 180, 216, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            animation: scan 3s infinite;
+        }
+
+        @keyframes scan {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .project-header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .project-subtitle {
+            font-size: 1.2rem;
+            color: var(--secondary);
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+        }
+
+        .project-meta {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .section {
+            margin-bottom: 4rem;
+            padding: 2rem;
+            background: rgba(10, 22, 40, 0.3);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 180, 216, 0.1);
+        }
+
+        .section-header {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            font-family: 'Courier New', monospace;
+        }
+
+        .highlight-box {
+            background: rgba(0, 180, 216, 0.05);
+            border-left: 4px solid var(--primary);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: rgba(0, 180, 216, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 180, 216, 0.2);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 180, 216, 0.2);
+            border-color: var(--primary);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .tech-item {
+            background: rgba(0, 180, 216, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 180, 216, 0.2);
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .tech-item:hover {
+            background: rgba(0, 180, 216, 0.1);
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 1rem;
+            margin: 0.5rem 0;
+            background: rgba(0, 180, 216, 0.03);
+            border-radius: 8px;
+            border-left: 3px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .feature-list li:hover {
+            background: rgba(0, 180, 216, 0.08);
+            transform: translateX(10px);
+        }
+
+        .architecture-diagram {
+            background: rgba(2, 5, 16, 0.6);
+            border: 2px solid rgba(0, 180, 216, 0.3);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .process-flow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .process-step {
+            flex: 1;
+            min-width: 200px;
+            background: rgba(0, 180, 216, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 180, 216, 0.2);
+            position: relative;
+        }
+
+        .process-step::after {
+            content: '→';
+            position: absolute;
+            right: -1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .process-step:last-child::after {
+            content: '';
+        }
+
+        .step-number {
+            background: var(--primary);
+            color: var(--dark);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .project-header h1 {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 5rem 1rem 2rem;
+            }
+
+            .back-button {
+                top: 1rem;
+                left: 1rem;
+                padding: 0.5rem 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .process-step::after {
+                content: '↓';
+                right: 50%;
+                top: auto;
+                bottom: -1.5rem;
+                transform: translateX(50%);
+            }
+        }
+
+        .project-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(0, 180, 216, 0.1);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .project-link:hover {
+            background: rgba(0, 180, 216, 0.2);
+            box-shadow: 0 0 20px rgba(0, 180, 216, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Custom Cursor */
+        .cursor {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #00b4d8;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.05s ease-out, opacity 0.2s ease, width 0.2s ease, height 0.2s ease;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px rgba(0, 180, 220, 0.5);
+            opacity: 1;
+            will-change: transform;
+        }
+
+        .cursor.hover {
+            width: 32px;
+            height: 32px;
+            background: rgba(0, 180, 220, 0.1);
+            border-width: 3px;
+            box-shadow: 0 0 20px rgba(0, 180, 220, 0.8);
+        }
+
+        .cursor-glow {
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle, rgba(0, 180, 220, 0.2) 0%, transparent 70%);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            transition: transform 0.1s ease-out, width 0.2s ease, height 0.2s ease;
+            transform: translate(-50%, -50%);
+            will-change: transform;
+        }
+
+        .cursor-glow.hover {
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, rgba(0, 180, 220, 0.3) 0%, transparent 70%);
+        }
+
+        a, button, .stat-card, .tech-item, .feature-list li {
+            cursor: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+    
+    <a href="../index.html" class="back-button">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+
+    <div class="container">
+        <div class="project-header">
+            <div class="project-subtitle">// ARTIFICIAL INTELLIGENCE ASSISTANT</div>
+            <h1>Zephyr AI</h1>
+            <div class="project-subtitle">Keyboard-Activated Personal Assistant with Local-First Architecture</div>
+            <div class="project-meta">
+                <span>⚡ <1s Response Time</span>
+                <span>🤖 Groq Llama 3.1</span>
+                <span>⌨️ Ctrl+Alt+Z Activation</span>
+            </div>
+            <a href="https://github.com/RishiShah99/Zephyr" target="_blank" class="project-link">
+                <i class="fab fa-github"></i> View on GitHub
+            </a>
+        </div>
+
+        <section class="section">
+            <h2 class="section-header">Overview</h2>
+            <div class="highlight-box">
+                <p><strong>Zephyr AI</strong> is a keyboard-activated personal assistant that combines the power of modern large language models with local-first architecture. Press Ctrl+Alt+Z anywhere on your system, speak your command, and get instant responses—whether it's controlling Spotify, checking weather, managing calendar events, or accessing your project portfolio.</p>
+            </div>
+            <p>Unlike cloud-dependent assistants that sacrifice privacy for convenience, Zephyr runs entirely on your machine with optional wake word detection. By leveraging Groq's free tier (14,400 calls/day with Llama 3.1 8B), it achieves sub-second response times while keeping all processing and data storage local.</p>
+            
+            <p style="margin-top: 1rem;">The system integrates 10+ services through a modular Python architecture: Spotify playback control, real-time weather updates, RSS news aggregation, Google Calendar management, custom project showcase, conversational memory, workspace automation, and smart home scenes. Every interaction stays private—no cloud storage, no data collection, no subscription fees.</p>
+        </section>
+
+        <section class="section">
+            <h2 class="section-header">Key Metrics</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">&lt;1s</div>
+                    <div class="stat-label">Average Response Time</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">14.4K</div>
+                    <div class="stat-label">Free Groq Calls/Day</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">10+</div>
+                    <div class="stat-label">Integrated Services</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Local Data Privacy</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-header">Technical Deep Dive</h2>
+            
+            <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">NLP Pipeline Architecture</h3>
+            <p>Zephyr uses a <strong>multi-tier LLM strategy</strong> for natural language understanding. The primary backend is Groq's Llama 3.1 8B model, chosen for its exceptional inference speed (sub-second response times) and generous free tier (14,400 requests/day). If Groq quota is exhausted or unavailable, the system seamlessly falls back to Google's Gemini 2.0 Flash Exp model.</p>
+            <p>The intent recognition system classifies user queries into service categories (Spotify, Weather, News, Projects, Memory, Calendar, Workspace, Scenes) using few-shot prompting. Each category routes to a specialized handler with service-specific API integrations, ensuring accurate execution without over-engineered classification models.</p>
+
+            <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">UI Philosophy: Minimal Friction</h3>
+            <p>The user interface is intentionally stripped down to reduce cognitive load. A single Tkinter window appears on hotkey press, captures voice input via speech recognition, displays the assistant's response, and then disappears. No persistent windows, no menu bars, no settings screens—just instant access to AI assistance without context switching.</p>
+            
+            <div class="highlight-box">
+                <p><strong>Global Hotkey:</strong> Ctrl+Alt+Z triggers Zephyr from any application (implemented via the <code>keyboard</code> library)</p>
+                <p style="margin-top: 0.5rem;"><strong>Wake Word (Optional):</strong> Porcupine engine detects custom "Yo Zephyr" keyword for hands-free activation</p>
+                <p style="margin-top: 0.5rem;"><strong>Voice Feedback:</strong> Text-to-speech (pyttsx3) provides audible confirmation for hands-free workflows</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-header">Key Features & Capabilities</h2>
+            
+            <div class="tech-grid">
+                <div class="tech-item">
+                    <h4>🎵 Spotify Control</h4>
+                    <p>Play/pause, skip tracks, search songs, create playlists via Spotipy API</p>
+                </div>
+                <div class="tech-item">
+                    <h4>🌤️ Weather Updates</h4>
+                    <p>Current conditions and forecasts via OpenWeatherMap API</p>
+                </div>
+                <div class="tech-item">
+                    <h4>📰 News Aggregation</h4>
+                    <p>RSS feed parsing with Feedparser—no API keys required</p>
+                </div>
+                <div class="tech-item">
+                    <h4>📁 Project Showcase</h4>
+                    <p>Custom portfolio retrieval with project descriptions and links</p>
+                </div>
+                <div class="tech-item">
+                    <h4>🧠 Conversational Memory</h4>
+                    <p>Local SQLite storage for context retention across sessions</p>
+                </div>
+                <div class="tech-item">
+                    <h4>📅 Calendar Management</h4>
+                    <p>Google Calendar integration with OAuth for event CRUD operations</p>
+                </div>
+                <div class="tech-item">
+                    <h4>🚀 Workspace Automation</h4>
+                    <p>Launch VS Code projects, open folders, manage development environments</p>
+                </div>
+                <div class="tech-item">
+                    <h4>🎬 Smart Home Scenes</h4>
+                    <p>Trigger lighting presets and home automation routines</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-header">Performance & Optimization</h2>
+            
+            <ul class="feature-list">
+                <li><strong>Groq Inference Speed:</strong> Llama 3.1 8B delivers responses in under 1 second, making conversational interactions feel instantaneous</li>
+                <li><strong>Lazy Loading:</strong> Service modules (Spotify, Calendar, etc.) are imported on-demand to reduce startup time</li>
+                <li><strong>Event-Driven Design:</strong> Global hotkey listener runs in background thread without blocking main application</li>
+                <li><strong>Local Storage:</strong> SQLite database for conversation memory, eliminating cloud dependencies</li>
+                <li><strong>Graceful Degradation:</strong> Automatic fallback to Gemini if Groq quota exhausted, ensuring 24/7 availability</li>
+            </ul>
+
+            <div class="highlight-box">
+                <h4 style="color: var(--primary); margin-bottom: 0.5rem;">Privacy First</h4>
+                <p>Unlike commercial assistants that upload voice data to the cloud, Zephyr processes everything locally. Speech recognition happens on your machine, LLM prompts are stateless (no conversation history sent to Groq/Gemini beyond current query), and all personal data (calendar events, Spotify history, etc.) stays in local SQLite databases.</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-header">Results & Impact</h2>
+            
+            <p>Zephyr demonstrates how modern LLMs can be integrated into local-first applications without sacrificing performance or privacy. By leveraging free-tier APIs strategically, it achieves commercial-grade responsiveness while keeping every piece of user data on the local machine.</p>
+            
+            <p style="margin-top: 1rem;">The project serves as a practical blueprint for AI engineering: modular architecture, service abstraction layers, and intelligent fallback strategies. It proves that you don't need enterprise budgets or cloud infrastructure to build powerful AI assistants—just thoughtful design and a commitment to user privacy.</p>
+
+            <div class="highlight-box">
+                <h4 style="color: var(--primary); margin-bottom: 1rem;">Real-World Applications</h4>
+                <ul class="feature-list" style="margin-left: 1.5rem;">
+                    <li><strong>Productivity Enhancement:</strong> Hands-free control of Spotify, calendar, and workspace without leaving keyboard</li>
+                    <li><strong>Developer Workflow Automation:</strong> Launch projects, open repositories, manage development environments via voice</li>
+                    <li><strong>Privacy-Conscious AI:</strong> Full-featured assistant with zero cloud data storage or telemetry</li>
+                    <li><strong>Educational Reference:</strong> Clean Python codebase demonstrating LLM integration, service orchestration, and UX design patterns</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-header">Technology Stack</h2>
+            <div class="tech-grid">
+                <div class="tech-item">
+                    <h4>Groq API</h4>
+                    <p>Llama 3.1 8B for natural language understanding (14.4K free calls/day)</p>
+                </div>
+                <div class="tech-item">
+                    <h4>Google Gemini</h4>
+                    <p>Fallback NLP backend using gemini-2.0-flash-exp model</p>
+                </div>
+                <div class="tech-item">
+                    <h4>Python 3.13</h4>
+                    <p>Core language with Tkinter for UI, keyboard for global hotkeys</p>
+                </div>
+                <div class="tech-item">
+                    <h4>Spotipy</h4>
+                    <p>Spotify Web API client for music control</p>
+                </div>
+                <div class="tech-item">
+                    <h4>Feedparser</h4>
+                    <p>RSS news aggregation without API keys</p>
+                </div>
+                <div class="tech-item">
+                    <h4>Google Calendar API</h4>
+                    <p>Calendar management with OAuth authentication</p>
+                </div>
+                <div class="tech-item">
+                    <h4>Porcupine</h4>
+                    <p>Optional wake word detection (custom "Yo Zephyr" keyword)</p>
+                </div>
+                <div class="tech-item">
+                    <h4>pyttsx3</h4>
+                    <p>Text-to-speech for voice feedback</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" style="padding-bottom: 100px;">
+            <h2 class="section-header">Conclusion</h2>
+            
+            <p>
+                Zephyr represents a new paradigm for personal AI assistants: local-first, privacy-conscious, and blazingly fast. By combining Groq's inference engine with thoughtful UX design and modular architecture, it proves that powerful AI can enhance productivity without sacrificing control over your data.
+            </p>
+            <p>
+                The project is fully open-source, encouraging developers to extend its capabilities, integrate new services, and build upon the foundation of keyboard-activated, LLM-powered assistance.
+            </p>
+
+            <p style="margin-top: 2rem; font-family: 'Courier New', monospace; color: var(--secondary); text-align: center;">
+                // PROTOCOL: LOCAL_FIRST_AI_ASSISTANT<br>
+                // STATUS: PRODUCTION_READY<br>
+                // INNOVATION: PRIVACY_CONSCIOUS_LLM
+            </p>
+        </section>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // Custom cursor
+        const cursor = document.createElement('div');
+        cursor.classList.add('cursor');
+        document.body.appendChild(cursor);
+
+        const cursorGlow = document.createElement('div');
+        cursorGlow.classList.add('cursor-glow');
+        document.body.appendChild(cursorGlow);
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            cursorGlow.style.left = e.clientX + 'px';
+            cursorGlow.style.top = e.clientY + 'px';
+        });
+
+        document.addEventListener('mousedown', () => {
+            cursor.style.transform = 'translate(-50%, -50%) scale(0.8)';
+            cursorGlow.style.transform = 'translate(-50%, -50%) scale(0.8)';
+        });
+
+        document.addEventListener('mouseup', () => {
+            cursor.style.transform = 'translate(-50%, -50%) scale(1)';
+            cursorGlow.style.transform = 'translate(-50%, -50%) scale(1)';
+        });
+
+        const interactiveElements = document.querySelectorAll('a, button, .stat-card, .tech-item, .feature-list li');
+        interactiveElements.forEach(element => {
+            element.addEventListener('mouseenter', () => {
+                cursor.classList.add('hover');
+                cursorGlow.classList.add('hover');
+            });
+            element.addEventListener('mouseleave', () => {
+                cursor.classList.remove('hover');
+                cursorGlow.classList.remove('hover');
+            });
+        });
+
+        // Particles.js configuration
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 70, density: { enable: true, value_area: 800 } },
+                color: { value: '#00b4d8' },
+                shape: { type: 'circle' },
+                opacity: { value: 0.3, random: true },
+                size: { value: 3, random: true },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: '#00b4d8',
+                    opacity: 0.2,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 2,
+                    direction: 'none',
+                    random: false,
+                    straight: false,
+                    out_mode: 'out',
+                    bounce: false
+                }
+            },
+            interactivity: {
+                detect_on: 'canvas',
+                events: {
+                    onhover: { enable: true, mode: 'grab' },
+                    onclick: { enable: true, mode: 'push' },
+                    resize: true
+                },
+                modes: {
+                    grab: { distance: 140, line_linked: { opacity: 0.5 } },
+                    push: { particles_nb: 4 }
+                }
+            },
+            retina_detect: true
+        });
+
+        // Back button scroll behavior
+        const backButton = document.querySelector('.back-button');
+        let lastScroll = 0;
+
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > lastScroll && currentScroll > 100) {
+                // Scrolling down - hide button
+                backButton.classList.add('hidden');
+            } else {
+                // Scrolling up or at top - show button
+                backButton.classList.remove('hidden');
+            }
+            
+            lastScroll = currentScroll;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adaptive Learning Robot - Natural Language Robot Control | Rishi Shah</title>
+    <meta name="description" content="Hack the North Top 32 - Real-time natural language robot control using Cohere LLMs, Tavily Search, and ESP32. System 1 & System 2 thinking for instant robotic skill learning.">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/17ea408dcc.js" crossorigin="anonymous"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #00b4d8;
+            --secondary: #5EEAD4;
+            --dark: #020510;
+            --darker: #0a1628;
+            --light: #e0f2fe;
+            --accent: #38bdf8;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
+            color: var(--light);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            cursor: none !important;
+        }
+
+        * {
+            cursor: none !important;
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            z-index: 10001;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 180, 216, 0.1);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            text-decoration: none;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .back-button.hidden {
+            opacity: 0;
+            transform: translateX(-20px);
+            pointer-events: none;
+        }
+
+        .back-button:hover {
+            background: rgba(0, 180, 216, 0.2);
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(0, 180, 216, 0.4);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 6rem 2rem 4rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .project-header {
+            text-align: center;
+            margin-bottom: 4rem;
+            padding: 3rem 2rem;
+            background: rgba(10, 22, 40, 0.5);
+            border-radius: 16px;
+            border: 1px solid rgba(0, 180, 216, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            animation: scan 3s infinite;
+        }
+
+        @keyframes scan {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .project-header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .project-subtitle {
+            font-size: 1.2rem;
+            color: var(--secondary);
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+        }
+
+        .project-meta {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .section {
+            margin-bottom: 4rem;
+            padding: 2rem;
+            background: rgba(10, 22, 40, 0.3);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 180, 216, 0.1);
+        }
+
+        .section-header {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            font-family: 'Courier New', monospace;
+        }
+
+        .highlight-box {
+            background: rgba(0, 180, 216, 0.05);
+            border-left: 4px solid var(--primary);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: rgba(0, 180, 216, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 180, 216, 0.2);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 180, 216, 0.2);
+            border-color: var(--primary);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .tech-item {
+            background: rgba(0, 180, 216, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 180, 216, 0.2);
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .tech-item:hover {
+            background: rgba(0, 180, 216, 0.1);
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 1rem;
+            margin: 0.5rem 0;
+            background: rgba(0, 180, 216, 0.03);
+            border-radius: 8px;
+            border-left: 3px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .feature-list li:hover {
+            background: rgba(0, 180, 216, 0.08);
+            transform: translateX(10px);
+        }
+
+        .architecture-diagram {
+            background: rgba(2, 5, 16, 0.6);
+            border: 2px solid rgba(0, 180, 216, 0.3);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .process-flow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .process-step {
+            flex: 1;
+            min-width: 200px;
+            background: rgba(0, 180, 216, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 180, 216, 0.2);
+            position: relative;
+        }
+
+        .process-step::after {
+            content: '→';
+            position: absolute;
+            right: -1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .process-step:last-child::after {
+            content: '';
+        }
+
+        .step-number {
+            background: var(--primary);
+            color: var(--dark);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .project-header h1 {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 5rem 1rem 2rem;
+            }
+
+            .back-button {
+                top: 1rem;
+                left: 1rem;
+                padding: 0.5rem 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .process-step::after {
+                content: '↓';
+                right: 50%;
+                top: auto;
+                bottom: -1.5rem;
+                transform: translateX(50%);
+            }
+        }
+
+        .devpost-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(0, 180, 216, 0.1);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .devpost-link:hover {
+            background: rgba(0, 180, 216, 0.2);
+            box-shadow: 0 0 20px rgba(0, 180, 216, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Custom Cursor */
+        .cursor {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #00b4d8;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.05s ease-out, opacity 0.2s ease, width 0.2s ease, height 0.2s ease;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px rgba(0, 180, 220, 0.5);
+            opacity: 1;
+            will-change: transform;
+        }
+
+        .cursor.hover {
+            width: 32px;
+            height: 32px;
+            background: rgba(0, 180, 220, 0.1);
+            border-width: 3px;
+            box-shadow: 0 0 20px rgba(0, 180, 220, 0.8);
+        }
+
+        .cursor-glow {
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle, rgba(0, 180, 220, 0.2) 0%, transparent 70%);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            transition: transform 0.1s ease-out, width 0.2s ease, height 0.2s ease;
+            transform: translate(-50%, -50%);
+            will-change: transform;
+        }
+
+        .cursor-glow.hover {
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, rgba(0, 180, 220, 0.3) 0%, transparent 70%);
+        }
+
+        a, button, .stat-card, .tech-item, .feature-list li {
+            cursor: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+    
+    <a href="../index.html" class="back-button">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+
+    <div class="container">
+        <div class="project-header">
+            <div class="project-subtitle">// HACK THE NORTH TOP 32 FINALIST</div>
+            <h1>Adaptive Learning Robot</h1>
+            <div class="project-subtitle">Natural Language Robot Control with System 1 & 2 Thinking</div>
+            <div class="project-meta">
+                <span>🏆 Top 32 at Hack the North</span>
+                <span>⚡ Built in 36 hours</span>
+                <span>🤖 Real-time skill learning</span>
+            </div>
+            <a href="https://devpost.com/software/monkey-see-monkey-do-joc1fm" target="_blank" class="devpost-link">
+                <i class="fas fa-external-link-alt"></i> View on Devpost
+            </a>
+        </div>
+
+        <section class="section">
+            <h2 class="section-header">Overview</h2>
+            <div class="highlight-box">
+                <p><strong>Adaptive Learning Robot</strong> revolutionizes robotics by eliminating the need for massive datasets and months of training. Instead of reinforcement learning, users can teach a robot instantly through natural language commands. Inspired by Daniel Kahneman's dual-system thinking framework, the system combines reasoning ("System 2") with execution ("System 1") to translate unstructured web data into precise robotic movements in real-time.</p>
+            </div>
+            <p>Traditional robotics requires extensive training datasets and complex reinforcement learning pipelines. This project flips that paradigm on its head: type "learn the jab punch" and watch as the system searches the internet, reasons about the motion, and executes it on custom hardware—all in real-time. A chat interface combined with a 3D robot viewer makes the entire process transparent, simple, and interactive.</p>
+        </section>
+
+        <section class="section">
+            <h2 class="section-header">Key Metrics</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">&lt;36h</div>
+                    <div class="stat-label">Development Time</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">Top 32</div>
+                    <div class="stat-label">Hack the North Ranking</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">3-DOF</div>
+                    <div class="stat-label">Dual Robotic Arms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">Real-Time</div>
+                    <div class="stat-label">Skill Compilation</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-header">Technical Architecture</h2>
+            
+            <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">System 2: Reasoning Layer</h3>
+            <p>The reasoning system transforms unstructured web data into structured motion guides using a multi-stage pipeline:</p>
+            
+            <div class="process-flow">
+                <div class="process-step">
+                    <div class="step-number">1</div>
+                    <h4>Natural Language Input</h4>
+                    <p>User types command like "learn the jab punch"</p>
+                </div>
+                <div class="process-step">
+                    <div class="step-number">2</div>
+                    <h4>Tavily Search</h4>
+                    <p>Searches web for relevant motion data and guides</p>
+                </div>
+                <div class="process-step">
+                    <div class="step-number">3</div>
+                    <h4>Cohere Agent</h4>
+                    <p>Reasons about data, extracts motion sequences</p>
+                </div>
+                <div class="process-step">
+                    <div class="step-number">4</div>
+                    <h4>Motion Guide</h4>
+                    <p>Structured representation of movement</p>
+                </div>
+            </div>
+
+            <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">System 1: Execution Layer</h3>
+            <p>The execution pipeline compiles motion guides into precise servo sequences streamed to hardware:</p>
+
+            <div class="architecture-diagram">
+                <p style="margin-bottom: 1rem;"><strong>Motion Guide → SkillCompiler → RobotControlGenerator → ESP32 → Servos</strong></p>
+                <p style="font-size: 0.9rem; color: rgba(255,255,255,0.7);">Synchronized timing ensures fluid motion execution across dual 3-DOF arms</p>
+            </div>
+
+            <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">Real-Time Visualization</h3>
+            <p>An Arduino UNO with TFT screen displays a monkey avatar reflecting the robot's mood and operational state, creating an engaging interface that makes complex robotics feel approachable.</p>
+        </section>
+
+        <section class="section">
+            <h2 class="section-header">Key Innovations</h2>
+            <ul class="feature-list">
+                <li><strong>Zero Pre-training Required:</strong> Robots learn skills on-demand from natural language descriptions, eliminating months of dataset collection and training cycles</li>
+                <li><strong>Dual-System Architecture:</strong> System 2 (reasoning) handles high-level planning with Cohere LLMs while System 1 (execution) manages low-level motor control in real-time</li>
+                <li><strong>Web-Scale Knowledge:</strong> Tavily Search API provides access to internet-wide movement data, from martial arts to dance to industrial motions</li>
+                <li><strong>Real-Time Feedback Loop:</strong> Socket.IO enables bidirectional communication between frontend visualization, Flask backend, and ESP32 hardware with minimal latency</li>
+                <li><strong>Playful User Experience:</strong> Monkey avatar visualization makes the system engaging and transparent, showing robot state at a glance</li>
+                <li><strong>Modular Skill Library:</strong> SkillCompiler and RobotControlGenerator pipelines create reusable motion primitives that can be combined for complex behaviors</li>
+                <li><strong>3D Interactive Viewer:</strong> Next.js frontend with 3D robot visualization lets users see planned motions before execution</li>
+            </ul>
+        </section>
+
+        <section class="section">
+            <h2 class="section-header">Challenges & Solutions</h2>
+            
+            <div class="highlight-box">
+                <h4 style="color: var(--primary); margin-bottom: 1rem;">Challenge: Noisy Unstructured Data</h4>
+                <p><strong>Problem:</strong> Web search results contain inconsistent formats, conflicting information, and irrelevant data about movements.</p>
+                <p><strong>Solution:</strong> Cohere Agent performs multi-step reasoning to validate, cross-reference, and synthesize information into coherent motion guides. The agent filters noise and extracts only kinematically-relevant motion parameters.</p>
+            </div>
+
+            <div class="highlight-box">
+                <h4 style="color: var(--primary); margin-bottom: 1rem;">Challenge: Timing & Synchronization</h4>
+                <p><strong>Problem:</strong> Frontend visualization and physical servo actions must stay synchronized despite network latency and processing delays.</p>
+                <p><strong>Solution:</strong> Implemented timestamp-based synchronization with Socket.IO event acknowledgments. Visualization predicts servo positions based on command queue, while actual hardware sends confirmation events to maintain accuracy.</p>
+            </div>
+
+            <div class="highlight-box">
+                <h4 style="color: var(--primary); margin-bottom: 1rem;">Challenge: Socket.IO Reliability</h4>
+                <p><strong>Problem:</strong> Real-time feedback system experienced lag and dropped packets during rapid motion sequences.</p>
+                <p><strong>Solution:</strong> Implemented message batching for high-frequency updates, added connection health monitoring with automatic reconnection, and used binary encoding for servo commands to reduce bandwidth.</p>
+            </div>
+
+            <div class="highlight-box">
+                <h4 style="color: var(--primary); margin-bottom: 1rem;">Challenge: Hardware Constraints</h4>
+                <p><strong>Problem:</strong> Servo sequences sometimes exceeded mechanical limits or caused jerky movements when LLM mis-interpreted motion data.</p>
+                <p><strong>Solution:</strong> Added safety constraints to SkillCompiler with angle limits, velocity caps, and smooth interpolation. Implemented "safety rehearsal" mode that validates sequences before hardware execution.</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-header">Results & Impact</h2>
+            
+            <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">Achievements</h3>
+            <ul class="feature-list">
+                <li><strong>Top 32 Finalist at Hack the North:</strong> Selected among Canada's largest hackathon participants for innovation in robotics and AI integration</li>
+                <li><strong>36-Hour Development Cycle:</strong> Fully functional pipeline from natural language to physical robot motion built during hackathon timeframe</li>
+                <li><strong>Seamless Integration:</strong> Successfully combined Cohere LLMs, Tavily Search, ESP32 microcontroller, Arduino visualization, Next.js frontend, and Flask backend into cohesive system</li>
+                <li><strong>True On-the-Spot Learning:</strong> Demonstrated zero-shot skill acquisition—robot performs movements it was never explicitly programmed to do</li>
+            </ul>
+
+            <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">Future Applications</h3>
+            <p><strong>Education:</strong> Students could teach robots physics experiments or chemistry procedures by describing them in plain language, making robotics accessible to non-programmers.</p>
+            
+            <p><strong>Industry:</strong> Engineers could prototype assembly sequences or test automation workflows without writing code, dramatically accelerating the design-test-iterate cycle.</p>
+            
+            <p><strong>Healthcare:</strong> Therapists and doctors could configure assistive robots for patient-specific needs on-the-fly, from physical therapy routines to mobility assistance tailored to individual conditions.</p>
+            
+            <div class="highlight-box">
+                <p><strong>Core Innovation:</strong> Replacing rigid training cycles with real-time adaptability makes robotics more accessible, scalable, and human-centered. By aligning high-level "thought" (System 2 reasoning) with low-level "muscle" (System 1 execution), this framework demonstrates a new paradigm where robots adapt instantly to human intent.</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-header">Technology Stack</h2>
+            <div class="tech-grid">
+                <div class="tech-item">Next.js</div>
+                <div class="tech-item">React</div>
+                <div class="tech-item">Three.js</div>
+                <div class="tech-item">Flask</div>
+                <div class="tech-item">Python</div>
+                <div class="tech-item">Cohere API</div>
+                <div class="tech-item">Tavily Search</div>
+                <div class="tech-item">Socket.IO</div>
+                <div class="tech-item">ESP32</div>
+                <div class="tech-item">Arduino UNO</div>
+                <div class="tech-item">TFT Display</div>
+                <div class="tech-item">Servo Motors</div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-header">Conclusion</h2>
+            <p>Monkey See, Monkey Do represents a fundamental shift in how humans interact with robots. By combining the reasoning power of modern LLMs with the accessibility of natural language and the immediacy of real-time execution, this project demonstrates that robotics doesn't need to be locked behind months of training and massive datasets.</p>
+            
+            <p style="margin-top: 1rem;">The dual-system architecture—inspired by human cognition—creates a framework where high-level intent seamlessly translates to low-level motor control. This makes robotics more approachable, more flexible, and more aligned with how humans naturally think about and describe movement.</p>
+
+            <p style="margin-top: 2rem; font-family: 'Courier New', monospace; color: var(--secondary); text-align: center;">
+                // PROTOCOL: ADAPTIVE_LEARNING_ROBOT<br>
+                // STATUS: DUAL_SYSTEM_ARCHITECTURE<br>
+                // INNOVATION: LLM_ROBOTICS_CONTROL
+            </p>
+        </section>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // Custom cursor
+        const cursor = document.createElement('div');
+        cursor.classList.add('cursor');
+        document.body.appendChild(cursor);
+
+        const cursorGlow = document.createElement('div');
+        cursorGlow.classList.add('cursor-glow');
+        document.body.appendChild(cursorGlow);
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            cursorGlow.style.left = e.clientX + 'px';
+            cursorGlow.style.top = e.clientY + 'px';
+        });
+
+        document.addEventListener('mousedown', () => {
+            cursor.style.transform = 'translate(-50%, -50%) scale(0.8)';
+            cursorGlow.style.transform = 'translate(-50%, -50%) scale(0.8)';
+        });
+
+        document.addEventListener('mouseup', () => {
+            cursor.style.transform = 'translate(-50%, -50%) scale(1)';
+            cursorGlow.style.transform = 'translate(-50%, -50%) scale(1)';
+        });
+
+        const interactiveElements = document.querySelectorAll('a, button, .stat-card, .tech-item, .feature-list li');
+        interactiveElements.forEach(element => {
+            element.addEventListener('mouseenter', () => {
+                cursor.classList.add('hover');
+                cursorGlow.classList.add('hover');
+            });
+            element.addEventListener('mouseleave', () => {
+                cursor.classList.remove('hover');
+                cursorGlow.classList.remove('hover');
+            });
+        });
+
+        // Particles.js configuration
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 70, density: { enable: true, value_area: 800 } },
+                color: { value: '#00b4d8' },
+                shape: { type: 'circle' },
+                opacity: { value: 0.3, random: true },
+                size: { value: 3, random: true },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: '#00b4d8',
+                    opacity: 0.2,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 2,
+                    direction: 'none',
+                    random: false,
+                    straight: false,
+                    out_mode: 'out',
+                    bounce: false
+                }
+            },
+            interactivity: {
+                detect_on: 'canvas',
+                events: {
+                    onhover: { enable: true, mode: 'grab' },
+                    onclick: { enable: true, mode: 'push' },
+                    resize: true
+                },
+                modes: {
+                    grab: { distance: 140, line_linked: { opacity: 0.5 } },
+                    push: { particles_nb: 4 }
+                }
+            },
+            retina_detect: true
+        });
+
+        // Show back button on scroll
+        const backButton = document.querySelector('.back-button');
+        let lastScroll = 0;
+
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+
+            if (currentScroll > lastScroll && currentScroll > 100) {
+                backButton.classList.add('hidden');
+            } else {
+                backButton.classList.remove('hidden');
+            }
+
+            lastScroll = currentScroll;
+        });
+    </script>
+</body>
+</html>
