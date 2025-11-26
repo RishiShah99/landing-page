@@ -1,10 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="cursor: none !important; background-color: #020510 !important;">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Security Footage Pose Estimation System | Rishi Shah</title>
     <meta name="description" content="Real-time human pose detection for surveillance applications. 17 keypoint detection using Keypoint R-CNN ResNet-50 FPN for security footage analysis.">
+    <style>
+        /* CRITICAL: Hide cursor and background immediately on page load */
+        html, body, * {
+            cursor: none !important;
+        }
+        html {
+            background: linear-gradient(135deg, #020510 0%, #0a1628 100%) !important;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: linear-gradient(135deg, #020510 0%, #0a1628 100%) !important;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
     <link rel="prefetch" href="../index.html">
     <link rel="preload" href="../style.css" as="style">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -395,7 +411,7 @@
         }
     </style>
 </head>
-<body>
+<body style="cursor: none !important; background-color: #020510 !important;">
     <div id="particles-js"></div>
     
     <a href="../index.html" class="back-button">
@@ -541,16 +557,30 @@
                 This system demonstrates practical application of deep learning to security and surveillance, transforming raw video footage into structured pose data. The skeletal overlays make human motion immediately interpretable, enabling quick analysis of behavior patterns.
             </p>
             
-            <div class="highlight-box">
-                <strong>Real-World Applications:</strong>
-                <ul style="margin-top: 1rem; margin-bottom: 0;">
-                    <li>Security monitoring: Detect unusual postures or activities</li>
-                    <li>Crowd analysis: Track movement patterns in public spaces</li>
-                    <li>Sports analytics: Analyze athlete movements and technique</li>
-                    <li>Healthcare: Monitor patient mobility and fall detection</li>
-                    <li>Retail analytics: Understand customer behavior and store navigation</li>
-                    <li>Manufacturing: Ensure worker safety and proper ergonomics</li>
-                </ul>
+            <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">Real-World Applications:</h3>
+            
+            <div style="padding: 1.2rem 1.5rem; margin: 1rem 0; background: rgba(6, 14, 30, 0.6); border-radius: 8px; border-left: 4px solid var(--primary);">
+                <strong>Security Monitoring:</strong> Detect unusual postures or activities
+            </div>
+            
+            <div style="padding: 1.2rem 1.5rem; margin: 1rem 0; background: rgba(6, 14, 30, 0.6); border-radius: 8px; border-left: 4px solid var(--primary);">
+                <strong>Crowd Analysis:</strong> Track movement patterns in public spaces
+            </div>
+            
+            <div style="padding: 1.2rem 1.5rem; margin: 1rem 0; background: rgba(6, 14, 30, 0.6); border-radius: 8px; border-left: 4px solid var(--primary);">
+                <strong>Sports Analytics:</strong> Analyze athlete movements and technique
+            </div>
+            
+            <div style="padding: 1.2rem 1.5rem; margin: 1rem 0; background: rgba(6, 14, 30, 0.6); border-radius: 8px; border-left: 4px solid var(--primary);">
+                <strong>Healthcare:</strong> Monitor patient mobility and fall detection
+            </div>
+            
+            <div style="padding: 1.2rem 1.5rem; margin: 1rem 0; background: rgba(6, 14, 30, 0.6); border-radius: 8px; border-left: 4px solid var(--primary);">
+                <strong>Retail Analytics:</strong> Understand customer behavior and store navigation
+            </div>
+            
+            <div style="padding: 1.2rem 1.5rem; margin: 1rem 0; background: rgba(6, 14, 30, 0.6); border-radius: 8px; border-left: 4px solid var(--primary);">
+                <strong>Manufacturing:</strong> Ensure worker safety and proper ergonomics
             </div>
 
             <p>
@@ -697,6 +727,37 @@
         // Back button scroll behavior
         const backButton = document.querySelector('.back-button');
         let lastScroll = 0;
+
+        // Smooth back button navigation
+        backButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // Create transition overlay
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(135deg, #020510 0%, #0a1628 100%);
+                z-index: 99999;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                pointer-events: none;
+            `;
+            document.body.appendChild(overlay);
+            
+            // Fade in overlay
+            setTimeout(() => {
+                overlay.style.opacity = '1';
+            }, 10);
+            
+            // Navigate after overlay is visible
+            setTimeout(() => {
+                window.location.href = '../index.html';
+            }, 200);
+        });
 
         window.addEventListener('scroll', () => {
             const currentScroll = window.pageYOffset;

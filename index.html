@@ -1,7 +1,7 @@
 <!-- Rishi Shah's Portfolio -->
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="cursor: none !important; background-color: #020510 !important;">
 <head>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-0M7YNWC9WW"></script>
@@ -12,14 +12,25 @@
         gtag('config', 'G-0M7YNWC9WW');
     </script>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rishi Shah</title>
+    <title>Rishi Shah - ML Engineer & Robotics Developer</title>
+    <meta name="description" content="Rishi Shah's portfolio showcasing machine learning, computer vision, and robotics projects. Schulich Leader Scholar at McMaster University.">
+    <style>
+        /* CRITICAL: Hide cursor and set background immediately on page load */
+        html, body, * {
+            cursor: none !important;
+        }
+        html, body {
+            background-color: #020510 !important;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
     <link rel="stylesheet" href="style.css">
     <script src="https://kit.fontawesome.com/17ea408dcc.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 </head>
-<body>
+<body style="cursor: none !important;">
     <!-- Particles Background -->
     <div id="particles-js"></div>
     
@@ -121,18 +132,18 @@
                         <p>Developed a novel ventral visual neural network, based on CORnet-S architecture with denoising and gated recurrent blocks, achieving robustness of 97.87% under evaluated model threats.</p>
                     </div>
                 </div>
-                <div class="work" onclick="window.location.href='projects/gesture-arm.html'">
-                    <img src="images/project-3.png" alt="Gesture Controlled Robotic Arm">
+                <div class="work" onclick="window.location.href='projects/sentinel.html'">
+                    <img src="images/project-8.png" alt="Sentinel">
                     <div class="work-content">
-                        <h3>Gesture Controlled Robotic Arm</h3>
-                        <p>Developed a robotic arm controlled by hand gestures using computer vision and Arduino, demonstrating real-time human-robot interaction.</p>
+                        <h3>Sentinel</h3>
+                        <p>The first hardware-intelligent static analyzer for embedded systems. Predicts RAM, pin, and protocol issues instantly via a custom VS Code + LSP toolchain.</p>
                     </div>
                 </div>
-                <div class="work" onclick="window.location.href='projects/pose-estimation.html'">
-                    <img src="images/project-4.jpg" alt="Pose Estimation Model">
+                <div class="work" onclick="window.location.href='projects/monkey-see-monkey-do.html'">
+                    <img src="images/project-7.jpg" alt="Adaptive Learning Robot">
                     <div class="work-content">
-                        <h3>Pose Estimation Model</h3>
-                        <p>Implemented a Keypoint R-CNN model with OpenCV for real-time pose estimation in security footage and surveillance applications.</p>
+                        <h3>Adaptive Learning Robot</h3>
+                        <p>A dual-system robot inspired by Daniel Kahneman's System 1 / System 2 model that learns new skills instantly from natural language, without pre-training or rigid scripts. Built with Cohere LLMs, real-time search, and 2 custom 3-DOF robotic arms, the system transforms messy instructions into smooth, executable motions. Placed Top 32 out of 256 projects at Hack the North, Canada's Largest Hackathon.</p>
                     </div>
                 </div>
                 <div class="work" onclick="window.location.href='projects/zephyr-ai.html'">
@@ -149,15 +160,22 @@
                         <p>Built a DenseNet121 model trained on 19,000+ DermNet images with integrated RAG chatbot for dermatological triage assessment.</p>
                     </div>
                 </div>
-                    <div class="work" onclick="window.location.href='projects/monkey-see-monkey-do.html'">
-                        <img src="images/project-7.jpg" alt="Adaptive Learning Robot">
-                        <div class="work-content">
-                            <h3>Adaptive Learning Robot</h3>
-                            <p>A dual-system robot inspired by Daniel Kahneman's System 1 / System 2 model that learns new skills instantly from natural language, without pre-training or rigid scripts. Built with Cohere LLMs, real-time search, and 2 custom 3-DOF robotic arms, the system transforms messy instructions into smooth, executable motions. Placed Top 32 out of 256 projects at Hack the North, Canada's Largest Hackathon.</p>
-                        </div>
+                <div class="work" onclick="window.location.href='projects/pose-estimation.html'">
+                    <img src="images/project-4.jpg" alt="Pose Estimation Model">
+                    <div class="work-content">
+                        <h3>Pose Estimation Model</h3>
+                        <p>Implemented a Keypoint R-CNN model with OpenCV for real-time pose estimation in security footage and surveillance applications.</p>
                     </div>
+                </div>
+                <div class="work" onclick="window.location.href='projects/gesture-arm.html'">
+                    <img src="images/project-3.png" alt="Gesture Controlled Robotic Arm">
+                    <div class="work-content">
+                        <h3>Gesture Controlled Robotic Arm</h3>
+                        <p>Developed a robotic arm controlled by hand gestures using computer vision and Arduino, demonstrating real-time human-robot interaction.</p>
+                    </div>
+                </div>
             </div>
-            <a href="https://github.com/RishiShah99" class="see-more-btn">View More Projects</a>
+            <a href="https://github.com/RishiShah99/Sentinel" class="see-more-btn">View More Projects</a>
         </div>
     </div>
 
@@ -179,7 +197,7 @@
                 <a href="https://www.linkedin.com/in/rishi-shah-7915a7309/"><i class="fa-brands fa-linkedin"></i></a>
                 <a href="https://www.kaggle.com/shahrish99"><i class="fa-brands fa-kaggle"></i></a>
             </div>
-            <a href="images/_.pdf" download="Rishi's Resume.pdf" class="download-resume">Download Resume</a>
+            <a href="images/Rishi_Shah_Resume.pdf" download="Rishi's Resume.pdf" class="download-resume">Download Resume</a>
         </div>
     </div>
     
@@ -220,17 +238,36 @@
             cursorGlow.style.transform = 'translate(-50%, -50%) scale(1)';
         });
 
+        // Force cursor to stay hidden on all elements
+        document.addEventListener('click', (e) => {
+            e.target.style.cursor = 'none';
+            document.body.style.cursor = 'none';
+        });
+
+        // Continuously enforce cursor hiding
+        setInterval(() => {
+            document.body.style.cursor = 'none';
+            document.documentElement.style.cursor = 'none';
+        }, 100);
+
         // Add hover effect to interactive elements
         const interactiveElements = document.querySelectorAll('a, button, .work, .services-list div, .about-points li, .skill-category');
         interactiveElements.forEach(element => {
             element.addEventListener('mouseenter', () => {
                 cursor.classList.add('hover');
                 cursorGlow.classList.add('hover');
+                element.style.cursor = 'none';
             });
             
             element.addEventListener('mouseleave', () => {
                 cursor.classList.remove('hover');
                 cursorGlow.classList.remove('hover');
+                element.style.cursor = 'none';
+            });
+            
+            element.addEventListener('click', () => {
+                element.style.cursor = 'none';
+                document.body.style.cursor = 'none';
             });
         });
         
@@ -244,6 +281,48 @@
             document.body.appendChild(ripple);
             setTimeout(() => ripple.remove(), 500);
         }
+
+        // Smooth project navigation
+        function navigateToProject(url) {
+            // Create transition overlay
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(135deg, #020510 0%, #0a1628 100%);
+                z-index: 99999;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                pointer-events: none;
+            `;
+            document.body.appendChild(overlay);
+            
+            // Fade in overlay
+            setTimeout(() => {
+                overlay.style.opacity = '1';
+            }, 10);
+            
+            // Navigate after overlay is visible
+            setTimeout(() => {
+                window.location.href = url;
+            }, 200);
+        }
+
+        // Add smooth navigation to project tiles
+        document.querySelectorAll('.work').forEach(workElement => {
+            const originalOnclick = workElement.getAttribute('onclick');
+            if (originalOnclick) {
+                const url = originalOnclick.match(/'([^']+)'/)[1];
+                workElement.removeAttribute('onclick');
+                workElement.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    navigateToProject(url);
+                });
+            }
+        });
 
         // Neural Circuit Board Particles - Embedded Systems Theme
         particlesJS('particles-js', {

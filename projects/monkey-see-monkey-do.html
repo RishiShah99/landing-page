@@ -1,10 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="cursor: none !important; background-color: #020510 !important;">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Adaptive Learning Robot - Natural Language Robot Control | Rishi Shah</title>
     <meta name="description" content="Hack the North Top 32 - Real-time natural language robot control using Cohere LLMs, Tavily Search, and ESP32. System 1 & System 2 thinking for instant robotic skill learning.">
+    <style>
+        /* CRITICAL: Hide cursor and background immediately on page load */
+        html, body, * {
+            cursor: none !important;
+        }
+        html, body {
+            background-color: #020510 !important;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
     <link rel="prefetch" href="../index.html">
     <link rel="preload" href="../style.css" as="style">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -254,22 +265,26 @@
         }
 
         .process-flow {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
             margin: 2rem 0;
+            align-items: stretch;
         }
 
         .process-step {
-            flex: 1;
-            min-width: 200px;
             background: rgba(0, 180, 216, 0.05);
             padding: 1.5rem;
             border-radius: 12px;
             border: 1px solid rgba(0, 180, 216, 0.2);
             position: relative;
+            transition: transform 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .process-step:hover {
+            transform: translateY(-6px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 25px rgba(0, 180, 216, 0.25);
         }
 
         .process-step::after {
@@ -315,6 +330,10 @@
             }
 
             .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .process-flow {
                 grid-template-columns: 1fr;
             }
 
@@ -572,9 +591,9 @@
 
         <section class="section">
             <h2 class="section-header">Conclusion</h2>
-            <p>Monkey See, Monkey Do represents a fundamental shift in how humans interact with robots. By combining the reasoning power of modern LLMs with the accessibility of natural language and the immediacy of real-time execution, this project demonstrates that robotics doesn't need to be locked behind months of training and massive datasets.</p>
+            <p>Adaptive Learning Robot represents a fundamental shift in how humans interact with robots. By combining the reasoning power of modern LLMs with the accessibility of natural language and the immediacy of real-time execution, this project demonstrates that robotics doesn't need to be locked behind months of training and massive datasets.</p>
             
-            <p style="margin-top: 1rem;">The dual-system architecture—inspired by human cognition—creates a framework where high-level intent seamlessly translates to low-level motor control. This makes robotics more approachable, more flexible, and more aligned with how humans naturally think about and describe movement.</p>
+            <p style="margin-top: 1rem;">The dual-system architecture (inspired by human cognition) creates a framework where high-level intent seamlessly translates to low-level motor control. This makes robotics more approachable, more flexible, and more aligned with how humans naturally think about and describe movement.</p>
 
             <p style="margin-top: 2rem; font-family: 'Courier New', monospace; color: var(--secondary); text-align: center;">
                 // PROTOCOL: ADAPTIVE_LEARNING_ROBOT<br>
@@ -667,6 +686,37 @@
         // Show back button on scroll
         const backButton = document.querySelector('.back-button');
         let lastScroll = 0;
+
+        // Smooth back button navigation
+        backButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // Create transition overlay
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(135deg, #020510 0%, #0a1628 100%);
+                z-index: 99999;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                pointer-events: none;
+            `;
+            document.body.appendChild(overlay);
+            
+            // Fade in overlay
+            setTimeout(() => {
+                overlay.style.opacity = '1';
+            }, 10);
+            
+            // Navigate after overlay is visible
+            setTimeout(() => {
+                window.location.href = '../index.html';
+            }, 200);
+        });
 
         window.addEventListener('scroll', () => {
             const currentScroll = window.pageYOffset;

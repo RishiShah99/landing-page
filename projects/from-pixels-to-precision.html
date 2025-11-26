@@ -1,10 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="cursor: none !important; background-color: #020510 !important;">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>From Pixels to Precision - Surgical Tool Segmentation AI | Rishi Shah</title>
     <meta name="description" content="Bronze Medal at CWSF - Neural network for real-time surgical tool segmentation in minimally invasive surgery. 95% accuracy, fluorescence-guided surgery support, <0.12s per image.">
+    <style>
+        /* CRITICAL: Hide cursor and background immediately on page load */
+        html, body, * {
+            cursor: none !important;
+        }
+        html, body {
+            background-color: #020510 !important;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
     <link rel="prefetch" href="../index.html">
     <link rel="preload" href="../style.css" as="style">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -254,36 +265,24 @@
         }
 
         .process-flow {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.4rem;
             margin: 2rem 0;
         }
 
         .process-step {
-            flex: 1;
-            min-width: 200px;
-            background: rgba(0, 180, 216, 0.05);
             padding: 1.5rem;
-            border-radius: 12px;
+            border-radius: 14px;
+            background: rgba(0, 180, 216, 0.06);
             border: 1px solid rgba(0, 180, 216, 0.2);
-            position: relative;
+            transition: transform 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .process-step::after {
-            content: '→';
-            position: absolute;
-            right: -1.5rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--primary);
-            font-size: 1.5rem;
-        }
-
-        .process-step:last-child::after {
-            content: '';
+        .process-step:hover {
+            transform: translateY(-6px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 25px rgba(0, 180, 216, 0.25);
         }
 
         .step-number {
@@ -318,13 +317,6 @@
                 grid-template-columns: 1fr;
             }
 
-            .process-step::after {
-                content: '↓';
-                right: 50%;
-                top: auto;
-                bottom: -1.5rem;
-                transform: translateX(50%);
-            }
         }
 
         .project-link {
@@ -406,7 +398,7 @@
         <div class="project-header">
             <div class="project-subtitle">CANADA-WIDE SCIENCE FAIR BRONZE MEDALIST</div>
             <h1>From Pixels to Precision</h1>
-            <div class="project-subtitle">Neural Network for Real-Time Surgical Tool Segmentation</div>
+            <div class="project-subtitle">Neural Network for Real Time Surgical Tool Segmentation</div>
             <div class="project-meta">
                 <span>🥉 Bronze Medal - CWSF</span>
                 <span>🏥 Synaptive Medical Partnership</span>
@@ -420,11 +412,11 @@
         <section class="section">
             <h2 class="section-header">Overview</h2>
             <div class="highlight-box">
-                <p><strong>From Pixels to Precision</strong> addresses a critical challenge in minimally invasive surgery: nearly 30% of surgical complications are caused by misrecognition of artifacts during operations. This neural network segments surgical tools from their background in real-time, providing surgeons with an AI-guided assist system that enhances precision and reduces the risk of errors.</p>
+                <p><strong>From Pixels to Precision</strong> addresses a critical challenge in minimally invasive surgery: nearly 30% of surgical complications are caused by misrecognition of artifacts during operations. This neural network segments surgical tools from their background in real time, providing surgeons with an AI guided assist system that enhances precision and reduces the risk of errors.</p>
             </div>
             <p>As robotic and minimally invasive surgeries become increasingly common, they offer patients reduced pain, shorter hospital stays, and faster recovery times. However, these procedures are prone to errors caused by limited depth perception and visual distortion through surgical cameras. Inspired by how autonomous vehicles use AI for obstacle recognition, this project applies the same technology to revolutionize surgical procedures.</p>
             
-            <p style="margin-top: 1rem;">The neural network supports both regular illumination and fluorescence-guided surgery, making it ideal for modern surgical practices. With support from <strong>Synaptive Medical Inc.</strong> and <strong>Robarts Research Institute</strong>, the system was trained on real surgical footage captured through a Modus V exoscope.</p>
+            <p style="margin-top: 1rem;">The neural network supports both regular illumination and fluorescence guided surgery, making it ideal for modern surgical practices. With support from <strong>Synaptive Medical Inc.</strong> and <strong>Robarts Research Institute</strong>, the system was trained on real surgical footage captured through a Modus V exoscope.</p>
         </section>
 
         <section class="section">
@@ -470,9 +462,9 @@
             <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">The Solution</h3>
             <p>Just as autonomous vehicles use AI to predict safe driving lanes based on obstacle recognition, this neural network acts as a guide to support surgeons' experience and skills. By accurately segmenting surgical tools from background tissue, the system:</p>
             <ul class="feature-list">
-                <li><strong>Enhances Surgical Precision:</strong> Provides real-time visual guidance to reduce misrecognition errors</li>
+                <li><strong>Enhances Surgical Precision:</strong> Provides real time visual guidance to reduce misrecognition errors</li>
                 <li><strong>Increases Patient Safety:</strong> Minimizes risk of complications caused by visual confusion</li>
-                <li><strong>Supports Fluorescence-Guided Surgery:</strong> Works with both regular and fluorescent illumination for modern surgical techniques</li>
+                <li><strong>Supports Fluorescence Guided Surgery:</strong> Works with both regular and fluorescent illumination for modern surgical techniques</li>
                 <li><strong>Saves Time:</strong> Automated segmentation is dramatically faster than manual approaches, allowing surgeons to focus on critical aspects of procedures</li>
             </ul>
         </section>
@@ -490,8 +482,8 @@
 
             <div class="highlight-box">
                 <p><strong>Encoder:</strong> Extracts hierarchical features through convolutional layers, progressively reducing spatial dimensions while increasing feature depth.</p>
-                <p style="margin-top: 0.5rem;"><strong>Decoder:</strong> Up-samples features using transpose convolution, reconstructing spatial resolution for pixel-level predictions.</p>
-                <p style="margin-top: 0.5rem;"><strong>Skip Connections:</strong> Directly links encoder features to decoder, preserving fine-grained spatial details lost during down-sampling. Critical for accurate boundary segmentation.</p>
+                <p style="margin-top: 0.5rem;"><strong>Decoder:</strong> Up samples features using transpose convolution, reconstructing spatial resolution for pixel level predictions.</p>
+                <p style="margin-top: 0.5rem;"><strong>Skip Connections:</strong> Directly links encoder features to decoder, preserving fine grained spatial details lost during down sampling. Critical for accurate boundary segmentation.</p>
             </div>
 
             <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">Training Pipeline</h3>
@@ -504,7 +496,7 @@
                 <div class="process-step">
                     <div class="step-number">2</div>
                     <h4>Preprocessing</h4>
-                    <p>Fluorescent images converted to grayscale for intensity-based learning</p>
+                    <p>Fluorescent images converted to grayscale for intensity based learning</p>
                 </div>
                 <div class="process-step">
                     <div class="step-number">3</div>
@@ -526,19 +518,19 @@
             <h2 class="section-header">Methodology</h2>
             
             <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">1. Manual Segmentation (Training Data Creation)</h3>
-            <p>Training data was captured using a <strong>Modus V exoscope by Synaptive Medical Inc.</strong> during experimental procedures on pig brain tissue—representative of real surgical environments.</p>
+            <p>Training data was captured using a <strong>Modus V exoscope by Synaptive Medical Inc.</strong> during experimental procedures on pig brain tissue, representative of real surgical environments.</p>
             
             <ul class="feature-list">
                 <li><strong>ITK-SNAP Software:</strong> 300 images manually segmented by breaking down into RGB components for grayscale viewing</li>
-                <li><strong>Dual Format Storage:</strong> NifTI files (for ITK-SNAP compatibility) and PNG files (for visualization)</li>
+                <li><strong>Dual Format Storage:</strong> NifTI files (for ITK SNAP compatibility) and PNG files (for visualization)</li>
                 <li><strong>Binary Classification:</strong> Pixels labeled as either "surgical tool" or "background tissue"</li>
-                <li><strong>Quality Control:</strong> All segmentations double-checked for accuracy to maximize ground-truth precision</li>
+                <li><strong>Quality Control:</strong> All segmentations double checked for accuracy to maximize ground truth precision</li>
             </ul>
 
             <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">2. Fluorescence Challenge Solution</h3>
             <div class="highlight-box">
                 <p><strong>Initial Problem:</strong> Neural network struggled with fluorescent blue images due to color variance issues.</p>
-                <p style="margin-top: 0.5rem;"><strong>Solution:</strong> Converted fluorescent images to grayscale using MATLAB, enabling the network to distinguish tools based on color <em>intensity</em> rather than color <em>variance</em>. This dramatically improved segmentation accuracy for fluorescence-guided surgery scenarios.</p>
+                <p style="margin-top: 0.5rem;"><strong>Solution:</strong> Converted fluorescent images to grayscale using MATLAB, enabling the network to distinguish tools based on color <em>intensity</em> rather than color <em>variance</em>. This dramatically improved segmentation accuracy for fluorescence guided surgery scenarios.</p>
             </div>
 
             <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">3. Training Process</h3>
@@ -546,7 +538,7 @@
                 <li><strong>Framework:</strong> Keras with Python backend</li>
                 <li><strong>Training Duration:</strong> Approximately 2 hours on GPU</li>
                 <li><strong>Validation:</strong> Same training images re-inputted to compare prediction vs. ground truth segmentations</li>
-                <li><strong>Optimization:</strong> Adam optimizer with binary cross-entropy loss function</li>
+                <li><strong>Optimization:</strong> Adam optimizer with binary cross entropy loss function</li>
             </ul>
 
             <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">4. Testing Protocol</h3>
@@ -571,7 +563,7 @@
                 <div class="process-step">
                     <div class="step-number">4</div>
                     <h4>Comparison</h4>
-                    <p>Side-by-side analysis of original vs. segmented video</p>
+                    <p>Side by side analysis of original vs. segmented video</p>
                 </div>
             </div>
 
@@ -611,7 +603,7 @@
             
             <div class="highlight-box">
                 <h4 style="color: var(--primary); margin-bottom: 1rem;">✓ Exceptional Speed & Efficiency</h4>
-                <p>The neural network demonstrated remarkable processing speed, segmenting approximately 500 images in under one minute. Each 600×800 pixel image required less than 0.12 seconds—fast enough for real-time surgical assistance.</p>
+                <p>The neural network demonstrated remarkable processing speed, segmenting approximately 500 images in under one minute. Each 600×800 pixel image required less than 0.12 seconds, which is fast enough for real-time surgical assistance.</p>
             </div>
 
             <div class="highlight-box">
@@ -631,14 +623,14 @@
 
             <div class="highlight-box">
                 <h4 style="color: var(--primary); margin-bottom: 1rem;">⚠ Fluorescent Blue Two-Tool Challenge</h4>
-                <p>The most difficult scenario was fluorescent blue images containing two tools, which showed the least consistent accuracy—validating the initial hypothesis.</p>
+                <p>The most difficult scenario was fluorescent blue images containing two tools, which showed the least consistent accuracy, validating the initial hypothesis.</p>
             </div>
 
             <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">Limitations & Analysis</h3>
             <ul class="feature-list">
                 <li><strong>Limited Training Diversity:</strong> All 300 training images came from a single video source, restricting the network's ability to generalize to unseen surgical scenarios, instruments, or anatomical regions</li>
                 <li><strong>Motion Blur Impact:</strong> The primary accuracy-limiting factor was motion blur affecting the edges between surgical tools and tissue, potentially causing false positives or negatives</li>
-                <li><strong>Manual Segmentation Dependency:</strong> Network accuracy directly depends on the precision of manual ground-truth segmentations—any errors in training data propagate to predictions</li>
+                <li><strong>Manual Segmentation Dependency:</strong> Network accuracy directly depends on the precision of manual ground-truth segmentations. Any errors in training data propagate to predictions</li>
                 <li><strong>Complex Scenario Challenges:</strong> Performance degradation with multiple tools suggests limitations in handling complex surgical scenarios with tool occlusion or overlapping instruments</li>
             </ul>
         </section>
@@ -712,7 +704,7 @@
             <p>The neural network framework extends far beyond surgical tool segmentation:</p>
             
             <div class="highlight-box">
-                <p><strong>Tumor Detection:</strong> Advanced neural networks can identify abnormalities in medical scans that are difficult for the human eye to detect—such as small tumors in early stages.</p>
+                <p><strong>Tumor Detection:</strong> Advanced neural networks can identify abnormalities in medical scans that are difficult for the human eye to detect, such as small tumors in early stages.</p>
                 
                 <p style="margin-top: 0.5rem;"><strong>Organ & Tissue Segmentation:</strong> Automatic delineation of organs, blood vessels, or tissue types in CT, MRI, or ultrasound imaging for diagnosis and surgical planning.</p>
                 
@@ -749,7 +741,7 @@
             <h2 class="section-header">Conclusion</h2>
             <p>From Pixels to Precision demonstrates that neural networks have transformative potential for surgical procedures and medical imaging. By achieving approximately 95% accuracy while processing images in under 0.12 seconds, the system proves that real-time AI assistance in surgery is not only possible but practical.</p>
             
-            <p style="margin-top: 1rem;">This project addresses a critical healthcare challenge: the 30% complication rate in minimally invasive surgeries caused by misrecognition. By providing surgeons with accurate, real-time tool segmentation—including support for fluorescence-guided surgery—the neural network enhances patient safety, increases surgical precision, and allows medical professionals to focus on the most critical aspects of procedures.</p>
+            <p style="margin-top: 1rem;">This project addresses a critical healthcare challenge: the 30% complication rate in minimally invasive surgeries caused by misrecognition. By providing surgeons with accurate, real-time tool segmentation (including support for fluorescence-guided surgery), the neural network enhances patient safety, increases surgical precision, and allows medical professionals to focus on the most critical aspects of procedures.</p>
 
             <p style="margin-top: 1rem;">The partnership with Synaptive Medical Inc. and Robarts Research Institute provided invaluable real-world surgical data and clinical validation. Recognition with a Bronze Medal at the Canada-Wide Science Fair affirms the innovation and potential impact of this work.</p>
 
@@ -846,6 +838,37 @@
         // Back button scroll behavior
         const backButton = document.querySelector('.back-button');
         let lastScroll = 0;
+
+        // Smooth back button navigation
+        backButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // Create transition overlay
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(135deg, #020510 0%, #0a1628 100%);
+                z-index: 99999;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                pointer-events: none;
+            `;
+            document.body.appendChild(overlay);
+            
+            // Fade in overlay
+            setTimeout(() => {
+                overlay.style.opacity = '1';
+            }, 10);
+            
+            // Navigate after overlay is visible
+            setTimeout(() => {
+                window.location.href = '../index.html';
+            }, 200);
+        });
 
         window.addEventListener('scroll', () => {
             const currentScroll = window.pageYOffset;
