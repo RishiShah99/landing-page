@@ -1,10 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="cursor: none !important; background-color: #020510 !important;">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DermAI - AI-Powered Skin Health Assistant | Rishi Shah</title>
     <meta name="description" content="Medical AI platform combining DenseNet121 image classification with RAG-powered chatbot for comprehensive dermatological triage and health guidance.">
+    <style>
+        /* CRITICAL: Hide cursor and background immediately on page load */
+        html, body, * {
+            cursor: none !important;
+        }
+        html, body {
+            background-color: #020510 !important;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
     <link rel="prefetch" href="../index.html">
     <link rel="preload" href="../style.css" as="style">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -395,7 +406,7 @@
         }
     </style>
 </head>
-<body>
+<body style="cursor: none !important; background-color: #020510 !important;">
     <div id="particles-js"></div>
     
     <a href="../index.html" class="back-button">
@@ -422,7 +433,7 @@
             <div class="highlight-box">
                 <p><strong>DermAI</strong> is a comprehensive dermatological triage system that combines deep learning image classification with retrieval-augmented generation (RAG) for conversational health guidance. Upload a skin photo, receive instant predictions across 23 condition categories, then chat with an AI assistant that grounds its medical advice in evidence-based sources.</p>
             </div>
-            <p>The classification backend uses a DenseNet121 convolutional neural network trained on the HAM10000 dataset (19,000+ dermatoscopic images). The model learns hierarchical patterns—from low-level textures to high-level lesion morphologies—to identify conditions ranging from melanoma to benign nevi.</p>
+            <p>The classification backend uses a DenseNet121 convolutional neural network trained on the DermNet dataset (19,000+ dermatoscopic images). The model learns hierarchical patterns from low-level textures to high-level lesion morphologies to identify conditions ranging from melanoma to benign nevi.</p>
             
             <p style="margin-top: 1rem;">The RAG-powered chatbot bridges the gap between algorithmic predictions and human understanding. By embedding medical documentation into a vector database (Supabase pgvector), the system retrieves relevant context for user questions and synthesizes responses using Gemini 2.0 Flash. Every answer cites sources, ensuring transparency and medical accuracy without hallucination.</p>
         </section>
@@ -432,7 +443,7 @@
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-number">19K+</div>
-                    <div class="stat-label">Training Images (HAM10000)</div>
+                    <div class="stat-label">Training Images (DermNet)</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number">23</div>
@@ -453,7 +464,7 @@
             <h2 class="section-header">Technical Deep Dive</h2>
             
             <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">Image Classification Architecture</h3>
-            <p>The classification backbone uses <strong>DenseNet121</strong>, a convolutional neural network optimized for feature reuse through dense connections. Trained on the HAM10000 dataset (19,000+ dermatoscopic images), the model learns hierarchical patterns—from low-level textures to high-level lesion morphologies—to classify skin conditions into 23 categories.</p>
+            <p>The classification backbone uses <strong>DenseNet121</strong>, a convolutional neural network optimized for feature reuse through dense connections. Trained on the DermNet dataset (19,000+ dermatoscopic images), the model learns hierarchical patterns from low-level textures to high-level lesion morphologies to classify skin conditions into 23 categories.</p>
             <p>The training strategy employs data augmentation (rotation, flipping, color jittering), class weighting to handle imbalance, and early stopping to prevent overfitting. The final model achieves robust generalization across diverse skin tones and imaging conditions.</p>
 
             <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">RAG System Architecture</h3>
@@ -713,6 +724,37 @@
         // Back button scroll behavior
         const backButton = document.querySelector('.back-button');
         let lastScroll = 0;
+
+        // Smooth back button navigation
+        backButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // Create transition overlay
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(135deg, #020510 0%, #0a1628 100%);
+                z-index: 99999;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                pointer-events: none;
+            `;
+            document.body.appendChild(overlay);
+            
+            // Fade in overlay
+            setTimeout(() => {
+                overlay.style.opacity = '1';
+            }, 10);
+            
+            // Navigate after overlay is visible
+            setTimeout(() => {
+                window.location.href = '../index.html';
+            }, 200);
+        });
 
         window.addEventListener('scroll', () => {
             const currentScroll = window.pageYOffset;

@@ -1,9 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="cursor: none !important; background-color: #020510 !important;">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gesture Controlled Robotic Arm - Rishi Shah</title>
+    <style>
+        /* CRITICAL: Hide cursor and background immediately on page load */
+        html, body, * {
+            cursor: none !important;
+        }
+        html {
+            background: linear-gradient(135deg, #020510 0%, #0a1628 100%) !important;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: linear-gradient(135deg, #020510 0%, #0a1628 100%) !important;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
     <link rel="prefetch" href="../index.html">
     <link rel="preload" href="../style.css" as="style">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -327,12 +343,38 @@
             background: radial-gradient(circle, rgba(0, 180, 220, 0.3) 0%, transparent 70%);
         }
 
-        a, button, .stat-card, .tech-item, .feature-list li {
+        .capability-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.4rem;
+            margin-top: 1.5rem;
+        }
+
+        .capability-card {
+            padding: 1.5rem;
+            border-radius: 14px;
+            background: rgba(0, 180, 216, 0.06);
+            border: 1px solid rgba(0, 180, 216, 0.2);
+            transition: transform 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .capability-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 25px rgba(0, 180, 216, 0.25);
+        }
+
+        .capability-card h4 {
+            margin-bottom: 0.5rem;
+            color: var(--secondary);
+        }
+
+        a, button, .stat-card, .tech-item, .feature-list li, .capability-card {
             cursor: none !important;
         }
     </style>
 </head>
-<body>
+<body style="cursor: none !important; background-color: #020510 !important;">
     <div id="particles-js"></div>
     <a href="../index.html" class="back-button">
         <i class="fas fa-arrow-left"></i>
@@ -448,37 +490,52 @@
             </p>
 
             <h3 style="color: #5EEAD4; margin-top: 3rem; margin-bottom: 1rem;">Hardware Components</h3>
-            <ul>
-                <li><strong>Custom Robotic Arm:</strong> CAD-designed hand structure with 3D-printed parts</li>
-                <li><strong>5× Servo Motors:</strong> One for each finger (thumb, index, middle, ring, pinky)</li>
-                <li><strong>Arduino Microcontroller:</strong> Receives serial commands and controls servos via PWM</li>
-                <li><strong>Webcam:</strong> Captures real-time video for hand tracking</li>
-                <li><strong>Power Supply:</strong> Dedicated supply for servo motors (servos draw significant current)</li>
-            </ul>
+            <div class="capability-grid">
+                <div class="capability-card">
+                    <h4>Custom Robotic Arm</h4>
+                    <p>CAD-designed hand structure with 3D-printed parts</p>
+                </div>
+                <div class="capability-card">
+                    <h4>5× Servo Motors</h4>
+                    <p>One for each finger (thumb, index, middle, ring, pinky)</p>
+                </div>
+                <div class="capability-card">
+                    <h4>Arduino Microcontroller</h4>
+                    <p>Receives serial commands and controls servos via PWM</p>
+                </div>
+                <div class="capability-card">
+                    <h4>Webcam</h4>
+                    <p>Captures real-time video for hand tracking</p>
+                </div>
+                <div class="capability-card">
+                    <h4>Power Supply</h4>
+                    <p>Dedicated supply for servo motors (servos draw significant current)</p>
+                </div>
+            </div>
 
             <h3 style="color: #5EEAD4; margin-top: 3rem; margin-bottom: 1rem;">Software Stack</h3>
-            <div class="tech-grid">
-                <div class="tech-item">
+            <div class="capability-grid">
+                <div class="capability-card">
                     <h4>Python</h4>
                     <p>Main application logic and computer vision processing</p>
                 </div>
-                <div class="tech-item">
+                <div class="capability-card">
                     <h4>OpenCV</h4>
                     <p>Webcam capture, image processing, and visualization</p>
                 </div>
-                <div class="tech-item">
+                <div class="capability-card">
                     <h4>MediaPipe</h4>
                     <p>Google's ML solution for hand landmark detection</p>
                 </div>
-                <div class="tech-item">
+                <div class="capability-card">
                     <h4>PySerial</h4>
                     <p>Serial communication between Python and Arduino</p>
                 </div>
-                <div class="tech-item">
+                <div class="capability-card">
                     <h4>Arduino IDE</h4>
                     <p>Microcontroller programming and servo control</p>
                 </div>
-                <div class="tech-item">
+                <div class="capability-card">
                     <h4>PlatformIO</h4>
                     <p>Modern development environment for embedded systems</p>
                 </div>
@@ -488,16 +545,35 @@
 
     <section class="section">
         <h2 class="section-header">Key Features</h2>
-        <div class="section-content">
-            <ul>
-                <li><strong>Real-Time Tracking:</strong> 30+ FPS hand detection with minimal latency for responsive control</li>
-                <li><strong>Visual Feedback:</strong> Live bounding box and landmark visualization on screen</li>
-                <li><strong>Binary Finger States:</strong> Simplified control using up/down detection for reliability</li>
-                <li><strong>Mirror Mapping:</strong> Webcam feed is flipped so hand movements feel natural</li>
-                <li><strong>Robust Communication:</strong> Start delimiter ($) ensures data integrity in serial protocol</li>
-                <li><strong>Custom Hardware:</strong> 3D-printed robotic hand designed for this specific application</li>
-                <li><strong>Modular Design:</strong> Separate Python and Arduino codebases for easy modification</li>
-            </ul>
+        <div class="capability-grid">
+            <div class="capability-card">
+                <h4>Real-Time Tracking</h4>
+                <p>30+ FPS hand detection with minimal latency for responsive control</p>
+            </div>
+            <div class="capability-card">
+                <h4>Visual Feedback</h4>
+                <p>Live bounding box and landmark visualization on screen</p>
+            </div>
+            <div class="capability-card">
+                <h4>Binary Finger States</h4>
+                <p>Simplified control using up/down detection for reliability</p>
+            </div>
+            <div class="capability-card">
+                <h4>Mirror Mapping</h4>
+                <p>Webcam feed is flipped so hand movements feel natural</p>
+            </div>
+            <div class="capability-card">
+                <h4>Robust Communication</h4>
+                <p>Start delimiter ($) ensures data integrity in serial protocol</p>
+            </div>
+            <div class="capability-card">
+                <h4>Custom Hardware</h4>
+                <p>3D-printed robotic hand designed for this specific application</p>
+            </div>
+            <div class="capability-card">
+                <h4>Modular Design</h4>
+                <p>Separate Python and Arduino codebases for easy modification</p>
+            </div>
         </div>
     </section>
 
@@ -508,18 +584,31 @@
                 This project demonstrates the practical application of computer vision and robotics, creating an intuitive interface between human gestures and robotic actuation. The system successfully achieves real-time control with minimal latency, making it suitable for various applications.
             </p>
             
-            <div class="highlight-box">
-                <strong>Real-World Applications:</strong>
-                <ul style="margin-top: 1rem; margin-bottom: 0;">
-                    <li>Prosthetic control systems for amputees</li>
-                    <li>Remote manipulation in hazardous environments</li>
-                    <li>Surgical robotics with intuitive gesture control</li>
-                    <li>Educational tool for learning computer vision and robotics</li>
-                    <li>Teleoperation for space or underwater exploration</li>
-                </ul>
+            <h3 style="color: #5EEAD4; margin-top: 2rem; margin-bottom: 1rem;">Real-World Applications</h3>
+            <div class="capability-grid">
+                <div class="capability-card">
+                    <h4>Prosthetic Control</h4>
+                    <p>Prosthetic control systems for amputees</p>
+                </div>
+                <div class="capability-card">
+                    <h4>Hazardous Environments</h4>
+                    <p>Remote manipulation in hazardous environments</p>
+                </div>
+                <div class="capability-card">
+                    <h4>Surgical Robotics</h4>
+                    <p>Surgical robotics with intuitive gesture control</p>
+                </div>
+                <div class="capability-card">
+                    <h4>Educational Tool</h4>
+                    <p>Educational tool for learning computer vision and robotics</p>
+                </div>
+                <div class="capability-card">
+                    <h4>Teleoperation</h4>
+                    <p>Teleoperation for space or underwater exploration</p>
+                </div>
             </div>
 
-            <p>
+            <p style="margin-top: 2rem;">
                 The project showcases how modern ML libraries like MediaPipe can be combined with embedded systems to create responsive human-robot interfaces without requiring expensive motion capture equipment.
             </p>
         </div>
@@ -532,7 +621,7 @@
                 By leveraging MediaPipe's powerful hand tracking and Arduino's real-time control capabilities, this project creates a seamless bridge between human gesture and robotic motion. The system demonstrates how accessible tools can be used to build sophisticated human-robot interaction systems.
             </p>
             <p>
-                This work serves as a foundation for more advanced gesture-controlled systems, from prosthetics to industrial robotics, showing that intuitive control doesn't require complex hardware—just clever integration of computer vision and embedded systems.
+                This work serves as a foundation for more advanced gesture-controlled systems, from prosthetics to industrial robotics, showing that intuitive control doesn't require complex hardware. It just requires clever integration of computer vision and embedded systems.
             </p>
 
             <p style="margin-top: 2rem; font-family: 'Courier New', monospace; color: var(--secondary); text-align: center;">
@@ -572,7 +661,7 @@
             cursorGlow.style.transform = 'translate(-50%, -50%) scale(1)';
         });
 
-        const interactiveElements = document.querySelectorAll('a, button, .stat-card, .tech-item, .feature-list li');
+        const interactiveElements = document.querySelectorAll('a, button, .stat-card, .tech-item, .feature-list li, .capability-card');
         interactiveElements.forEach(element => {
             element.addEventListener('mouseenter', () => {
                 cursor.classList.add('hover');
@@ -606,6 +695,37 @@
         // Show back button on scroll
         const backButton = document.querySelector('.back-button');
         let lastScroll = 0;
+
+        // Smooth back button navigation
+        backButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // Create transition overlay
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(135deg, #020510 0%, #0a1628 100%);
+                z-index: 99999;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                pointer-events: none;
+            `;
+            document.body.appendChild(overlay);
+            
+            // Fade in overlay
+            setTimeout(() => {
+                overlay.style.opacity = '1';
+            }, 10);
+            
+            // Navigate after overlay is visible
+            setTimeout(() => {
+                window.location.href = '../index.html';
+            }, 200);
+        });
 
         window.addEventListener('scroll', () => {
             const currentScroll = window.pageYOffset;
