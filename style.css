@@ -1238,6 +1238,15 @@ nav .fa-solid {
     font-family: 'Courier New', monospace;
 }
 
+.social-icons a:nth-child(4)::after {
+    content: "0x04";
+    position: absolute;
+    bottom: -20px;
+    font-size: 10px;
+    color: rgba(0, 180, 220, 0.4);
+    font-family: 'Courier New', monospace;
+}
+
 @keyframes oscilloscope {
     0% { transform: translateX(0); }
     100% { transform: translateX(12px); }
