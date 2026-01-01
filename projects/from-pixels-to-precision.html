@@ -156,7 +156,7 @@
         }
 
         .section {
-            margin-bottom: 4rem;
+            margin-bottom: 2rem;
             padding: 2rem;
             background: rgba(10, 22, 40, 0.3);
             border-radius: 12px;
@@ -177,6 +177,60 @@
             padding: 1.5rem;
             margin: 1.5rem 0;
             border-radius: 8px;
+        }
+
+        /* Document-style formatting */
+        .document-section {
+            margin-bottom: 2rem;
+            padding: 3rem;
+            background: rgba(10, 22, 40, 0.3);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 180, 216, 0.1);
+        }
+
+        .document-section h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--primary);
+            font-family: 'Courier New', monospace;
+            margin-bottom: 1.5rem;
+            margin-top: 2.5rem;
+        }
+
+        .document-section h1:first-child {
+            margin-top: 0;
+        }
+
+        .document-section h2 {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: var(--secondary);
+            margin-bottom: 1rem;
+            margin-top: 2rem;
+        }
+
+        .document-section p {
+            font-size: 1rem;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 1rem;
+        }
+
+        .document-section ul {
+            margin: 1rem 0 1rem 1.5rem;
+            list-style-type: disc;
+        }
+
+        .document-section ul li {
+            font-size: 1rem;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 0.5rem;
+        }
+
+        .document-section strong {
+            color: #ffffff;
+            font-weight: 600;
         }
 
         .stats-grid {
@@ -409,6 +463,7 @@
             </a>
         </div>
 
+        <!-- Box 2: Overview -->
         <section class="section">
             <h2 class="section-header">Overview</h2>
             <div class="highlight-box">
@@ -433,325 +488,168 @@
             </div>
         </section>
 
-        <section class="section">
-            <h2 class="section-header">Key Metrics</h2>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-number">~95%</div>
-                    <div class="stat-label">DICE Coefficient Accuracy</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">&lt;0.12s</div>
-                    <div class="stat-label">Segmentation Per Image</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">300</div>
-                    <div class="stat-label">Training Images (Manual)</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">600×800</div>
-                    <div class="stat-label">Pixel Resolution</div>
-                </div>
-            </div>
-        </section>
+        <!-- Box 4: Main Document Content -->
+        <section class="document-section">
+            <h1>Motivation & Significance</h1>
 
-        <section class="section">
-            <h2 class="section-header">Motivation & Significance</h2>
-            
-            <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">The Problem</h3>
+            <h2>The Problem</h2>
             <p>Robotic surgeries offer numerous advantages over traditional procedures, including:</p>
-            <ul class="feature-list">
+            <ul>
                 <li>Reduced blood loss and smaller incisions</li>
                 <li>Faster recovery rates and shorter hospital stays</li>
                 <li>Greater precision through robotic arm stabilization</li>
             </ul>
 
-            <p style="margin-top: 1.5rem;">However, these benefits come with significant challenges:</p>
-            <div class="highlight-box">
-                <p><strong>Limited Vision:</strong> Surgeons have restricted view of the surgical site due to camera distortion affecting depth and size perception of 3D structures.</p>
-                <p style="margin-top: 0.5rem;"><strong>High Error Rate:</strong> According to research on minimally invasive surgery performance errors, nearly <strong>30% of surgical complications</strong> are caused by misrecognition during operations.</p>
-                <p style="margin-top: 0.5rem;"><strong>Risk of Damage:</strong> Misidentification can lead to nerve damage, incorrect surgical maneuvers, or damage to surrounding tissue.</p>
-            </div>
+            <p>However, these benefits come with significant challenges:</p>
+            <ul>
+                <li><strong>Limited Vision:</strong> Surgeons have restricted view of the surgical site due to camera distortion affecting depth and size perception of 3D structures</li>
+                <li><strong>High Error Rate:</strong> According to research on minimally invasive surgery performance errors, nearly 30% of surgical complications are caused by misrecognition during operations</li>
+                <li><strong>Risk of Damage:</strong> Misidentification can lead to nerve damage, incorrect surgical maneuvers, or damage to surrounding tissue</li>
+            </ul>
 
-            <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">The Solution</h3>
+            <h2>The Solution</h2>
             <p>Just as autonomous vehicles use AI to predict safe driving lanes based on obstacle recognition, this neural network acts as a guide to support surgeons' experience and skills. By accurately segmenting surgical tools from background tissue, the system:</p>
-            <ul class="feature-list">
+            <ul>
                 <li><strong>Enhances Surgical Precision:</strong> Provides real time visual guidance to reduce misrecognition errors</li>
                 <li><strong>Increases Patient Safety:</strong> Minimizes risk of complications caused by visual confusion</li>
                 <li><strong>Supports Fluorescence Guided Surgery:</strong> Works with both regular and fluorescent illumination for modern surgical techniques</li>
                 <li><strong>Saves Time:</strong> Automated segmentation is dramatically faster than manual approaches, allowing surgeons to focus on critical aspects of procedures</li>
             </ul>
-        </section>
 
-        <section class="section">
-            <h2 class="section-header">Neural Network Architecture</h2>
-            
-            <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">U-Net Implementation</h3>
+            <h1>Neural Network Architecture</h1>
+
+            <h2>U-Net Implementation</h2>
             <p>The project utilizes <strong>U-Net architecture</strong>, a fully convolutional neural network specifically designed for medical image segmentation. Published in 2015, U-Net revolutionized deep learning for biomedical applications by learning effectively from small training samples.</p>
 
-            <div class="architecture-diagram">
-                <p style="margin-bottom: 1rem;"><strong>U-Net Architecture: Encoder-Decoder with Skip Connections</strong></p>
-                <p style="font-size: 0.9rem; color: rgba(255,255,255,0.7);">572×572 Input → 4 Encoder Blocks → Bottleneck → 4 Decoder Blocks → 388×388 Segmentation Mask</p>
-            </div>
+            <p><strong>Key Components:</strong></p>
+            <ul>
+                <li><strong>Encoder:</strong> Extracts hierarchical features through convolutional layers, progressively reducing spatial dimensions while increasing feature depth</li>
+                <li><strong>Decoder:</strong> Up samples features using transpose convolution, reconstructing spatial resolution for pixel level predictions</li>
+                <li><strong>Skip Connections:</strong> Directly links encoder features to decoder, preserving fine grained spatial details lost during down sampling, critical for accurate boundary segmentation</li>
+            </ul>
 
-            <div class="highlight-box">
-                <p><strong>Encoder:</strong> Extracts hierarchical features through convolutional layers, progressively reducing spatial dimensions while increasing feature depth.</p>
-                <p style="margin-top: 0.5rem;"><strong>Decoder:</strong> Up samples features using transpose convolution, reconstructing spatial resolution for pixel level predictions.</p>
-                <p style="margin-top: 0.5rem;"><strong>Skip Connections:</strong> Directly links encoder features to decoder, preserving fine grained spatial details lost during down sampling. Critical for accurate boundary segmentation.</p>
-            </div>
+            <h2>Training Pipeline</h2>
+            <p>The network was trained using a systematic 4-step process:</p>
+            <ul>
+                <li><strong>Data Preparation:</strong> 300 images manually segmented using ITK-SNAP software</li>
+                <li><strong>Preprocessing:</strong> Fluorescent images converted to grayscale for intensity based learning</li>
+                <li><strong>Training:</strong> Keras + Python implementation, approximately 2 hours on GPU</li>
+                <li><strong>Validation:</strong> DICE coefficient comparison on test images</li>
+            </ul>
 
-            <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">Training Pipeline</h3>
-            <div class="process-flow">
-                <div class="process-step">
-                    <div class="step-number">1</div>
-                    <h4>Data Preparation</h4>
-                    <p>300 images manually segmented using ITK-SNAP software</p>
-                </div>
-                <div class="process-step">
-                    <div class="step-number">2</div>
-                    <h4>Preprocessing</h4>
-                    <p>Fluorescent images converted to grayscale for intensity based learning</p>
-                </div>
-                <div class="process-step">
-                    <div class="step-number">3</div>
-                    <h4>Training</h4>
-                    <p>Keras + Python implementation, ~2 hours on GPU</p>
-                </div>
-                <div class="process-step">
-                    <div class="step-number">4</div>
-                    <h4>Validation</h4>
-                    <p>DICE coefficient comparison on test images</p>
-                </div>
-            </div>
-
-            <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">DICE Coefficient Evaluation</h3>
+            <h2>DICE Coefficient Evaluation</h2>
             <p>Segmentation accuracy was measured using the <strong>DICE coefficient</strong>, a statistical measure of overlap between predicted and ground-truth segmentation masks. The DICE score ranges from 0 (no overlap) to 1 (perfect match), calculated as 2 times the intersection divided by the sum of both mask areas.</p>
-        </section>
 
-        <section class="section">
-            <h2 class="section-header">Methodology</h2>
-            
-            <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">1. Manual Segmentation (Training Data Creation)</h3>
+            <h1>Methodology</h1>
+
+            <h2>1. Manual Segmentation (Training Data Creation)</h2>
             <p>Training data was captured using a <strong>Modus V exoscope by Synaptive Medical Inc.</strong> during experimental procedures on pig brain tissue, representative of real surgical environments.</p>
-            
-            <ul class="feature-list">
+            <ul>
                 <li><strong>ITK-SNAP Software:</strong> 300 images manually segmented by breaking down into RGB components for grayscale viewing</li>
                 <li><strong>Dual Format Storage:</strong> NifTI files (for ITK SNAP compatibility) and PNG files (for visualization)</li>
                 <li><strong>Binary Classification:</strong> Pixels labeled as either "surgical tool" or "background tissue"</li>
                 <li><strong>Quality Control:</strong> All segmentations double checked for accuracy to maximize ground truth precision</li>
             </ul>
 
-            <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">2. Fluorescence Challenge Solution</h3>
-            <div class="highlight-box">
-                <p><strong>Initial Problem:</strong> Neural network struggled with fluorescent blue images due to color variance issues.</p>
-                <p style="margin-top: 0.5rem;"><strong>Solution:</strong> Converted fluorescent images to grayscale using MATLAB, enabling the network to distinguish tools based on color <em>intensity</em> rather than color <em>variance</em>. This dramatically improved segmentation accuracy for fluorescence guided surgery scenarios.</p>
-            </div>
+            <h2>2. Fluorescence Challenge Solution</h2>
+            <p><strong>Initial Problem:</strong> Neural network struggled with fluorescent blue images due to color variance issues.</p>
+            <p><strong>Solution:</strong> Converted fluorescent images to grayscale using MATLAB, enabling the network to distinguish tools based on color intensity rather than color variance. This dramatically improved segmentation accuracy for fluorescence guided surgery scenarios.</p>
 
-            <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">3. Training Process</h3>
-            <ul class="feature-list">
+            <h2>3. Training Process</h2>
+            <ul>
                 <li><strong>Framework:</strong> Keras with Python backend</li>
                 <li><strong>Training Duration:</strong> Approximately 2 hours on GPU</li>
                 <li><strong>Validation:</strong> Same training images re-inputted to compare prediction vs. ground truth segmentations</li>
                 <li><strong>Optimization:</strong> Adam optimizer with binary cross entropy loss function</li>
             </ul>
 
-            <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">4. Testing Protocol</h3>
+            <h2>4. Testing Protocol</h2>
             <p>To evaluate real-world performance, a completely new surgical video (unseen during training) was tested:</p>
-            
-            <div class="process-flow">
-                <div class="process-step">
-                    <div class="step-number">1</div>
-                    <h4>Video Processing</h4>
-                    <p>MATLAB code breaks video into PNG frames</p>
-                </div>
-                <div class="process-step">
-                    <div class="step-number">2</div>
-                    <h4>Segmentation</h4>
-                    <p>Neural network segments each frame (&lt;0.12s per image)</p>
-                </div>
-                <div class="process-step">
-                    <div class="step-number">3</div>
-                    <h4>Reconstruction</h4>
-                    <p>Segmented frames compiled back into video</p>
-                </div>
-                <div class="process-step">
-                    <div class="step-number">4</div>
-                    <h4>Comparison</h4>
-                    <p>Side by side analysis of original vs. segmented video</p>
-                </div>
-            </div>
+            <ul>
+                <li>MATLAB code breaks video into PNG frames</li>
+                <li>Neural network segments each frame (less than 0.12s per image)</li>
+                <li>Segmented frames compiled back into video</li>
+                <li>Side by side analysis of original vs. segmented video</li>
+            </ul>
 
-            <p style="margin-top: 1.5rem;"><strong>Test Categories:</strong> Four scenarios tested with 20 random images each:</p>
-            <ul class="feature-list">
+            <p><strong>Test Categories:</strong> Four scenarios tested with 20 random images each:</p>
+            <ul>
                 <li>Regular illumination (pink) with one surgical tool</li>
                 <li>Fluorescent blue with one surgical tool</li>
                 <li>Regular illumination (pink) with two surgical tools</li>
                 <li>Fluorescent blue with two surgical tools</li>
             </ul>
-        </section>
 
-        <section class="section">
-            <h2 class="section-header">Results & Analysis</h2>
-            
-            <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">Performance Metrics</h3>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-number">~95%</div>
-                    <div class="stat-label">Overall DICE Accuracy</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">&lt;1 min</div>
-                    <div class="stat-label">Segment 500 Images</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">0.12s</div>
-                    <div class="stat-label">Per Image (600×800 pixels)</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">4</div>
-                    <div class="stat-label">Test Scenarios</div>
-                </div>
-            </div>
+            <h1>Results & Analysis</h1>
 
-            <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">Key Findings</h3>
-            
-            <div class="highlight-box">
-                <h4 style="color: var(--primary); margin-bottom: 1rem;">✓ Exceptional Speed & Efficiency</h4>
-                <p>The neural network demonstrated remarkable processing speed, segmenting approximately 500 images in under one minute. Each 600×800 pixel image required less than 0.12 seconds, which is fast enough for real-time surgical assistance.</p>
-            </div>
+            <h2>Performance Metrics</h2>
+            <ul>
+                <li><strong>Overall DICE Accuracy:</strong> Approximately 95%</li>
+                <li><strong>Processing Speed:</strong> Less than 1 minute to segment 500 images</li>
+                <li><strong>Per Image Time:</strong> 0.12s per 600×800 pixel image</li>
+                <li><strong>Test Scenarios:</strong> 4 different surgical environments</li>
+            </ul>
 
-            <div class="highlight-box">
-                <h4 style="color: var(--primary); margin-bottom: 1rem;">✓ High Accuracy Under Normal Lighting</h4>
-                <p>The network achieved particularly strong performance identifying surgical tools under regular illumination, with DICE coefficients hovering around 95%.</p>
-            </div>
+            <h2>Key Findings</h2>
+            <p><strong>Exceptional Speed & Efficiency:</strong> The neural network demonstrated remarkable processing speed, segmenting approximately 500 images in under one minute. Each 600×800 pixel image required less than 0.12 seconds, which is fast enough for real-time surgical assistance.</p>
 
-            <div class="highlight-box">
-                <h4 style="color: var(--primary); margin-bottom: 1rem;">✓ Fluorescence Support After Preprocessing</h4>
-                <p>Once fluorescent blue images were converted to grayscale, the network successfully segmented tools with comparable accuracy to regular illumination scenarios.</p>
-            </div>
+            <p><strong>High Accuracy Under Normal Lighting:</strong> The network achieved particularly strong performance identifying surgical tools under regular illumination, with DICE coefficients hovering around 95%.</p>
 
-            <div class="highlight-box">
-                <h4 style="color: var(--primary); margin-bottom: 1rem;">⚠ Performance Degradation with Multiple Tools</h4>
-                <p>As more surgical tools were added to the scene, accuracy became less consistent. However, pink images with two tools showed the smallest accuracy drop across all categories.</p>
-            </div>
+            <p><strong>Fluorescence Support After Preprocessing:</strong> Once fluorescent blue images were converted to grayscale, the network successfully segmented tools with comparable accuracy to regular illumination scenarios.</p>
 
-            <div class="highlight-box">
-                <h4 style="color: var(--primary); margin-bottom: 1rem;">⚠ Fluorescent Blue Two-Tool Challenge</h4>
-                <p>The most difficult scenario was fluorescent blue images containing two tools, which showed the least consistent accuracy, validating the initial hypothesis.</p>
-            </div>
+            <p><strong>Performance Degradation with Multiple Tools:</strong> As more surgical tools were added to the scene, accuracy became less consistent. However, pink images with two tools showed the smallest accuracy drop across all categories.</p>
 
-            <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">Limitations & Analysis</h3>
-            <ul class="feature-list">
+            <p><strong>Fluorescent Blue Two-Tool Challenge:</strong> The most difficult scenario was fluorescent blue images containing two tools, which showed the least consistent accuracy, validating the initial hypothesis.</p>
+
+            <h2>Limitations & Analysis</h2>
+            <ul>
                 <li><strong>Limited Training Diversity:</strong> All 300 training images came from a single video source, restricting the network's ability to generalize to unseen surgical scenarios, instruments, or anatomical regions</li>
                 <li><strong>Motion Blur Impact:</strong> The primary accuracy-limiting factor was motion blur affecting the edges between surgical tools and tissue, potentially causing false positives or negatives</li>
                 <li><strong>Manual Segmentation Dependency:</strong> Network accuracy directly depends on the precision of manual ground-truth segmentations. Any errors in training data propagate to predictions</li>
                 <li><strong>Complex Scenario Challenges:</strong> Performance degradation with multiple tools suggests limitations in handling complex surgical scenarios with tool occlusion or overlapping instruments</li>
             </ul>
-        </section>
 
-        <section class="section">
-            <h2 class="section-header">Opportunities for Improvement</h2>
-            
-            <div class="highlight-box">
-                <h4 style="color: var(--primary); margin-bottom: 1rem;">1. Advanced Multi-Layer Architecture</h4>
-                <p>Implementing a deeper neural network with additional convolutional layers could detect more intricate patterns and features. This would improve the network's ability to handle motion blur by learning more robust edge detection and boundary refinement strategies.</p>
-            </div>
+            <h1>Opportunities for Improvement</h1>
 
-            <div class="highlight-box">
-                <h4 style="color: var(--primary); margin-bottom: 1rem;">2. Dataset Expansion & Diversification</h4>
-                <p>Training on multiple video sources across different:</p>
-                <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
-                    <li>Surgical procedures (brain, cardiac, abdominal, etc.)</li>
-                    <li>Instrument types (forceps, scalpels, suction tools, etc.)</li>
-                    <li>Lighting conditions (various fluorescence wavelengths, intensities)</li>
-                    <li>Camera systems and resolutions</li>
-                </ul>
-                <p style="margin-top: 0.5rem;">This would dramatically improve generalization and reduce false positives/negatives in novel scenarios.</p>
-            </div>
+            <h2>1. Advanced Multi-Layer Architecture</h2>
+            <p>Implementing a deeper neural network with additional convolutional layers could detect more intricate patterns and features. This would improve the network's ability to handle motion blur by learning more robust edge detection and boundary refinement strategies.</p>
 
-            <div class="highlight-box">
-                <h4 style="color: var(--primary); margin-bottom: 1rem;">3. Enhanced Ground Truth Quality</h4>
-                <p>Improving the precision of original manual segmentations through:</p>
-                <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
-                    <li>Multiple expert annotators with consensus voting</li>
-                    <li>Higher-resolution source imagery</li>
-                    <li>Semi-automated segmentation refinement tools</li>
-                    <li>Validation against surgical tool CAD models</li>
-                </ul>
-            </div>
+            <h2>2. Dataset Expansion & Diversification</h2>
+            <p>Training on multiple video sources across different surgical procedures (brain, cardiac, abdominal, etc.), instrument types (forceps, scalpels, suction tools, etc.), lighting conditions (various fluorescence wavelengths, intensities), and camera systems would dramatically improve generalization and reduce false positives/negatives in novel scenarios.</p>
 
-            <div class="highlight-box">
-                <h4 style="color: var(--primary); margin-bottom: 1rem;">4. Motion Blur Mitigation</h4>
-                <p>Potential approaches include:</p>
-                <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
-                    <li>Temporal consistency constraints using video frame sequences</li>
-                    <li>Deblurring preprocessing pipeline before segmentation</li>
-                    <li>Training data augmentation with synthetic motion blur</li>
-                    <li>Recurrent neural network components for temporal context</li>
-                </ul>
-            </div>
+            <h2>3. Enhanced Ground Truth Quality</h2>
+            <p>Improving the precision of original manual segmentations through multiple expert annotators with consensus voting, higher-resolution source imagery, semi-automated segmentation refinement tools, and validation against surgical tool CAD models.</p>
 
-            <div class="highlight-box">
-                <h4 style="color: var(--primary); margin-bottom: 1rem;">5. Multi-Tool Handling</h4>
-                <p>To improve performance with multiple surgical instruments:</p>
-                <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
-                    <li>Instance segmentation (identifying each tool separately, not just "tool vs. background")</li>
-                    <li>Attention mechanisms to focus on individual instruments</li>
-                    <li>Training specifically on crowded surgical scenes</li>
-                    <li>Tool tracking across frames for temporal consistency</li>
-                </ul>
-            </div>
-        </section>
+            <h2>4. Motion Blur Mitigation</h2>
+            <p>Potential approaches include temporal consistency constraints using video frame sequences, deblurring preprocessing pipeline before segmentation, training data augmentation with synthetic motion blur, and recurrent neural network components for temporal context.</p>
 
-        <section class="section">
-            <h2 class="section-header">Broader Applications</h2>
-            
-            <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">Surgical Tool Segmentation</h3>
-            <ul class="feature-list">
+            <h2>5. Multi-Tool Handling</h2>
+            <p>To improve performance with multiple surgical instruments: instance segmentation (identifying each tool separately), attention mechanisms to focus on individual instruments, training specifically on crowded surgical scenes, and post-processing algorithms to separate overlapping tool predictions.</p>
+
+            <h1>Broader Applications</h1>
+
+            <h2>Surgical Tool Segmentation</h2>
+            <ul>
                 <li><strong>Reduced Misrecognition Errors:</strong> Addresses the 30% complication rate caused by artifact misidentification</li>
                 <li><strong>Enhanced Precision:</strong> Real-time visual guidance helps surgeons maintain spatial awareness during minimally invasive procedures</li>
                 <li><strong>Time Savings:</strong> Automated segmentation dramatically faster than manual approaches, letting surgeons focus on critical decision-making</li>
                 <li><strong>Training & Education:</strong> Annotated surgical videos for medical student training and skill assessment</li>
             </ul>
 
-            <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">Beyond Surgery: Medical Imaging</h3>
-            <p>The neural network framework extends far beyond surgical tool segmentation:</p>
-            
-            <div class="highlight-box">
-                <p><strong>Tumor Detection:</strong> Advanced neural networks can identify abnormalities in medical scans that are difficult for the human eye to detect, such as small tumors in early stages.</p>
-                
-                <p style="margin-top: 0.5rem;"><strong>Organ & Tissue Segmentation:</strong> Automatic delineation of organs, blood vessels, or tissue types in CT, MRI, or ultrasound imaging for diagnosis and surgical planning.</p>
-                
-                <p style="margin-top: 0.5rem;"><strong>Disease Diagnosis:</strong> Pattern recognition in radiological images for conditions like pneumonia, fractures, or degenerative diseases.</p>
-                
-                <p style="margin-top: 0.5rem;"><strong>Quantitative Analysis:</strong> Measuring organ volumes, tracking disease progression, or assessing treatment efficacy through precise segmentation.</p>
-            </div>
+            <h2>Beyond Surgery: Medical Imaging</h2>
+            <p>The neural network framework extends far beyond surgical tool segmentation. <strong>Tumor Detection:</strong> Advanced neural networks can identify abnormalities in medical scans that are difficult for the human eye to detect, such as small tumors in early stages. <strong>Organ & Tissue Segmentation:</strong> Automatic delineation of organs, blood vessels, or tissue types in CT, MRI, or ultrasound imaging for diagnosis and surgical planning. <strong>Disease Diagnosis:</strong> Pattern recognition in radiological images for conditions like pneumonia, fractures, or degenerative diseases. <strong>Quantitative Analysis:</strong> Measuring organ volumes, tracking disease progression, or assessing treatment efficacy through precise segmentation.</p>
 
-            <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">Industry Partnership Impact</h3>
-            <p>Collaboration with <strong>Synaptive Medical Inc.</strong> and <strong>Robarts Research Institute</strong> provided:</p>
-            <ul class="feature-list">
-                <li>Access to professional-grade Modus V exoscope surgical footage</li>
-                <li>Real-world surgical environment data unavailable to typical research projects</li>
-                <li>Validation of clinical relevance and potential commercial applications</li>
-                <li>Mentorship from medical imaging and neurosurgery experts</li>
-            </ul>
-        </section>
+            <h2>Industry Partnership Impact</h2>
+            <p>Collaboration with <strong>Synaptive Medical Inc.</strong> and <strong>Robarts Research Institute</strong> provided access to professional-grade Modus V exoscope surgical footage, real-world surgical environment data unavailable to typical research projects, validation of clinical relevance and potential commercial applications, and mentorship from medical imaging and neurosurgery experts.</p>
 
-        <section class="section">
-            <h2 class="section-header">Conclusion</h2>
+            <h1>Conclusion</h1>
             <p>From Pixels to Precision demonstrates that neural networks have transformative potential for surgical procedures and medical imaging. By achieving approximately 95% accuracy while processing images in under 0.12 seconds, the system proves that real-time AI assistance in surgery is not only possible but practical.</p>
             
-            <p style="margin-top: 1rem;">This project addresses a critical healthcare challenge: the 30% complication rate in minimally invasive surgeries caused by misrecognition. By providing surgeons with accurate, real-time tool segmentation (including support for fluorescence-guided surgery), the neural network enhances patient safety, increases surgical precision, and allows medical professionals to focus on the most critical aspects of procedures.</p>
+            <p>This project addresses a critical healthcare challenge: the 30% complication rate in minimally invasive surgeries caused by misrecognition. By providing surgeons with accurate, real-time tool segmentation (including support for fluorescence-guided surgery), the neural network enhances patient safety, increases surgical precision, and allows medical professionals to focus on the most critical aspects of procedures.</p>
 
-            <p style="margin-top: 1rem;">The partnership with Synaptive Medical Inc. and Robarts Research Institute provided invaluable real-world surgical data and clinical validation. Recognition with a Bronze Medal at the Canada-Wide Science Fair affirms the innovation and potential impact of this work.</p>
+            <p>The partnership with Synaptive Medical Inc. and Robarts Research Institute provided invaluable real-world surgical data and clinical validation. Recognition with a Bronze Medal at the Canada-Wide Science Fair affirms the innovation and potential impact of this work.</p>
 
-            <p style="margin-top: 1rem;">Beyond surgical tool segmentation, this research opens doors to broader medical imaging applications: tumor detection, organ segmentation, disease diagnosis, and quantitative analysis. As neural network architectures become more sophisticated and training datasets expand, the potential to revolutionize healthcare and improve countless lives becomes increasingly tangible.</p>
-
-            <p style="margin-top: 2rem; font-family: 'Courier New', monospace; color: var(--secondary); text-align: center;">
-                // PROTOCOL: MEDICAL_IMAGE_SEGMENTATION<br>
-                // STATUS: CWSF_BRONZE_MEDAL<br>
-                // INNOVATION: SURGICAL_PRECISION_AI
-            </p>
+            <p>Beyond surgical tool segmentation, this research opens doors to broader medical imaging applications: tumor detection, organ segmentation, disease diagnosis, and quantitative analysis. As neural network architectures become more sophisticated and training datasets expand, the potential to revolutionize healthcare and improve countless lives becomes increasingly tangible.</p>
         </section>
     </div>
 
@@ -783,7 +681,7 @@
             cursorGlow.style.transform = 'translate(-50%, -50%) scale(1)';
         });
 
-        const interactiveElements = document.querySelectorAll('a, button, .stat-card, .tech-item, .feature-list li');
+        const interactiveElements = document.querySelectorAll('a, button, .stat-card, .tech-item');
         interactiveElements.forEach(element => {
             element.addEventListener('mouseenter', () => {
                 cursor.classList.add('hover');

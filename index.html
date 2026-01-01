@@ -1,7 +1,7 @@
 <!-- Rishi Shah's Portfolio -->
 
 <!DOCTYPE html>
-<html lang="en" style="cursor: none !important; background-color: #020510 !important;">
+<html lang="en" style="cursor: none !important; background-color: #050a15 !important;">
 <head>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-0M7YNWC9WW"></script>
@@ -37,7 +37,7 @@
             cursor: none !important;
         }
         html, body {
-            background-color: #020510 !important;
+            background-color: #050a15 !important;
             margin: 0;
             padding: 0;
         }
@@ -53,27 +53,20 @@
     <!-- Header Section -->
     <div id="header">
         <div class="container">
-            <nav>
-                <a href="#" class="logo">
-                    <span class="logo-text">RS</span>
-                </a>
-                <ul id="sidemenu">
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#portfolio">Projects</a></li>
-                    <li><a href="#contact">Contact</a></li>
-                </ul>                
-            </nav>
-            <div class="header-content">
-                <div class="header-text">
-                    <div class="intro">Hello, I'm</div>
+            <div class="header-content-compact">
+                <div class="header-info">
                     <h1>Rishi Shah</h1>
-                    <h2>Research Engineer focused on neural networks and their real-world applicability.</h2>
-                    <div class="cta-buttons">
-                        <a href="#portfolio" class="primary">View My Work</a>
-                        <a href="#contact" class="secondary">Get In Touch</a>
+                    <p class="subtitle">ML/CV Research Engineer specializing in perception systems and robust computer vision.</p>
+                    <div class="contact-links">
+                        <a href="https://github.com/RishiShah99"><i class="fa-brands fa-github"></i></a>
+                        <a href="https://www.linkedin.com/in/rishi-shah-7915a7309/"><i class="fa-brands fa-linkedin"></i></a>
+                        <a href="https://x.com/Rishi_Shah99"><i class="fa-brands fa-x-twitter"></i></a>
+                        <a href="https://www.kaggle.com/shahrish99"><i class="fa-brands fa-kaggle"></i></a>
+                        <a href="mailto:rishishah994@gmail.com"><i class="fa-solid fa-envelope"></i></a>
+                        <a href="images/Rishi_Shah_Resume.pdf" download="Rishi's Resume.pdf">Resume</a>
                     </div>
                 </div>
-                <div class="header-image">
+                <div class="header-image-compact">
                     <img src="images/user.jpg" alt="Rishi Shah">
                 </div>
             </div>
@@ -84,7 +77,7 @@
     <div id="about">
         <div class="container">
             <div class="about-content">
-                <h1 class="sub-title">About Me</h1>
+                <h2 class="section-title">ABOUT ME</h2>
                 <ul class="about-points">
                     <li>Schulich Leader Scholar at McMaster University, one of Canada's top 50 entrepreneurial engineers that was awarded $120,000.</li>
                     <li>Engineered a biologically inspired recurrent vision model that outperformed MIT’s CORNet-S in adversarial robustness across MNIST, CIFAR, and ImageNet100.</li>
@@ -92,44 +85,6 @@
                     <li>Founded Hack49 Global, a worldwide hackathon with 950+ participants from 40+ countries, securing $19,000+ in sponsorships</li>
                     <li>Built Sentinel, a hardware-aware static analysis system with a custom language server, performing RAM and Flash estimation, pin-mapping, and 50+ embedded validations before compilation.</li>
                 </ul>
-
-                <div class="skills-section">
-                    <h2>Technical Skills</h2>
-                    <div class="skills-grid">
-                        <div class="skill-category">
-                            <h3>Programming Languages</h3>
-                            <p>Python, JavaScript, TypeScript, Java, C#, C++</p>
-                        </div>
-                        <div class="skill-category">
-                            <h3>Machine Learning</h3>
-                            <p>PyTorch, Keras, MATLAB</p>
-                        </div>
-                        <div class="skill-category">
-                            <h3>Web Development</h3>
-                            <p>React, Flask, Django, TailwindCSS, Electron</p>
-                        </div>
-                        <div class="skill-category">
-                            <h3>Computer Vision</h3>
-                            <p>OpenCV, ITK SNAP</p>
-                        </div>
-                        <div class="skill-category">
-                            <h3>Databases</h3>
-                            <p>SQL, SQLite, MongoDB</p>
-                        </div>
-                        <div class="skill-category">
-                            <h3>Embedded Systems</h3>
-                            <p>Arduino, Raspberry Pi, ESP32</p>
-                        </div>
-                        <div class="skill-category">
-                            <h3>Tools & Platforms</h3>
-                            <p>Unity, Git/GitHub, VS Code, AWS, Bash</p>
-                        </div>
-                        <div class="skill-category">
-                            <h3>3D & Design</h3>
-                            <p>Fusion 360, Autodesk Inventor, Blender, SketchUp, OnShape, KiCad, CURA</p>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -137,97 +92,69 @@
     <!-- Portfolio Section -->
     <div id="portfolio">
         <div class="container">
-            <div class="portfolio-header">
-                <h2>Featured Projects</h2>
-                <p>A showcase of my latest work in machine learning, computer vision, and robotics.</p>
-            </div>
-            <div class="work-grid">
+            <h2 class="section-title">PROJECTS</h2>
+            <div class="work-grid-2col">
                 <div class="work" onclick="window.location.href='projects/from-pixels-to-precision.html'">
                     <img src="images/project-1.png" alt="From Pixels to Precision">
                     <div class="work-content">
                         <h3>From Pixels to Precision</h3>
-                        <p>Developed a neural network that segments surgical tools from minimally invasive surgical videos, improving surgical precision and safety.</p>
+                        <p>Partnered with Synaptive Medical and Robarts Research Institute to build surgical-vision AI system achieving 95% tool-segmentation accuracy for real-time guidance. Bronze Medal at Canada-Wide Science Fair for fluorescence-guided surgery support with <0.12s per image processing.</p>
                     </div>
                 </div>
                 <div class="work" onclick="window.location.href='projects/adversarial-robustness.html'">
                     <img src="images/project-2.png" alt="Adversarial Robustness">
                     <div class="work-content">
                         <h3>Adversarial Robustness Research</h3>
-                        <p>Developed a novel ventral visual neural network, based on CORnet-S architecture with denoising and gated recurrent blocks, achieving robustness of 97.87% under evaluated model threats.</p>
+                        <p>Engineered a bio-inspired recurrent vision model achieving 97.82% adversarial robustness, outperforming MIT's CORNet-S across MNIST, CIFAR, and ImageNet100. Integrated learnable prefiltering, gated recurrence, and denoise-scaling without requiring any adversarial training.</p>
                     </div>
                 </div>
                 <div class="work" onclick="window.location.href='projects/sentinel.html'">
                     <img src="images/project-8.png" alt="Sentinel">
                     <div class="work-content">
                         <h3>Sentinel</h3>
-                        <p>The first hardware-intelligent static analyzer for embedded systems. Predicts RAM, pin, and protocol issues instantly via a custom VS Code + LSP toolchain.</p>
+                        <p>First hardware-aware static analyzer for embedded systems performing RAM/Flash estimation, pin-mapping, and 50+ validations before compilation. Built a custom Language Server Protocol integration with VS Code for real-time hardware-intelligent error detection.</p>
                     </div>
                 </div>
                 <div class="work" onclick="window.location.href='projects/monkey-see-monkey-do.html'">
                     <img src="images/project-7.jpg" alt="Adaptive Learning Robot">
                     <div class="work-content">
                         <h3>Adaptive Learning Robot</h3>
-                        <p>A dual-system robot inspired by Daniel Kahneman's System 1 / System 2 model that learns new skills instantly from natural language, without pre-training or rigid scripts. Built with Cohere LLMs, real-time search, and 2 custom 3-DOF robotic arms, the system transforms messy instructions into smooth, executable motions. Placed Top 32 out of 256 projects at Hack the North, Canada's Largest Hackathon.</p>
+                        <p>Built a dual-system robot using Cohere LLMs and real-time search that learns new skills instantly from natural language without pre-training. Placed Top 32 out of 256 projects at Hack the North with 2 custom 3-DOF robotic arms executing smooth motions from messy instructions.</p>
                     </div>
                 </div>
                 <div class="work" onclick="window.location.href='projects/zephyr-ai.html'">
                     <img src="images/project-5.png" alt="Zephyr">
                     <div class="work-content">
                         <h3>Zephyr AI Assistant</h3>
-                        <p>Built a keyboard-activated AI assistant that seamlessly integrates into your workflow with a single hotkey press. Leverages Groq's Llama 3.1 8B model to understand natural language commands and instantly control Spotify playback, check weather conditions, aggregate news feeds, manage calendar events, and track project tasks.</p>
+                        <p>Keyboard-activated AI assistant with dual interface combining instant popup access and powerful dashboard for seamless workflow integration. Leverages Groq's Llama 3.1 8B for voice commands, intelligent memory, and controls Spotify, weather, news, calendar, and project tracking.</p>
                     </div>
                 </div>
                 <div class="work" onclick="window.location.href='projects/dermai.html'">
                     <img src="images/project-6.jpg" alt="DermAI">
                     <div class="work-content">
                         <h3>DermAI Medical Assistant</h3>
-                        <p>Built a DenseNet121 model trained on 19,000+ DermNet images with integrated RAG chatbot for dermatological triage assessment.</p>
+                        <p>Medical AI platform combining DenseNet121 classification trained on 19,000+ DermNet images with RAG-powered chatbot for comprehensive triage. Provides instant dermatological assessment and personalized health guidance through dual AI architecture.</p>
                     </div>
                 </div>
                 <div class="work" onclick="window.location.href='projects/pose-estimation.html'">
                     <img src="images/project-4.jpg" alt="Pose Estimation Model">
                     <div class="work-content">
                         <h3>Pose Estimation Model</h3>
-                        <p>Implemented a Keypoint R-CNN model with OpenCV for real-time pose estimation in security footage and surveillance applications.</p>
+                        <p>Real-time human pose detection system using Keypoint R-CNN ResNet-50 FPN for security and surveillance applications. Tracks 17 skeletal keypoints with OpenCV integration for automated behavior analysis in footage.</p>
                     </div>
                 </div>
                 <div class="work" onclick="window.location.href='projects/gesture-arm.html'">
                     <img src="images/project-3.png" alt="Gesture Controlled Robotic Arm">
                     <div class="work-content">
                         <h3>Gesture Controlled Robotic Arm</h3>
-                        <p>Developed a robotic arm controlled by hand gestures using computer vision and Arduino, demonstrating real-time human-robot interaction.</p>
+                        <p>Computer vision-controlled robotic arm responding to hand gestures in real-time using MediaPipe and Arduino. Demonstrates natural human-robot interaction with 6-DOF movement mapped from gesture recognition.</p>
                     </div>
                 </div>
             </div>
-            <a href="https://github.com/RishiShah99/" class="see-more-btn">View More Projects</a>
+            <div class="copyright">
+                <p>Copyright © 2025 Rishi Shah. All rights reserved.</p>
+            </div>
         </div>
-    </div>
-
-    <!-- Contact Section -->
-    <div id="contact">
-        <div class="container">
-            <div class="contact-header">
-                <h2>Let's Connect</h2>
-                <p>I'm always interested in new opportunities, collaborations, and interesting projects. Feel free to reach out!</p>
-            </div>
-            <div class="contact-info">
-                <a href="mailto:rishishah994@gmail.com">
-                    <i class="fa-solid fa-envelope"></i>
-                    rishishah994@gmail.com
-                </a>
-            </div>
-            <div class="social-icons">
-                <a href="https://github.com/RishiShah99"><i class="fa-brands fa-github"></i></a>
-                <a href="https://www.linkedin.com/in/rishi-shah-7915a7309/"><i class="fa-brands fa-linkedin"></i></a>
-                <a href="https://www.kaggle.com/shahrish99"><i class="fa-brands fa-kaggle"></i></a>
-                <a href="https://x.com/Rishi_Shah99"><i class="fa-brands fa-x-twitter"></i></a>
-            </div>
-            <a href="images/Rishi_Shah_Resume.pdf" download="Rishi's Resume.pdf" class="download-resume">Download Resume</a>
-        </div>
-    </div>
-    
-    <div class="copyright">
-        <p>Copyright © 2025 Rishi Shah. All rights reserved.</p>
     </div>
     
     <script>
@@ -366,12 +293,12 @@
                     type: 'circle'
                 },
                 opacity: {
-                    value: 0.4,
+                    value: 0.15,
                     random: true,
                     anim: {
                         enable: true,
                         speed: 0.8,
-                        opacity_min: 0.1,
+                        opacity_min: 0.05,
                         sync: false
                     }
                 },
@@ -389,7 +316,7 @@
                     enable: true,
                     distance: 140,
                     color: '#00b4d8',
-                    opacity: 0.3,
+                    opacity: 0.12,
                     width: 1
                 },
                 move: {

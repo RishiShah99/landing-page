@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en" style="cursor: none !important; background-color: #020510 !important;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Footage Pose Estimation System | Rishi Shah</title>
+    <meta name="description" content="Real-time human pose detection for surveillance applications. 17 keypoint detection using Keypoint R-CNN ResNet-50 FPN for security footage analysis.">
+    <style>
+        /* CRITICAL: Hide cursor and background immediately on page load */
+        html, body, * {
+            cursor: none !important;
+        }
+        html {
+            background: linear-gradient(135deg, #020510 0%, #0a1628 100%) !important;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: linear-gradient(135deg, #020510 0%, #0a1628 100%) !important;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+    <link rel="prefetch" href="../index.html">
+    <link rel="preload" href="../style.css" as="style">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/17ea408dcc.js" crossorigin="anonymous"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #00b4d8;
+            --secondary: #5EEAD4;
+            --dark: #020510;
+            --darker: #0a1628;
+            --light: #e0f2fe;
+            --accent: #38bdf8;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
+            color: var(--light);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            cursor: none !important;
+        }
+
+        * {
+            cursor: none !important;
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            z-index: 10001;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 180, 216, 0.1);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            text-decoration: none;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .back-button.hidden {
+            opacity: 0;
+            transform: translateX(-20px);
+            pointer-events: none;
+        }
+
+        .back-button:hover {
+            background: rgba(0, 180, 216, 0.2);
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(0, 180, 216, 0.4);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 6rem 2rem 4rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .project-header {
+            text-align: center;
+            margin-bottom: 4rem;
+            padding: 3rem 2rem;
+            background: rgba(10, 22, 40, 0.5);
+            border-radius: 16px;
+            border: 1px solid rgba(0, 180, 216, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            animation: scan 3s infinite;
+        }
+
+        @keyframes scan {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .project-header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .project-subtitle {
+            font-size: 1.2rem;
+            color: var(--secondary);
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+        }
+
+        .project-meta {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .section {
+            margin-bottom: 4rem;
+            padding: 2rem;
+            background: rgba(10, 22, 40, 0.3);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 180, 216, 0.1);
+        }
+
+        .section-header {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            font-family: 'Courier New', monospace;
+        }
+
+        .highlight-box {
+            background: rgba(0, 180, 216, 0.05);
+            border-left: 4px solid var(--primary);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: rgba(0, 180, 216, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 180, 216, 0.2);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 180, 216, 0.2);
+            border-color: var(--primary);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .tech-item {
+            background: rgba(0, 180, 216, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 180, 216, 0.2);
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .tech-item:hover {
+            background: rgba(0, 180, 216, 0.1);
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 1rem;
+            margin: 0.5rem 0;
+            background: rgba(0, 180, 216, 0.03);
+            border-radius: 8px;
+            border-left: 3px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .feature-list li:hover {
+            background: rgba(0, 180, 216, 0.08);
+            transform: translateX(10px);
+        }
+
+        .architecture-diagram {
+            background: rgba(2, 5, 16, 0.6);
+            border: 2px solid rgba(0, 180, 216, 0.3);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .process-flow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .process-step {
+            flex: 1;
+            min-width: 200px;
+            background: rgba(0, 180, 216, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 180, 216, 0.2);
+            position: relative;
+        }
+
+        .process-step::after {
+            content: '→';
+            position: absolute;
+            right: -1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .process-step:last-child::after {
+            content: '';
+        }
+
+        .step-number {
+            background: var(--primary);
+            color: var(--dark);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .project-header h1 {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 5rem 1rem 2rem;
+            }
+
+            .back-button {
+                top: 1rem;
+                left: 1rem;
+                padding: 0.5rem 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .process-step::after {
+                content: '↓';
+                right: 50%;
+                top: auto;
+                bottom: -1.5rem;
+                transform: translateX(50%);
+            }
+        }
+
+        .project-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(0, 180, 216, 0.1);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .project-link:hover {
+            background: rgba(0, 180, 216, 0.2);
+            box-shadow: 0 0 20px rgba(0, 180, 216, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Custom Cursor */
+        .cursor {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #00b4d8;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.05s ease-out, opacity 0.2s ease, width 0.2s ease, height 0.2s ease;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px rgba(0, 180, 220, 0.5);
+            opacity: 1;
+            will-change: transform;
+        }
+
+        .cursor.hover {
+            width: 32px;
+            height: 32px;
+            background: rgba(0, 180, 220, 0.1);
+            border-width: 3px;
+            box-shadow: 0 0 20px rgba(0, 180, 220, 0.8);
+        }
+
+        .cursor-glow {
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle, rgba(0, 180, 220, 0.2) 0%, transparent 70%);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            transition: transform 0.1s ease-out, width 0.2s ease, height 0.2s ease;
+            transform: translate(-50%, -50%);
+            will-change: transform;
+        }
+
+        .cursor-glow.hover {
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, rgba(0, 180, 220, 0.3) 0%, transparent 70%);
+        }
+
+        a, button, .stat-card, .tech-item, .feature-list li {
+            cursor: none !important;
+        }
+    </style>
+</head>
+<body style="cursor: none !important; background-color: #020510 !important;">
+    <div id="particles-js"></div>
+    
+    <a href="../index.html" class="back-button">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+
+    <div class="container">
+        <div class="project-header">
+            <div class="project-subtitle">COMPUTER VISION & DEEP LEARNING</div>
+            <h1>Security Footage Pose Estimation System</h1>
+            <div class="project-subtitle">Real-Time Human Pose Detection for Surveillance Applications</div>
+            <div class="project-meta">
+                <span>👁️ 17 Keypoint Detection</span>
+                <span>⚡ Real-time Processing</span>
+                <span>🎯 0.9+ Confidence</span>
+            </div>
+            <a href="https://github.com/RishiShah99/SecurityFootageTracker" target="_blank" class="project-link">
+                <i class="fab fa-github"></i> View on GitHub
+            </a>
+        </div>
+
+        <section class="section">
+            <h2 class="section-header">Overview</h2>
+            <div class="highlight-box">
+                <p><strong>Security Footage Pose Estimation System</strong> applies state-of-the-art pose estimation to security footage analysis, enabling automated detection and tracking of human movements in surveillance videos. Using Keypoint R-CNN, a powerful deep learning architecture, the system identifies 17 body keypoints (joints and key body parts) and overlays skeletal structures onto video frames in real-time.</p>
+            </div>
+            <p>The system processes security footage to extract meaningful motion data, which can be used for activity recognition, anomaly detection, crowd analysis, and behavioral pattern identification. By visualizing human poses with connected keypoints, the system makes complex motion data immediately interpretable for security personnel.</p>
+            
+            <p style="margin-top: 1rem;">Built on PyTorch's pre-trained Keypoint R-CNN ResNet-50 FPN model, the system achieves high confidence detection (0.9+) and generates color-coded skeletal overlays that make complex motion patterns immediately visible to security operators.</p>
+        </section>
+
+        <section class="section">
+            <h2 class="section-header">Technology Stack</h2>
+            <div class="tech-grid">
+                <div class="tech-item">Python</div>
+                <div class="tech-item">PyTorch</div>
+                <div class="tech-item">torchvision</div>
+                <div class="tech-item">Keypoint R-CNN</div>
+                <div class="tech-item">OpenCV</div>
+                <div class="tech-item">Flask</div>
+                <div class="tech-item">NumPy</div>
+                <div class="tech-item">Pillow</div>
+                <div class="tech-item">CUDA</div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-header">Key Metrics</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">17</div>
+                    <div class="stat-label">Body Keypoints</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">15</div>
+                    <div class="stat-label">Skeletal Connections</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">0.9+</div>
+                    <div class="stat-label">Confidence Threshold</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">Real-time</div>
+                    <div class="stat-label">Video Processing</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-header">Technical Deep Dive</h2>
+            
+            <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">Keypoint R-CNN Architecture</h3>
+            <p>
+                Keypoint R-CNN extends Mask R-CNN by adding a keypoint detection head alongside object detection and instance segmentation. The architecture uses ResNet-50 with Feature Pyramid Network (FPN) as its backbone for multi-scale feature extraction.
+            </p>
+
+            <p>
+                The model detects 17 COCO keypoints: nose, eyes, ears, shoulders, elbows, wrists, hips, knees, and ankles. Each detection includes confidence scores, allowing filtering of low-confidence predictions for robust tracking.
+            </p>
+
+            <h3 style="color: var(--secondary); margin: 3rem 0 1rem;">17 COCO Keypoint Locations</h3>
+            <div class="tech-grid">
+                <div class="tech-item">
+                    <h4>Head Region</h4>
+                    <p>0: Nose | 1: Left Eye | 2: Right Eye | 3: Left Ear | 4: Right Ear</p>
+                </div>
+                <div class="tech-item">
+                    <h4>Upper Body</h4>
+                    <p>5: Left Shoulder | 6: Right Shoulder | 7: Left Elbow | 8: Right Elbow</p>
+                </div>
+                <div class="tech-item">
+                    <h4>Arms</h4>
+                    <p>9: Left Wrist | 10: Right Wrist</p>
+                </div>
+                <div class="tech-item">
+                    <h4>Lower Body</h4>
+                    <p>11: Left Hip | 12: Right Hip | 13: Left Knee | 14: Right Knee</p>
+                </div>
+                <div class="tech-item">
+                    <h4>Legs</h4>
+                    <p>15: Left Ankle | 16: Right Ankle</p>
+                </div>
+            </div>
+
+            <h3 style="color: var(--secondary); margin: 3rem 0 1rem;">Skeletal Connection Edges</h3>
+            <p>
+                The system draws 15 connections between keypoints to create a skeletal overlay, each color-coded using HSV color mapping for visual distinction.
+            </p>
+
+            <p>
+                Each edge is rendered with a unique color generated from HSV to RGB conversion, making it easy to track different body parts in crowded scenes.
+            </p>
+
+            <h3 style="color: var(--secondary); margin: 3rem 0 1rem;">Video Processing Pipeline</h3>
+            <p>
+                The system processes each frame by converting it to a tensor, running inference, and overlaying detected keypoints with green circles (3px radius) and colored connection lines (2px thickness).
+            </p>
+        </section>
+
+        <section class="section">
+            <h2 class="section-header">Implementation Details</h2>
+            
+            <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">Keypoint Visualization</h3>
+            <p>
+                The draw_keypoints function processes model outputs by filtering detections based on confidence scores (>0.9), drawing circles at each keypoint location, and connecting them with colored lines using HSV-to-RGB conversion for unique edge coloring.
+            </p>
+
+            <h3 style="color: var(--secondary); margin: 3rem 0 1rem;">Flask Web Interface</h3>
+            <p>
+                The system also includes a Flask web application for single-image pose estimation:
+            </p>
+            <ul class="feature-list">
+                <li><strong>Upload Endpoint:</strong> POST /upload accepts images via multipart form data</li>
+                <li><strong>Processing:</strong> Runs Keypoint R-CNN inference on uploaded image</li>
+                <li><strong>Response:</strong> Returns annotated image with keypoints and skeletal overlay</li>
+                <li><strong>Storage:</strong> Saves results to /results directory for review</li>
+            </ul>
+        </section>
+
+        <section class="section">
+            <h2 class="section-header">Key Features</h2>
+            
+            <ul class="feature-list">
+                <li><strong>Pre-Trained Model:</strong> Leverages torchvision's Keypoint R-CNN trained on COCO dataset</li>
+                <li><strong>High Confidence Filtering:</strong> Only displays detections with >90% confidence for accuracy</li>
+                <li><strong>Color-Coded Visualization:</strong> HSV-based coloring distinguishes different skeletal connections</li>
+                <li><strong>Batch Video Processing:</strong> Processes entire video files with progress tracking via tqdm</li>
+                <li><strong>Web Interface:</strong> Flask app enables easy single-image testing</li>
+                <li><strong>GPU Acceleration:</strong> CUDA support for faster inference on compatible hardware</li>
+                <li><strong>Multi-Person Detection:</strong> Handles multiple people in frame simultaneously</li>
+            </ul>
+        </section>
+
+        <section class="section">
+            <h2 class="section-header">Results & Impact</h2>
+            
+            <p>
+                This system demonstrates practical application of deep learning to security and surveillance, transforming raw video footage into structured pose data. The skeletal overlays make human motion immediately interpretable, enabling quick analysis of behavior patterns.
+            </p>
+            
+            <h3 style="color: var(--secondary); margin: 2rem 0 1rem;">Real-World Applications:</h3>
+            
+            <div style="padding: 1.2rem 1.5rem; margin: 1rem 0; background: rgba(6, 14, 30, 0.6); border-radius: 8px; border-left: 4px solid var(--primary);">
+                <strong>Security Monitoring:</strong> Detect unusual postures or activities
+            </div>
+            
+            <div style="padding: 1.2rem 1.5rem; margin: 1rem 0; background: rgba(6, 14, 30, 0.6); border-radius: 8px; border-left: 4px solid var(--primary);">
+                <strong>Crowd Analysis:</strong> Track movement patterns in public spaces
+            </div>
+            
+            <div style="padding: 1.2rem 1.5rem; margin: 1rem 0; background: rgba(6, 14, 30, 0.6); border-radius: 8px; border-left: 4px solid var(--primary);">
+                <strong>Sports Analytics:</strong> Analyze athlete movements and technique
+            </div>
+            
+            <div style="padding: 1.2rem 1.5rem; margin: 1rem 0; background: rgba(6, 14, 30, 0.6); border-radius: 8px; border-left: 4px solid var(--primary);">
+                <strong>Healthcare:</strong> Monitor patient mobility and fall detection
+            </div>
+            
+            <div style="padding: 1.2rem 1.5rem; margin: 1rem 0; background: rgba(6, 14, 30, 0.6); border-radius: 8px; border-left: 4px solid var(--primary);">
+                <strong>Retail Analytics:</strong> Understand customer behavior and store navigation
+            </div>
+            
+            <div style="padding: 1.2rem 1.5rem; margin: 1rem 0; background: rgba(6, 14, 30, 0.6); border-radius: 8px; border-left: 4px solid var(--primary);">
+                <strong>Manufacturing:</strong> Ensure worker safety and proper ergonomics
+            </div>
+
+            <p>
+                The project showcases how pre-trained models can be effectively deployed for domain-specific applications, reducing the need for extensive custom training while achieving production-quality results.
+            </p>
+        </section>
+
+        <section class="section" style="padding-bottom: 100px;">
+            <h2 class="section-header">Conclusion</h2>
+            
+            <p>
+                By applying Keypoint R-CNN to security footage, this project bridges the gap between raw video data and actionable insights. The system's ability to extract and visualize human poses in real-time makes it a powerful tool for security, analytics, and research applications.
+            </p>
+            <p>
+                This work demonstrates the practical deployment of computer vision models, from loading pre-trained weights to processing videos and building user interfaces. It serves as a template for applying pose estimation to domain-specific problems across various industries.
+            </p>
+
+            <p style="margin-top: 2rem; font-family: 'Courier New', monospace; color: var(--secondary); text-align: center;">
+                // PROTOCOL: POSE_ESTIMATION_PIPELINE<br>
+                // STATUS: REAL_TIME_PROCESSING<br>
+                // INNOVATION: SECURITY_FOOTAGE_ANALYSIS
+            </p>
+        </section>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // Custom cursor
+        const cursor = document.createElement('div');
+        cursor.classList.add('cursor');
+        document.body.appendChild(cursor);
+
+        const cursorGlow = document.createElement('div');
+        cursorGlow.classList.add('cursor-glow');
+        document.body.appendChild(cursorGlow);
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            cursorGlow.style.left = e.clientX + 'px';
+            cursorGlow.style.top = e.clientY + 'px';
+        });
+
+        document.addEventListener('mousedown', () => {
+            cursor.style.transform = 'translate(-50%, -50%) scale(0.8)';
+            cursorGlow.style.transform = 'translate(-50%, -50%) scale(0.8)';
+        });
+
+        document.addEventListener('mouseup', () => {
+            cursor.style.transform = 'translate(-50%, -50%) scale(1)';
+            cursorGlow.style.transform = 'translate(-50%, -50%) scale(1)';
+        });
+
+        const interactiveElements = document.querySelectorAll('a, button, .stat-card, .tech-item, .feature-list li');
+        interactiveElements.forEach(element => {
+            element.addEventListener('mouseenter', () => {
+                cursor.classList.add('hover');
+                cursorGlow.classList.add('hover');
+            });
+            element.addEventListener('mouseleave', () => {
+                cursor.classList.remove('hover');
+                cursorGlow.classList.remove('hover');
+            });
+        });
+
+        // Particles.js configuration
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 70, density: { enable: true, value_area: 800 } },
+                color: { value: '#00b4d8' },
+                shape: { type: 'circle' },
+                opacity: { value: 0.3, random: true },
+                size: { value: 3, random: true },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: '#00b4d8',
+                    opacity: 0.2,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 2,
+                    direction: 'none',
+                    random: false,
+                    straight: false,
+                    out_mode: 'out',
+                    bounce: false
+                }
+            },
+            interactivity: {
+                detect_on: 'canvas',
+                events: {
+                    onhover: { enable: true, mode: 'grab' },
+                    onclick: { enable: true, mode: 'push' },
+                    resize: true
+                },
+                modes: {
+                    grab: { distance: 140, line_linked: { opacity: 0.5 } },
+                    push: { particles_nb: 4 }
+                }
+            },
+            retina_detect: true
+        });
+
+        // Back button scroll behavior
+        const backButton = document.querySelector('.back-button');
+        let lastScroll = 0;
+
+        // Smooth back button navigation
+        backButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // Create transition overlay
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(135deg, #020510 0%, #0a1628 100%);
+                z-index: 99999;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                pointer-events: none;
+            `;
+            document.body.appendChild(overlay);
+            
+            // Fade in overlay
+            setTimeout(() => {
+                overlay.style.opacity = '1';
+            }, 10);
+            
+            // Navigate after overlay is visible
+            setTimeout(() => {
+                window.location.href = '../index.html';
+            }, 200);
+        });
+
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > lastScroll && currentScroll > 100) {
+                // Scrolling down - hide button
+                backButton.classList.add('hidden');
+            } else {
+                // Scrolling up or at top - show button
+                backButton.classList.remove('hidden');
+            }
+            
+            lastScroll = currentScroll;
+        });
+    </script>
+</body>
+</html>
