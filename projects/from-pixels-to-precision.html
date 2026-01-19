@@ -233,6 +233,24 @@
             font-weight: 600;
         }
 
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            margin: 2rem 0;
+            border-radius: 12px;
+            border: 2px solid rgba(0, 180, 216, 0.3);
+        }
+
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -466,6 +484,20 @@
         <!-- Box 2: Overview -->
         <section class="section">
             <h2 class="section-header">Overview</h2>
+            
+            <div class="video-container">
+                <video 
+                    id="project-video"
+                    controls
+                    autoplay
+                    muted
+                    loop>
+                    <source src="../images/tool_segmentation.mp4" type="video/mp4">
+                    <source src="../images/tool_segmentation.avi" type="video/x-msvideo">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+            
             <div class="highlight-box">
                 <p><strong>From Pixels to Precision</strong> addresses a critical challenge in minimally invasive surgery: nearly 30% of surgical complications are caused by misrecognition of artifacts during operations. This neural network segments surgical tools from their background in real time, providing surgeons with an AI guided assist system that enhances precision and reduces the risk of errors.</p>
             </div>
