@@ -1,0 +1,13 @@
+# Local Claude Code state
+.claude/
+
+# QA screenshots (dev-only, regenerated per session)
+.qa_shots/
+
+# Thumbnail working dir
+images/.thumb_candidates/
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
