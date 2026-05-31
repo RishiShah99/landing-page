@@ -1,0 +1,349 @@
+/* ============================================
+   CREAM PAPER — project page
+   Locked 2026-05-31. See memory: project_cream_paper_typography,
+   feedback_project_page_structure.
+   Paper reading column: 880px. Strip all chrome.
+   ============================================ */
+
+:root {
+    /* Backgrounds */
+    --paper:        #f3ece0;
+    --paper-card:   #f9f3e6;
+    --paper-sunk:   #ece4d4;
+
+    /* Ink */
+    --ink:          #1d1a16;
+    --ink-muted:    #6b6359;
+    --ink-faint:    #8e857a;
+
+    /* Lines */
+    --rule:         #d6cdb9;
+    --rule-strong:  #b8ad96;
+
+    /* Accent — warm gold */
+    --accent:       #b18639;
+    --accent-soft:  rgba(177, 134, 57, 0.22);
+
+    /* Tag pills — warm neutral on cream. Locked 2026-06-01 per Rishi. */
+    --tag-bg:       var(--paper-sunk);
+    --tag-ink:      var(--ink-muted);
+
+    /* Fonts */
+    --font-serif:   'EB Garamond', Georgia, 'Times New Roman', serif;
+    --font-sans:    'Inter Tight', system-ui, -apple-system, sans-serif;
+
+    /* Type scale */
+    --text-eyebrow: 12px;
+    --text-small:   14px;
+    --text-body:    17px;
+    --text-h-sub:   20px;
+    --text-h-sec:   26px;
+    --text-title:   56px;
+
+    /* Layout */
+    --col-max:      880px;
+    --gutter:       32px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    background: var(--paper);
+}
+
+body {
+    font-family: var(--font-serif);
+    font-size: var(--text-body);
+    line-height: 1.65;
+    color: var(--ink);
+    background: var(--paper);
+    overflow-x: hidden;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+::selection { background: var(--accent-soft); color: var(--ink); }
+::-moz-selection { background: var(--accent-soft); color: var(--ink); }
+
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: var(--paper); }
+::-webkit-scrollbar-thumb { background: var(--rule-strong); border-radius: 5px; border: 2px solid var(--paper); }
+::-webkit-scrollbar-thumb:hover { background: var(--ink-faint); }
+
+/* Particles layer sits behind content */
+#particles-js {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* ============================================
+   PAGE WRAP
+   ============================================ */
+
+.container {
+    max-width: var(--col-max);
+    margin: 0 auto;
+    padding: 56px var(--gutter) 96px;
+    position: relative;
+    z-index: 1;
+}
+
+/* ============================================
+   BACK LINK (bracket style)
+   ============================================ */
+
+.back-link {
+    font-family: var(--font-sans);
+    font-size: var(--text-small);
+    color: var(--ink-muted);
+    text-decoration: none;
+    letter-spacing: 0.01em;
+    transition: color 0.15s ease;
+    display: inline-block;
+}
+.back-link:hover { color: var(--accent); }
+
+/* ============================================
+   HEADER BLOCK (eyebrow, title, chips, subtitle)
+   ============================================ */
+
+.eyebrow {
+    font-family: var(--font-sans);
+    font-size: var(--text-eyebrow);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 48px 0 18px;
+}
+
+h1.title {
+    font-family: var(--font-sans);
+    font-size: var(--text-title);
+    font-weight: 800;
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin: 0 0 22px;
+}
+h1.title .accent {
+    background-image: linear-gradient(transparent 64%, var(--accent-soft) 64%, var(--accent-soft) 92%, transparent 92%);
+    padding: 0 2px;
+}
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; }
+.chip {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    background: var(--tag-bg);
+    color: var(--tag-ink);
+    padding: 5px 12px;
+    border-radius: 999px;
+}
+
+/* Subtitle — NOT italic. Per memory project_cream_paper_typography. */
+.subtitle {
+    font-family: var(--font-serif);
+    font-size: 21px;
+    line-height: 1.5;
+    color: var(--ink);
+    margin: 0 0 28px;
+    max-width: 640px;
+}
+
+/* ============================================
+   SECTION HEADINGS
+   ============================================ */
+
+h2.section {
+    font-family: var(--font-serif);
+    font-size: var(--text-h-sec);
+    font-weight: 600;
+    color: var(--ink);
+    margin: 56px 0 14px;
+    letter-spacing: -0.005em;
+}
+
+h3.subsection {
+    font-family: var(--font-serif);
+    font-size: var(--text-h-sub);
+    font-weight: 600;
+    color: var(--ink);
+    margin: 28px 0 8px;
+}
+
+/* ============================================
+   BODY TEXT, BULLETS, INLINE LINKS
+   ============================================ */
+
+p { margin: 0 0 14px; }
+p + p { margin-top: 0; }
+
+ul.body-list, ol.body-list { margin: 0 0 14px; padding-left: 22px; }
+ul.body-list li, ol.body-list li { margin-bottom: 10px; }
+ul.body-list li:last-child, ol.body-list li:last-child { margin-bottom: 0; }
+
+strong { font-weight: 600; color: var(--ink); }
+
+a.inline {
+    color: var(--accent);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    transition: color 0.15s ease;
+}
+a.inline:hover { color: var(--ink); }
+
+/* Inline code in body (kept minimal; not a chrome block) */
+code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.92em;
+    background: var(--paper-sunk);
+    color: var(--ink);
+    padding: 1px 6px;
+    border-radius: 3px;
+}
+
+/* Block citation (e.g., BibTeX) — single paper-card */
+pre {
+    background: var(--paper-card);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    margin: 18px 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--ink);
+}
+pre code { background: transparent; padding: 0; font-size: inherit; }
+
+/* ============================================
+   FIGURES (images, videos, charts)
+   ============================================ */
+
+figure { margin: 28px 0; }
+
+.figure-card {
+    background: var(--paper-card);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 18px;
+    text-align: center;
+    overflow: hidden;
+}
+
+.figure-card img,
+.figure-card video,
+.figure-card iframe {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 2px;
+    background: var(--paper-sunk);
+}
+
+.figure-card iframe { aspect-ratio: 16 / 9; }
+
+figcaption {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: var(--text-small);
+    color: var(--ink-muted);
+    text-align: center;
+    margin-top: 10px;
+}
+
+/* ============================================
+   RESULTS TABLE
+   ============================================ */
+
+table.results {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 18px 0 14px;
+    font-family: var(--font-serif);
+    font-size: var(--text-small);
+}
+table.results th,
+table.results td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--rule);
+}
+table.results th {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-size: 11px;
+    color: var(--ink-muted);
+    border-bottom: 1px solid var(--rule-strong);
+}
+table.results td.num { font-variant-numeric: tabular-nums; }
+table.results tr:last-child td { border-bottom: none; }
+
+/* ============================================
+   SEPARATOR
+   ============================================ */
+
+hr.sep {
+    border: none;
+    border-top: 1px solid var(--rule);
+    margin: 56px 0 0;
+}
+
+/* ============================================
+   PAGE TRANSITION OVERLAY (cream)
+   ============================================ */
+
+.page-transition-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--paper);
+    z-index: 99999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 1024px) {
+    :root { --text-title: 48px; }
+    .container { padding: 40px 24px 80px; }
+}
+
+@media (max-width: 768px) {
+    :root {
+        --text-title: 38px;
+        --text-h-sec: 22px;
+        --text-h-sub: 18px;
+    }
+    .container { padding: 32px 20px 64px; }
+    .eyebrow { margin: 32px 0 14px; }
+    .subtitle { font-size: 18px; }
+    h2.section { margin: 44px 0 12px; }
+    h3.subsection { margin: 22px 0 6px; }
+    .figure-card { padding: 12px; }
+}
+
+@media (max-width: 480px) {
+    :root { --text-title: 32px; }
+    .subtitle { font-size: 17px; }
+    table.results { font-size: 13px; }
+    table.results th, table.results td { padding: 8px 10px; }
+}
