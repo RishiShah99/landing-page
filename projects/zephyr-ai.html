@@ -1,777 +1,170 @@
 <!DOCTYPE html>
-<html lang="en" style="cursor: none !important; background-color: #020510 !important;">
+<html lang="en" style="background-color: #f3ece0;">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zephyr - Dual Interface AI Assistant | Rishi Shah</title>
-    <meta name="description" content="A personal AI assistant combining instant popup access with a powerful dashboard. Voice commands, intelligent memory, and seamless workflow integration.">
-    <style>
-        /* CRITICAL: Hide cursor and background immediately on page load */
-        html, body, * {
-            cursor: none !important;
-        }
-        html, body {
-            background-color: #020510 !important;
-            margin: 0;
-            padding: 0;
-        }
-    </style>
+    <title>Zephyr · Dual-interface personal AI with persistent memory | Rishi Shah</title>
+    <meta name="description" content="A personal AI assistant that ships two interfaces over one backend. Tkinter popup on a global hotkey, Electron dashboard for the full workspace, Flask API and SQLite memory shared between them. Multi-LLM routing across Groq, OpenAI, and Gemini.">
+
     <link rel="prefetch" href="../index.html">
-    <link rel="preload" href="../style.css" as="style">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/17ea408dcc.js" crossorigin="anonymous"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    <style>html, body { background-color: #f3ece0; margin: 0; padding: 0; }</style>
 
-        :root {
-            --primary: #00b4d8;
-            --secondary: #5EEAD4;
-            --dark: #020510;
-            --darker: #0a1628;
-            --light: #e0f2fe;
-            --accent: #38bdf8;
-        }
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
-            color: var(--light);
-            line-height: 1.6;
-            min-height: 100vh;
-            overflow-x: hidden;
-            cursor: none !important;
-        }
-
-        * {
-            cursor: none !important;
-        }
-
-        #particles-js {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: 5;
-            pointer-events: none;
-        }
-
-        .back-button {
-            position: fixed;
-            top: 2rem;
-            left: 2rem;
-            z-index: 10001;
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 180, 216, 0.1);
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            text-decoration: none;
-            border-radius: 50%;
-            font-size: 1.2rem;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(10px);
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        .back-button.hidden {
-            opacity: 0;
-            transform: translateX(-20px);
-            pointer-events: none;
-        }
-
-        .back-button:hover {
-            background: rgba(0, 180, 216, 0.2);
-            transform: scale(1.1);
-            box-shadow: 0 0 30px rgba(0, 180, 216, 0.4);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 6rem 2rem 4rem;
-            position: relative;
-            z-index: 10;
-        }
-
-        .project-header {
-            text-align: center;
-            margin-bottom: 4rem;
-            padding: 3rem 2rem;
-            background: rgba(10, 22, 40, 0.5);
-            border-radius: 16px;
-            border: 1px solid rgba(0, 180, 216, 0.2);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .project-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--primary), transparent);
-            animation: scan 3s infinite;
-        }
-
-        @keyframes scan {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-
-        .project-header h1 {
-            font-size: 3rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .project-subtitle {
-            font-size: 1.1rem;
-            color: var(--secondary);
-            font-weight: 300;
-            margin-bottom: 0.5rem;
-        }
-
-        .project-meta {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-top: 1.5rem;
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .section {
-            margin-bottom: 2rem;
-            padding: 2rem;
-            background: rgba(10, 22, 40, 0.3);
-            border-radius: 12px;
-            border: 1px solid rgba(0, 180, 216, 0.1);
-        }
-
-        .section-header {
-            font-size: 2rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            color: var(--primary);
-            font-family: 'Courier New', monospace;
-        }
-
-        .highlight-box {
-            background: rgba(0, 180, 216, 0.05);
-            border-left: 4px solid var(--primary);
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-            border-radius: 8px;
-        }
-
-        /* Document-style formatting */
-        .document-section {
-            margin-bottom: 2rem;
-            padding: 3rem;
-            background: rgba(10, 22, 40, 0.3);
-            border-radius: 12px;
-            border: 1px solid rgba(0, 180, 216, 0.1);
-        }
-
-        .document-section h1 {
-            font-size: 2rem;
-            font-weight: 600;
-            color: var(--primary);
-            font-family: 'Courier New', monospace;
-            margin-bottom: 1.5rem;
-            margin-top: 2.5rem;
-        }
-
-        .document-section h1:first-child {
-            margin-top: 0;
-        }
-
-        .document-section h2 {
-            font-size: 1.3rem;
-            font-weight: 500;
-            color: var(--secondary);
-            margin-bottom: 1rem;
-            margin-top: 2rem;
-        }
-
-        .document-section p {
-            font-size: 1rem;
-            line-height: 1.8;
-            color: rgba(255, 255, 255, 0.85);
-            margin-bottom: 1rem;
-        }
-
-        .document-section ul {
-            margin: 1rem 0 1rem 1.5rem;
-            list-style-type: disc;
-        }
-
-        .document-section ul li {
-            font-size: 1rem;
-            line-height: 1.8;
-            color: rgba(255, 255, 255, 0.85);
-            margin-bottom: 0.5rem;
-        }
-
-        .document-section strong {
-            color: #ffffff;
-            font-weight: 600;
-        }
-
-        .document-section code {
-            background: rgba(0, 180, 216, 0.1);
-            padding: 0.2rem 0.4rem;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-            color: var(--secondary);
-            font-size: 0.9em;
-        }
-
-        .document-section pre {
-            background: rgba(2, 5, 16, 0.8);
-            padding: 1rem;
-            border-radius: 6px;
-            overflow-x: auto;
-            margin: 1rem 0;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .stat-card {
-            background: rgba(0, 180, 216, 0.05);
-            padding: 1.5rem;
-            border-radius: 12px;
-            border: 1px solid rgba(0, 180, 216, 0.2);
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 180, 216, 0.2);
-            border-color: var(--primary);
-        }
-
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-label {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .tech-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin: 2rem 0;
-        }
-
-        .tech-item {
-            background: rgba(0, 180, 216, 0.05);
-            padding: 1rem;
-            border-radius: 8px;
-            border: 1px solid rgba(0, 180, 216, 0.2);
-            text-align: center;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .tech-item:hover {
-            background: rgba(0, 180, 216, 0.1);
-            border-color: var(--primary);
-            transform: scale(1.05);
-        }
-
-        @media (max-width: 768px) {
-            .project-header h1 {
-                font-size: 2rem;
-            }
-
-            .container {
-                padding: 5rem 1rem 2rem;
-            }
-
-            .back-button {
-                top: 1rem;
-                left: 1rem;
-                padding: 0.5rem 1rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .project-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 1rem;
-            padding: 0.75rem 1.5rem;
-            background: rgba(0, 180, 216, 0.1);
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            text-decoration: none;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .project-link:hover {
-            background: rgba(0, 180, 216, 0.2);
-            box-shadow: 0 0 20px rgba(0, 180, 216, 0.3);
-            transform: translateY(-2px);
-        }
-
-        /* Custom Cursor */
-        .cursor {
-            width: 16px;
-            height: 16px;
-            border: 2px solid #00b4d8;
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 9999;
-            transition: transform 0.05s ease-out, opacity 0.2s ease, width 0.2s ease, height 0.2s ease;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 0 10px rgba(0, 180, 220, 0.5);
-            opacity: 1;
-            will-change: transform;
-        }
-
-        .cursor.hover {
-            width: 32px;
-            height: 32px;
-            background: rgba(0, 180, 220, 0.1);
-            border-width: 3px;
-            box-shadow: 0 0 20px rgba(0, 180, 220, 0.8);
-        }
-
-        .cursor-glow {
-            width: 40px;
-            height: 40px;
-            background: radial-gradient(circle, rgba(0, 180, 220, 0.2) 0%, transparent 70%);
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 9998;
-            transition: transform 0.1s ease-out, width 0.2s ease, height 0.2s ease;
-            transform: translate(-50%, -50%);
-            will-change: transform;
-        }
-
-        .cursor-glow.hover {
-            width: 60px;
-            height: 60px;
-            background: radial-gradient(circle, rgba(0, 180, 220, 0.3) 0%, transparent 70%);
-        }
-
-        a, button, .stat-card, .tech-item {
-            cursor: none !important;
-        }
-    </style>
+    <link rel="stylesheet" href="project.css">
+    <script defer src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script defer src="../shared.js"></script>
+    <script defer src="project.js"></script>
 </head>
 <body>
     <div id="particles-js"></div>
-    
-    <a href="../index.html" class="back-button">
-        <i class="fas fa-arrow-left"></i>
-    </a>
 
     <div class="container">
-        <!-- Box 1: Header -->
-        <div class="project-header">
-            <div class="project-subtitle">DUAL INTERFACE AI ASSISTANT</div>
-            <h1>Zephyr</h1>
-            <div class="project-subtitle">Instant Popup Access + Powerful Dashboard Interface</div>
-            <div class="project-meta">
-                <span>⚡ Ctrl+Alt+Z Hotkey</span>
-                <span>🎙️ Voice Commands</span>
-                <span>🧠 Smart Memory</span>
-            </div>
-            <a href="https://github.com/RishiShah99/Zephyr" target="_blank" class="project-link">
-                <i class="fab fa-github"></i> View on GitHub
-            </a>
+        <a class="back-link" href="../index.html">[ Back to home ]</a>
+
+        <div class="eyebrow">2024</div>
+
+        <h1 class="title">A dual-interface personal AI <span class="accent">assistant</span>.</h1>
+
+        <div class="chips">
+            <span class="chip">Personal AI</span>
+            <span class="chip">Productivity</span>
+            <span class="chip">Multi-LLM</span>
         </div>
 
-        <!-- Box 2: Overview -->
-        <section class="section">
-            <h2 class="section-header">Overview</h2>
-            <div class="highlight-box">
-                <p><strong>Zephyr</strong> is a personal AI assistant that combines the speed of a minimal popup interface with the power of a full featured dashboard. Designed for seamless integration into your daily workflow with voice commands, natural language processing, and intelligent memory.</p>
-            </div>
-            <p>Built to be your always accessible companion that remembers, assists, and adapts to your needs. Press Ctrl+Alt+Z for instant access, or launch the full dashboard for advanced features and visual management.</p>
-            
-            <p style="margin-top: 1rem;">The dual interface system provides flexibility: quick commands through the popup (Tiny Zephyr) for speed, and a comprehensive React/Electron dashboard for deep interaction. Seamless transitions between both interfaces with one click expansion and system tray integration for background operation.</p>
-        </section>
-
-        <!-- Box 3: Technology Stack -->
-        <section class="section">
-            <h2 class="section-header">Technology Stack</h2>
-            <div class="tech-grid">
-                <div class="tech-item">Python 3.x</div>
-                <div class="tech-item">Flask</div>
-                <div class="tech-item">Tkinter</div>
-                <div class="tech-item">React 18</div>
-                <div class="tech-item">Vite</div>
-                <div class="tech-item">Electron</div>
-                <div class="tech-item">TailwindCSS</div>
-                <div class="tech-item">Framer Motion</div>
-                <div class="tech-item">SQLite</div>
-                <div class="tech-item">Groq API</div>
-                <div class="tech-item">OpenAI API</div>
-                <div class="tech-item">Gemini API</div>
-                <div class="tech-item">Spotipy</div>
-                <div class="tech-item">WeatherAPI</div>
-                <div class="tech-item">Google Calendar</div>
-            </div>
-        </section>
-
-        <!-- Box 4: Main Document Content -->
-        <section class="document-section">
-            <h1>Design Philosophy</h1>
-
-            <h2>The Dual Interface Problem</h2>
-            <p>Traditional AI assistants force users to choose between two extremes: lightweight mobile apps with limited functionality, or heavy desktop applications that take time to launch and navigate. Zephyr solves this by implementing a dual interface system where both experiences coexist and complement each other.</p>
-
-            <p>The core insight is that different tasks require different interaction modes. Quick queries like "what's the weather" or "play music" benefit from instant popup access without disrupting workflow. Complex tasks like reviewing conversation history, managing projects, or configuring integrations benefit from a full dashboard with visual organization and detailed controls.</p>
-
-            <p>Rather than compromising on either experience, Zephyr provides both: Tiny Zephyr for speed and Dashboard for power, with seamless transitions between them.</p>
-
-            <h2>System Architecture Principles</h2>
-            <p>Zephyr employs a three tier architecture that separates concerns while enabling tight integration:</p>
-
-            <ul>
-                <li><strong>Tiny Zephyr (Frontend):</strong> Minimal Tkinter interface providing instant popup access with global hotkey registration and voice input</li>
-                <li><strong>Flask API Server (Bridge):</strong> RESTful API running on localhost that bridges communication between interfaces and manages backend services</li>
-                <li><strong>Dashboard (Full Interface):</strong> React/Electron application providing comprehensive visual management and advanced features</li>
-            </ul>
-
-            <p>This separation allows each component to be developed, optimized, and scaled independently while maintaining a cohesive user experience. The API server acts as a central hub, ensuring both interfaces access the same data and functionality.</p>
-
-            <h1>Core Capabilities</h1>
-
-            <h2>Intelligent Natural Language Processing</h2>
-            <p>Zephyr integrates multiple LLM providers (Groq, OpenAI, Gemini) to ensure reliable natural language understanding regardless of API availability. The command processing pipeline analyzes user input, extracts intent, routes to appropriate handlers, and generates context aware responses.</p>
-
-            <p>Unlike simple keyword matching, Zephyr understands conversational context. "Play that song again" works because the system retains memory of previous music requests. "What about tomorrow?" understands temporal context from prior weather queries. This contextual awareness makes interactions feel natural rather than robotic.</p>
-
-            <p>Voice input extends accessibility beyond keyboard commands. Text to speech with streaming responses provides auditory feedback, making Zephyr usable hands free during multitasking scenarios like cooking, driving, or working with physical tools.</p>
-
-            <h2>Persistent Memory System</h2>
-            <p>Memory is what transforms a stateless chatbot into a persistent assistant. Zephyr implements a SQLite backed memory system that stores:</p>
-
-            <ul>
-                <li><strong>Learned Facts:</strong> Information extracted from conversations ("I prefer dark mode", "My birthday is March 15th")</li>
-                <li><strong>User Preferences:</strong> Implicit behavior patterns (frequently used commands, preferred music genres)</li>
-                <li><strong>Conversation Context:</strong> Recent exchanges enabling multi turn dialogues</li>
-                <li><strong>Project Ideas:</strong> Tracked concepts, tasks, and creative inspirations organized by topic</li>
-            </ul>
-
-            <p>The memory system uses optimized SQL queries for fast retrieval, ensuring sub 100ms lookup times even with thousands of stored facts. Relevance scoring prioritizes recent and frequently accessed memories, making context retrieval intelligent rather than chronological.</p>
-
-            <h2>Rich Third Party Integrations</h2>
-            <p>Zephyr extends beyond conversation through deep integrations with external services:</p>
-
-            <p><strong>Spotify Control:</strong> Full playback management through Spotipy library. Natural commands like "play jazz" search Spotify's catalog, "skip this song" advances tracks, and "what's playing" retrieves current song metadata. Integration maintains active session state, allowing control even when Spotify is minimized.</p>
-
-            <p><strong>Weather Information:</strong> Real time weather data via WeatherAPI with location based queries. "What's the weather" uses system location, "weather in Tokyo" supports arbitrary locations. Responses include current conditions, forecasts, and contextual advice ("bring an umbrella").</p>
-
-            <p><strong>Google Calendar:</strong> Event retrieval and creation through Calendar API. "What's on my schedule" lists upcoming events, "add meeting tomorrow at 3pm" creates calendar entries. Natural language parsing handles relative dates ("next Wednesday") and recurring events ("every Monday").</p>
-
-            <p><strong>File Management:</strong> Local file search and organization using OS level APIs. "Find my resume" scans common directories, "open project folder" launches file explorer at specific paths. Integration respects system permissions and user configured search paths.</p>
-
-            <h1>Technical Implementation</h1>
-
-            <h2>Tiny Zephyr: The Popup Interface</h2>
-            <p>Built with Python's Tkinter library, Tiny Zephyr prioritizes minimal resource usage and instant responsiveness. The interface consists of a single window with dark theme styling, positioned at screen center with slide in animations.</p>
-
-            <p><strong>Global Hotkey Registration:</strong> System wide Ctrl+Alt+Z binding requires administrator privileges on Windows. The hotkey listener runs in a background thread, detecting activation even when Zephyr is minimized. Pressing the hotkey brings the window to foreground focus, ready for immediate input.</p>
-
-            <p><strong>Auto Hide Behavior:</strong> When focus is lost (user clicks outside window), Tiny Zephyr automatically hides after configurable timeout. This prevents screen clutter while keeping the application running in background. System tray icon provides persistent access and status indication.</p>
-
-            <p><strong>Voice Recording:</strong> Microphone access enables hands free operation. Clicking the microphone button starts recording, which continues until silence detection or manual stop. Audio is processed locally, converted to text via speech recognition, and sent to NLP pipeline as if typed.</p>
-
-            <p><strong>Streaming Responses:</strong> Rather than waiting for complete LLM responses, Tiny Zephyr streams text as it generates. This provides immediate feedback, reduces perceived latency, and enables interruption of long responses. Text to speech synthesis runs concurrently with display, creating natural conversational flow.</p>
-
-            <h2>Flask API Server: The Communication Bridge</h2>
-            <p>The Flask server runs on <code>localhost:5000</code> and provides RESTful endpoints for both interfaces. It auto starts with Tiny Zephyr but remains accessible independently, enabling remote access if configured.</p>
-
-            <p><strong>Command Endpoint (<code>POST /command</code>):</strong> Primary entry point for natural language processing. Accepts JSON with command text, routes to appropriate handler (weather, music, memory, etc.), executes action, and returns structured response. Handles concurrent requests through Flask's threading model.</p>
-
-            <p><strong>Memory Endpoints (<code>GET/POST/DELETE /memory</code>):</strong> Full CRUD operations for memory database. Dashboard uses these to visualize stored facts, allow manual editing, and batch delete outdated information. Supports filtering by date, category, and relevance score.</p>
-
-            <p><strong>Project Endpoints (<code>GET/POST /projects</code>):</strong> Manage project ideas and task tracking. Projects have titles, descriptions, status (active, completed, archived), and tags. The dashboard displays projects as cards with visual status indicators and search filtering.</p>
-
-            <p><strong>Integration Endpoints:</strong> Dedicated routes for Spotify control (<code>POST /spotify/control</code>), weather queries (<code>GET /weather</code>), and calendar access (<code>GET /calendar/events</code>). These endpoints abstract third party API complexity, providing consistent interfaces regardless of underlying service.</p>
-
-            <h2>Dashboard: The Visual Management Interface</h2>
-            <p>Built with React 18, Vite, and Electron, the dashboard provides a modern web experience wrapped in a native desktop application. TailwindCSS enables rapid UI development while Framer Motion adds smooth animations and transitions.</p>
-
-            <p><strong>Conversation History View:</strong> Displays complete dialogue history with message threading, timestamps, and speaker identification (user vs assistant). Search and filter by date range or keyword. Export conversations to JSON or Markdown for archival.</p>
-
-            <p><strong>Memory Browser:</strong> Visual interface for exploring stored facts organized by category. Tag cloud shows frequently referenced topics. Manual editing allows corrections to learned information. Bulk operations enable cleanup of outdated memories.</p>
-
-            <p><strong>Project Dashboard:</strong> Kanban style board for managing ideas and tasks. Drag and drop between status columns (idea, in progress, completed). Rich text descriptions with Markdown support. Attachment uploads for related files and images.</p>
-
-            <p><strong>Settings Panel:</strong> Comprehensive configuration for LLM providers (API keys, model selection), integrations (Spotify credentials, Calendar auth), appearance (theme, font size), and behavior (auto hide timeout, wake word sensitivity). Changes persist to local config files and sync with API server.</p>
-
-            <p><strong>Real Time Sync:</strong> Dashboard maintains WebSocket connection to Flask server for live updates. When Tiny Zephyr executes a command, changes propagate to open dashboard instances instantly. This enables monitoring assistant activity while using the popup interface.</p>
-
-            <h1>Advanced Features</h1>
-
-            <h2>Command Routing & Extensibility</h2>
-            <p>Zephyr's command system uses pattern matching combined with LLM intent detection. When a command arrives, the router first checks for exact matches ("weather", "spotify play"), then fuzzy matches ("what's the temperature" → weather), and finally falls back to LLM classification for ambiguous queries.</p>
-
-            <p>The modular handler system allows easy extension. Each integration is a separate Python module implementing a standard interface with <code>can_handle(command)</code> and <code>execute(command)</code> methods. New integrations simply register with the router without modifying core code.</p>
-
-            <p>Custom commands can be defined through configuration files. Users specify regex patterns and corresponding actions (run script, open URL, execute shell command). This enables personal workflows like "start work mode" executing a sequence of application launches and music playback.</p>
-
-            <h2>Privacy & Local First Operation</h2>
-            <p>While Zephyr relies on cloud LLM APIs for natural language understanding, all data storage is local first. Memories, conversations, and projects reside in SQLite databases on user's machine with no cloud sync by default.</p>
-
-            <p>API keys are stored in local configuration files with filesystem permissions restricting access. Conversations sent to LLM providers are not logged server side (depending on provider policies). Users can configure which integrations are active, disabling cloud services entirely for offline operation with reduced functionality.</p>
-
-            <p>Future roadmap includes local LLM support through models like Llama or Mistral running on user's GPU. This would enable fully offline operation while maintaining natural language capabilities, though at cost of increased resource usage and setup complexity.</p>
-
-            <h1>Project Structure & Codebase</h1>
-
-            <h2>Backend Architecture</h2>
-            <p>The Python backend follows a modular design with clear separation of concerns:</p>
-
-            <ul>
-                <li><strong>app.py:</strong> Application entry point, launches Tiny Zephyr and API server</li>
-                <li><strong>ui.py:</strong> Tkinter interface implementation with hotkey registration and voice input</li>
-                <li><strong>assistant.py:</strong> Command routing logic and handler orchestration</li>
-                <li><strong>groq_nlp.py:</strong> NLP processing with multi provider LLM support (Groq, OpenAI, Gemini)</li>
-                <li><strong>api_server.py:</strong> Flask REST API with endpoint definitions</li>
-                <li><strong>memory_db.py:</strong> SQLite database layer with CRUD operations and query optimization</li>
-                <li><strong>projects.py:</strong> Project and idea management system</li>
-                <li><strong>weather.py:</strong> WeatherAPI integration for location based forecasts</li>
-                <li><strong>spotify.py:</strong> Spotipy wrapper for music playback control</li>
-                <li><strong>calendar_integration.py:</strong> Google Calendar API client</li>
-                <li><strong>settings.py:</strong> Configuration management and persistence</li>
-                <li><strong>tray_icon.py:</strong> System tray integration for background operation</li>
-            </ul>
-
-            <p>Each module exposes a clean interface, enabling independent testing and replacement. For example, swapping Groq for another LLM provider requires modifying only <code>groq_nlp.py</code> without touching command routing or UI code.</p>
-
-            <h2>Frontend Architecture</h2>
-            <p>The React dashboard uses modern hooks based architecture with functional components throughout. State management relies on React Context for global state (user settings, auth tokens) and local state for component specific data.</p>
-
-            <p>Component structure follows atomic design principles: atoms (buttons, inputs), molecules (search bars, card headers), organisms (conversation list, project board), and pages (dashboard home, settings). This promotes reusability and consistent styling.</p>
-
-            <p>Vite provides fast development builds with hot module replacement. Changes to React components reload instantly without full page refresh, accelerating iteration speed. Production builds are optimized with tree shaking and code splitting for minimal bundle size.</p>
-
-            <p>Electron wraps the React app in a native window with access to Node.js APIs. This enables filesystem operations, system tray integration, and window management unavailable to web applications. Inter process communication between Electron main process and renderer allows secure API key storage in protected memory.</p>
-
-            <h1>Deployment & Distribution</h1>
-
-            <h2>Installation Process</h2>
-            <p>Zephyr is distributed as source code requiring local setup. Users clone the repository, install Python dependencies via <code>pip install -r requirements.txt</code>, and configure API keys in <code>config.json</code>. The dashboard requires Node.js for building: <code>npm install</code> followed by <code>npm run build</code> produces production bundles.</p>
-
-            <p>Global hotkey registration requires administrator privileges on Windows. Users must run Tiny Zephyr with elevated permissions or configure system wide hotkey policies. This limitation is inherent to Windows security model and not easily avoidable without signed drivers.</p>
-
-            <p>Future distribution plans include packaged executables (PyInstaller for Python backend, Electron Builder for dashboard) eliminating manual dependency installation. Installers would handle API key configuration through setup wizard and register Windows hotkeys during installation.</p>
-
-            <h2>Current Limitations</h2>
-            <p>Several constraints limit Zephyr's current reach and capabilities:</p>
-
-            <ul>
-                <li><strong>Windows Only:</strong> Global hotkey library and system tray integration use Windows specific APIs. macOS and Linux require alternative libraries (pynput, AppKit) with different permission models</li>
-                <li><strong>Single Instance:</strong> Multiple Zephyr instances conflict over hotkey binding and port 5000. Implementing multi instance support requires dynamic port allocation and inter process coordination</li>
-                <li><strong>API Keys Required:</strong> Core functionality depends on third party services (Groq, Spotify, WeatherAPI). Users without API access have degraded experience. Local LLM support would reduce this dependency</li>
-                <li><strong>Network Dependent:</strong> Most features require internet connectivity. Offline mode is limited to local file operations and cached memories. Full offline support requires local LLM inference</li>
-            </ul>
-
-            <h1>Future Development Roadmap</h1>
-
-            <h2>Cross Platform Support</h2>
-            <p>Porting Zephyr to macOS and Linux involves replacing platform specific components. Global hotkey registration can use <code>pynput</code> (cross platform) or platform native APIs (macOS Accessibility, Linux X11). System tray integration requires AppKit on macOS and GTK on Linux.</p>
-
-            <p>The Flask API and dashboard are already cross platform, requiring no changes. Main effort focuses on Tiny Zephyr's UI and hotkey handling. Electron provides consistent window management across platforms, simplifying dashboard distribution.</p>
-
-            <h2>Cloud Sync & Multi Device Access</h2>
-            <p>Optional cloud sync would enable memory and project synchronization across devices. Implementation could use encrypted cloud storage (S3, Firebase) with end to end encryption ensuring privacy. Sync conflicts resolved through last write wins or manual merge interfaces.</p>
-
-            <p>Mobile companion app (React Native) would provide on the go access to memories, projects, and limited command execution. Push notifications could alert about calendar events or custom triggers ("remind me when I'm near grocery store").</p>
-
-            <h2>Plugin System & Marketplace</h2>
-            <p>A formal plugin API would enable community contributions without modifying core code. Plugins declare capabilities (commands handled, integrations provided), register with router, and receive isolated execution contexts. Sandboxing prevents malicious plugins from accessing sensitive data.</p>
-
-            <p>Plugin marketplace (web based discovery portal) allows browsing, rating, and installing extensions. Examples: GitHub integration (create issues, check PRs), stock market tracking, smart home control (Philips Hue, Nest), workout logging (Strava, Fitbit).</p>
-
-            <h2>Advanced AI Features</h2>
-            <p>Local LLM support through Ollama, LM Studio, or llama.cpp would enable offline operation with privacy guarantees. Fine tuning on user's conversation history could create personalized models understanding individual communication styles and preferences.</p>
-
-            <p>Proactive suggestions based on behavior patterns: "It's 9 AM, want me to start your work playlist?" or "You usually check weather before leaving, looks like rain today." Machine learning on usage patterns identifies automation opportunities.</p>
-
-            <p>Multi modal inputs beyond text and voice: screenshot analysis ("what's in this image"), handwriting recognition (stylus or tablet input), and sentiment detection (adjust response tone based on user emotion).</p>
-
-            <h1>Conclusion</h1>
-            
-            <p>Zephyr demonstrates that personal AI assistants don't require choosing between speed and power. The dual interface architecture provides instant popup access for quick tasks and comprehensive dashboard for complex workflows, with seamless transitions between both experiences.</p>
-
-            <p>By combining modern web technologies (React, Electron) with a robust Python backend, Zephyr achieves flexibility and extensibility without sacrificing user experience. The three tier architecture (Frontend, API Bridge, Dashboard) cleanly separates concerns while enabling tight integration through well defined interfaces.</p>
-
-            <p>Open source and built for extension, Zephyr serves as both a functional assistant and a foundation for exploring AI integration patterns. The modular command system, persistent memory, and rich integrations showcase how to build intelligent systems that adapt to user needs rather than forcing users to adapt to rigid interfaces.</p>
-
-            <p>As AI capabilities advance and local models improve, Zephyr's architecture positions it to incorporate new technologies without fundamental redesigns. The goal remains constant: an always accessible, intelligent companion that enhances productivity and integrates seamlessly into daily life.</p>
-        </section>
+        <p class="subtitle">Press <code>Ctrl+Alt+Z</code> for an instant popup. Launch the Electron dashboard for the full workspace. Both surfaces talk to one Flask API and one SQLite memory store, so the assistant feels like one tool no matter where it is invoked from.</p>
+
+        <!-- ============================================================== -->
+        <h2 class="section">1. Abstract</h2>
+        <p>Personal AI assistants usually force a tradeoff. A lightweight popup is fast but cannot do much. A heavy desktop app can do everything but takes too long to open for the small task that triggered the impulse to ask. Zephyr ships both, sharing one backend so memory and integrations stay consistent across surfaces. Quick command, popup. Complex management, dashboard. The user never feels like the assistant has two minds.</p>
+
+        <p>The implementation is a three-tier architecture. A <strong>Tkinter popup</strong> on a system-wide hotkey (<code>Ctrl+Alt+Z</code>) for instant capture. A <strong>Flask API</strong> on localhost that owns all state. An <strong>Electron + React dashboard</strong> for the full workspace: conversation history, memory browser, project board, settings. The popup and the dashboard never talk to each other; both speak only to the API. SQLite holds persistent memory, integrations sit behind their own endpoints, and a multi-LLM router fronts Groq Llama 3.1 8B, OpenAI, and Gemini so a single provider outage does not take the assistant down.</p>
+
+        <p>The novelty is the surface design, not the LLM. Multi-LLM routing exists, SQLite-backed memory exists, system-tray apps exist. The contribution is the discipline that keeps two interfaces backed by one backend feel like a single product: the API is the only abstraction boundary, every integration is a single Python module that registers two functions, and the dashboard treats popup activity as just another client of the same endpoints.</p>
+
+        <ul class="body-list">
+            <li><strong>Three-tier architecture.</strong> Tkinter popup, Flask API on <code>localhost:5000</code>, Electron + React dashboard. One backend, two interfaces, zero direct UI-to-UI traffic.</li>
+            <li><strong>Sub-100 ms memory lookups</strong> from SQLite across thousands of stored facts, with relevance scoring that prioritises recent and frequently-accessed entries.</li>
+            <li><strong>Multi-LLM router with provider fallback.</strong> Groq Llama 3.1 8B is the default for speed. OpenAI and Gemini back it up automatically when the primary is unavailable.</li>
+            <li><strong>Streaming responses to both surfaces</strong> via the same Flask endpoint. Perceived latency is dominated by network, not by the architecture.</li>
+            <li><strong>Plugin-style integrations.</strong> A new handler is one Python module with a <code>can_handle()</code> and an <code>execute()</code>. No core changes, no router edits.</li>
+            <li><strong>Spotify, Google Calendar, WeatherAPI, and local file search</strong> as first-party integrations, all behind their own routed endpoints.</li>
+        </ul>
+
+        <!-- ============================================================== -->
+        <h2 class="section">2. Introduction</h2>
+        <p>Voice assistants on phones are fast but shallow. Desktop AI apps are deep but slow to launch and slow to navigate. The user's tasks do not fit either shape cleanly; they span the same memory, but they want different interfaces depending on what they are doing.</p>
+        <ul class="body-list">
+            <li><strong>Quick tasks need a fast capture surface.</strong> "Remind me to email the registrar tomorrow." The cognitive cost of opening a dashboard, navigating to the right pane, and clicking through forms kills the impulse before the thought reaches the keyboard.</li>
+            <li><strong>Complex tasks need a workspace.</strong> "Pull up everything we logged about the rehab study, group by week, export to markdown." A popup is the wrong shape for that kind of exploration; a dashboard is the right one.</li>
+            <li><strong>Both tasks share memory.</strong> The assistant cannot have two personas. What you tell the popup must be available to the dashboard, and vice versa, without manual sync.</li>
+        </ul>
+
+        <h3 class="subsection">2.1 Why three tiers, not two</h3>
+        <p>The naive design is one process that ships both UIs. That fails as soon as either UI wants to update independently, run on a different machine, or be replaced by a third client (a mobile companion, a Slack bot, a voice device). The three-tier split puts the API in the middle as the only stable contract, and each UI becomes a thin client of that contract. Cost: an extra process. Benefit: the assistant can grow without rebuilding state management each time.</p>
+        <ul class="body-list">
+            <li><strong>The API is the abstraction boundary.</strong> All state lives in the Flask server. The popup is a UI, not a backend with a UI on top of it.</li>
+            <li><strong>The popup and dashboard never share code beyond the API contract.</strong> Tkinter and Electron speak the same JSON over HTTP, and that is all they have in common.</li>
+            <li><strong>New surfaces are cheap.</strong> A mobile companion or a Slack endpoint adds another client of the same API rather than another state owner.</li>
+        </ul>
+
+        <h3 class="subsection">2.2 What is actually new</h3>
+        <p>Tkinter is decades old. Flask is decades old. Electron is a known quantity. The LLM providers are off the shelf. The contribution is the structural design that holds those pieces together into something that feels like one product.</p>
+        <ul class="body-list">
+            <li><strong>Two interfaces, one backend, zero state drift.</strong> Memory written by the popup is visible to the dashboard within a single API roundtrip. There is no sync layer because there is no second source of truth.</li>
+            <li><strong>Provider-agnostic LLM layer.</strong> The router treats Groq, OpenAI, and Gemini as interchangeable for the same task. Falling back across providers does not require the calling code to know it happened.</li>
+            <li><strong>Plugin-shaped integrations.</strong> Every external service (Spotify, Calendar, Weather, file search) is wrapped as a handler that implements two functions. Adding a new one is a single file plus a single import.</li>
+        </ul>
+
+        <p>Every section below is the engineering that makes those three commitments hold across two UI surfaces.</p>
+
+        <!-- ============================================================== -->
+        <h2 class="section">3. System</h2>
+
+        <h3 class="subsection">3.1 Tiny Zephyr (the popup)</h3>
+        <ul class="body-list">
+            <li><strong>Python + Tkinter</strong> with a dark theme, slide-in animation, and centring on the active monitor.</li>
+            <li><strong>Global hotkey</strong> (<code>Ctrl+Alt+Z</code>) registered system-wide on Windows. Brings the window to focus from any state without stealing window order more than necessary.</li>
+            <li><strong>Auto-hide on focus loss</strong> and a system-tray presence that keeps the hotkey reachable across sessions.</li>
+            <li><strong>Voice input</strong> via microphone routed into the same NLP pipeline as typed input. The popup never branches on input modality past the capture step.</li>
+            <li><strong>Streaming responses with concurrent text-to-speech.</strong> The assistant talks while the text materialises so the perceived latency stays under what the LLM's full generation takes.</li>
+        </ul>
+
+        <h3 class="subsection">3.2 Flask API bridge</h3>
+        <p>Runs on <code>localhost:5000</code>, auto-started with Tiny Zephyr but addressable independently. Both UI surfaces speak only to the API; all state lives in this process.</p>
+        <ul class="body-list">
+            <li><code>POST /command</code> is the natural-language entry point. Routes the input to the right handler, executes, and returns a structured response with both the answer and any side effects (memory writes, integration calls).</li>
+            <li><code>GET / POST / DELETE /memory</code> provides full CRUD over the SQLite memory store, surfaced to both UIs identically.</li>
+            <li><code>GET / POST /projects</code> handles project and idea tracking with tags and status. The dashboard's Kanban board reads from this endpoint; the popup writes to it by phrase ("add project: rewrite the portfolio").</li>
+            <li><strong>Per-integration endpoints</strong> for Spotify control, Weather queries, and Calendar events. Each one is a thin wrapper over the upstream API with the assistant's response shaping bolted on.</li>
+            <li><strong>WebSocket channel</strong> pushes live dashboard updates from popup activity, so a fact captured through the popup appears in the dashboard's memory browser without a refresh.</li>
+        </ul>
+
+        <h3 class="subsection">3.3 Electron dashboard</h3>
+        <ul class="body-list">
+            <li><strong>React 18 + Vite + TailwindCSS + Framer Motion</strong>, wrapped in Electron for native desktop integration (tray, autostart, OS notifications).</li>
+            <li><strong>Conversation history</strong> with threaded view, search, filter, and JSON or Markdown export. The same conversation captured through the popup is rendered here without translation.</li>
+            <li><strong>Memory browser</strong> with categorised facts, a tag cloud, manual edit affordances, and bulk cleanup for stale entries.</li>
+            <li><strong>Project board</strong> as a Kanban surface with drag-and-drop reordering, Markdown descriptions, and attachments.</li>
+            <li><strong>Settings panel</strong> for LLM API keys, integration credentials, theme toggles, and hotkey behaviour. All of this writes through the API rather than to local files.</li>
+        </ul>
+
+        <h3 class="subsection">3.4 Memory and routing</h3>
+        <ul class="body-list">
+            <li><strong>SQLite-backed memory</strong> holds learned facts, user preferences, conversation context, and project ideas in a single store.</li>
+            <li><strong>Relevance scoring</strong> on retrieval prioritises recent and frequently-accessed memories, so a months-old captured fact does not crowd out something the user mentioned this morning.</li>
+            <li><strong>Command router</strong> uses a three-tier escalation: exact-match on registered intents, fuzzy match on phrasing, then LLM intent classification when neither lands. The cheap tiers absorb most traffic.</li>
+            <li><strong>Multi-LLM fallback.</strong> Groq Llama 3.1 8B is the default for latency. OpenAI and Gemini back it up. Provider failure triggers automatic re-routing with no user-visible interruption.</li>
+        </ul>
+
+        <h3 class="subsection">3.5 Integrations</h3>
+        <ul class="body-list">
+            <li><strong>Spotify</strong> via Spotipy. Play, pause, skip, "what is playing," queue from natural language.</li>
+            <li><strong>WeatherAPI</strong>. System-location or explicit-city queries with contextual advice ("bring a jacket").</li>
+            <li><strong>Google Calendar.</strong> Event listing and creation with natural-language date parsing ("add a study block tomorrow at 7 pm").</li>
+            <li><strong>Local file search.</strong> "Find my resume," "open project folder" against a configured set of paths, so the assistant can act on local state, not just remote services.</li>
+        </ul>
+
+        <!-- ============================================================== -->
+        <h2 class="section">4. Evaluation</h2>
+        <p>Evaluation is functional and personal-use-driven, not benchmark-based. Zephyr is a tool the author uses daily, not a system aimed at a leaderboard; the numbers below are measured on the running install rather than against an external suite.</p>
+        <ul class="body-list">
+            <li><strong>Memory lookups under 100 ms</strong> across thousands of stored facts, validated by direct timing on the API endpoint.</li>
+            <li><strong>Multi-LLM fallback survives provider outages.</strong> When Groq has been unavailable, the router has rolled over to OpenAI without user-visible interruption.</li>
+            <li><strong>Streaming responses materialise before the LLM has finished generating.</strong> The perceived latency floor is the network roundtrip to the provider, not the architecture.</li>
+            <li><strong>Modular handler system.</strong> Each new integration is one Python module with two functions. Adding Spotify, Calendar, and Weather did not require core router changes.</li>
+            <li><strong>Two surfaces, one memory.</strong> A fact captured through the popup is visible in the dashboard's memory browser within the next render, validated by direct observation during use.</li>
+        </ul>
+
+        <p>The numbers above are measurements of this build's behaviour on its own protocol, not comparisons against another assistant. Personal-AI assistants do not have a settled benchmark suite the way ML models do, and Zephyr's design point (two interfaces, one backend, persistent memory) is not directly comparable to single-surface assistants like the OS-native ones. Read the results as evidence that the three-tier architecture works as a daily-use tool, not as a leaderboard claim.</p>
+
+        <!-- ============================================================== -->
+        <h2 class="section">5. Conclusion and Implications</h2>
+        <p>The right interface for an AI assistant depends on the task, not the assistant. By splitting popup and dashboard but unifying state behind an API, Zephyr lets the user pick the interaction mode without giving up coherence. The downstream consequence is that any future surface (mobile companion, voice device, Slack bot, terminal client) becomes another client of the same backend rather than a fork of the assistant. The architecture also positions the build to absorb local LLMs (Ollama, llama.cpp, LM Studio) without redesign; the API becomes the abstraction boundary, and the provider behind it is interchangeable. For a personal tool that has to live in the user's daily workflow without becoming yet another app to manage, that boundary is the load-bearing one.</p>
+
+        <h3 class="subsection">5.1 Limitations</h3>
+        <ul class="body-list">
+            <li><strong>Windows-only at present.</strong> The hotkey, tray, and OS-notification paths use Windows-specific APIs. macOS and Linux are reachable but unbuilt.</li>
+            <li><strong>Single instance only.</strong> Two copies of the popup conflict on the global hotkey and on port 5000. There is no multi-user mode.</li>
+            <li><strong>Cloud LLM dependence for the deep features.</strong> Offline mode covers file operations and cached memory; reasoning-heavy queries still require an upstream provider.</li>
+            <li><strong>No end-to-end encryption on memory at rest.</strong> SQLite sits on local disk in plaintext; that is acceptable for a single-user local tool, not for a multi-device sync scenario.</li>
+            <li><strong>Integrations cover what the author uses.</strong> Spotify, Calendar, Weather, and file search are first-party, but a user with a different stack would need to write their own handler module.</li>
+        </ul>
+
+        <h3 class="subsection">5.2 Future Work</h3>
+        <ul class="body-list">
+            <li><strong>macOS and Linux ports.</strong> <code>pynput</code> for hotkeys, AppKit and GTK for the platform-specific shims, identical Flask backend.</li>
+            <li><strong>Local LLM support via Ollama or llama.cpp</strong> for fully offline operation. The multi-LLM router already abstracts the provider, so this is a new backend, not a redesign.</li>
+            <li><strong>Optional encrypted cloud sync</strong> with a React Native mobile companion as the first additional surface.</li>
+            <li><strong>Plugin marketplace</strong> with sandboxed third-party handlers, so users can extend the integration set without forking the core.</li>
+            <li><strong>Voice-only mode</strong> on top of the existing speech-to-text path, for a hands-free workflow.</li>
+        </ul>
+
+        <!-- ============================================================== -->
+        <h2 class="section">6. Acknowledgments</h2>
+        <p>Built independently. LLM inference relies on <strong>Groq</strong>, <strong>OpenAI</strong>, and <strong>Google Gemini</strong>. <strong>Spotipy</strong> wraps the Spotify Web API; <strong>WeatherAPI</strong> and the <strong>Google Calendar API</strong> supply the remaining external state. Desktop integration uses the standard <strong>Electron</strong> shell.</p>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    <script>
-        // Custom cursor
-        const cursor = document.createElement('div');
-        cursor.classList.add('cursor');
-        document.body.appendChild(cursor);
-
-        const cursorGlow = document.createElement('div');
-        cursorGlow.classList.add('cursor-glow');
-        document.body.appendChild(cursorGlow);
-
-        document.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-            cursorGlow.style.left = e.clientX + 'px';
-            cursorGlow.style.top = e.clientY + 'px';
-        });
-
-        document.addEventListener('mousedown', () => {
-            cursor.style.transform = 'translate(-50%, -50%) scale(0.8)';
-            cursorGlow.style.transform = 'translate(-50%, -50%) scale(0.8)';
-        });
-
-        document.addEventListener('mouseup', () => {
-            cursor.style.transform = 'translate(-50%, -50%) scale(1)';
-            cursorGlow.style.transform = 'translate(-50%, -50%) scale(1)';
-        });
-
-        const interactiveElements = document.querySelectorAll('a, button, .stat-card, .tech-item');
-        interactiveElements.forEach(element => {
-            element.addEventListener('mouseenter', () => {
-                cursor.classList.add('hover');
-                cursorGlow.classList.add('hover');
-            });
-            element.addEventListener('mouseleave', () => {
-                cursor.classList.remove('hover');
-                cursorGlow.classList.remove('hover');
-            });
-        });
-
-        // Particles.js configuration
-        particlesJS('particles-js', {
-            particles: {
-                number: { value: 70, density: { enable: true, value_area: 800 } },
-                color: { value: '#00b4d8' },
-                shape: { type: 'circle' },
-                opacity: { value: 0.3, random: true },
-                size: { value: 3, random: true },
-                line_linked: {
-                    enable: true,
-                    distance: 150,
-                    color: '#00b4d8',
-                    opacity: 0.2,
-                    width: 1
-                },
-                move: {
-                    enable: true,
-                    speed: 2,
-                    direction: 'none',
-                    random: false,
-                    straight: false,
-                    out_mode: 'out',
-                    bounce: false
-                }
-            },
-            interactivity: {
-                detect_on: 'canvas',
-                events: {
-                    onhover: { enable: true, mode: 'grab' },
-                    onclick: { enable: true, mode: 'push' },
-                    resize: true
-                },
-                modes: {
-                    grab: { distance: 140, line_linked: { opacity: 0.5 } },
-                    push: { particles_nb: 4 }
-                }
-            },
-            retina_detect: true
-        });
-
-        // Back button scroll behavior
-        const backButton = document.querySelector('.back-button');
-        let lastScroll = 0;
-
-        // Smooth back button navigation
-        backButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            
-            // Create transition overlay
-            const overlay = document.createElement('div');
-            overlay.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(135deg, #020510 0%, #0a1628 100%);
-                z-index: 99999;
-                opacity: 0;
-                transition: opacity 0.3s ease;
-                pointer-events: none;
-            `;
-            document.body.appendChild(overlay);
-            
-            // Fade in overlay
-            setTimeout(() => {
-                overlay.style.opacity = '1';
-            }, 10);
-            
-            // Navigate after overlay is visible
-            setTimeout(() => {
-                window.location.href = '../index.html';
-            }, 200);
-        });
-
-        window.addEventListener('scroll', () => {
-            const currentScroll = window.pageYOffset;
-            
-            if (currentScroll > lastScroll && currentScroll > 100) {
-                // Scrolling down - hide button
-                backButton.classList.add('hidden');
-            } else {
-                // Scrolling up or at top - show button
-                backButton.classList.remove('hidden');
-            }
-            
-            lastScroll = currentScroll;
-        });
-    </script>
 </body>
 </html>

@@ -1,715 +1,159 @@
 <!DOCTYPE html>
-<html lang="en" style="cursor: none !important; background-color: #020510 !important;">
+<html lang="en" style="background-color: #f3ece0;">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gesture Controlled Robotic Arm | Rishi Shah</title>
-    <meta name="description" content="Real time gesture recognition system using MediaPipe for hand tracking and Arduino for servo control, enabling natural human robot interaction through computer vision.">
-    <style>
-        /* CRITICAL: Hide cursor and background immediately on page load */
-        html, body, * {
-            cursor: none !important;
-        }
-        html, body {
-            background-color: #020510 !important;
-            margin: 0;
-            padding: 0;
-        }
-    </style>
+    <title>Gesture-controlled robotic hand · MediaPipe to Arduino in real time | Rishi Shah</title>
+    <meta name="description" content="A 3D-printed robotic hand mirroring a user's gestures in real time. MediaPipe extracts 21 hand landmarks; a finger-state classifier produces a five-bit command; an Arduino with five servos and antagonistic cable actuation reproduces the gesture at 30+ FPS on commodity webcam input.">
+
     <link rel="prefetch" href="../index.html">
-    <link rel="preload" href="../style.css" as="style">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/17ea408dcc.js" crossorigin="anonymous"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    <style>html, body { background-color: #f3ece0; margin: 0; padding: 0; }</style>
 
-        :root {
-            --primary: #00b4d8;
-            --secondary: #5EEAD4;
-            --dark: #020510;
-            --darker: #0a1628;
-            --light: #e0f2fe;
-            --accent: #38bdf8;
-        }
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
-            color: var(--light);
-            line-height: 1.6;
-            min-height: 100vh;
-            overflow-x: hidden;
-            cursor: none !important;
-        }
-
-        * {
-            cursor: none !important;
-        }
-
-        #particles-js {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: 5;
-            pointer-events: none;
-        }
-
-        .back-button {
-            position: fixed;
-            top: 2rem;
-            left: 2rem;
-            z-index: 10001;
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 180, 216, 0.1);
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            text-decoration: none;
-            border-radius: 50%;
-            font-size: 1.2rem;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(10px);
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        .back-button.hidden {
-            opacity: 0;
-            transform: translateX(-20px);
-            pointer-events: none;
-        }
-
-        .back-button:hover {
-            background: rgba(0, 180, 216, 0.2);
-            transform: scale(1.1);
-            box-shadow: 0 0 30px rgba(0, 180, 216, 0.4);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 6rem 2rem 4rem;
-            position: relative;
-            z-index: 10;
-        }
-
-        .project-header {
-            text-align: center;
-            margin-bottom: 4rem;
-            padding: 3rem 2rem;
-            background: rgba(10, 22, 40, 0.5);
-            border-radius: 16px;
-            border: 1px solid rgba(0, 180, 216, 0.2);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .project-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--primary), transparent);
-            animation: scan 3s infinite;
-        }
-
-        @keyframes scan {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-
-        .project-header h1 {
-            font-size: 3rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .project-subtitle {
-            font-size: 1.1rem;
-            color: var(--secondary);
-            font-weight: 300;
-            margin-bottom: 0.5rem;
-        }
-
-        .project-meta {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-top: 1.5rem;
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .section {
-            margin-bottom: 2rem;
-            padding: 2rem;
-            background: rgba(10, 22, 40, 0.3);
-            border-radius: 12px;
-            border: 1px solid rgba(0, 180, 216, 0.1);
-        }
-
-        .section-header {
-            font-size: 2rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            color: var(--primary);
-            font-family: 'Courier New', monospace;
-        }
-
-        .highlight-box {
-            background: rgba(0, 180, 216, 0.05);
-            border-left: 4px solid var(--primary);
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-            border-radius: 8px;
-        }
-
-        /* Document-style formatting */
-        .document-section {
-            margin-bottom: 2rem;
-            padding: 3rem;
-            background: rgba(10, 22, 40, 0.3);
-            border-radius: 12px;
-            border: 1px solid rgba(0, 180, 216, 0.1);
-        }
-
-        .document-section h1 {
-            font-size: 2rem;
-            font-weight: 600;
-            color: var(--primary);
-            font-family: 'Courier New', monospace;
-            margin-bottom: 1.5rem;
-            margin-top: 2.5rem;
-        }
-
-        .document-section h1:first-child {
-            margin-top: 0;
-        }
-
-        .document-section h2 {
-            font-size: 1.3rem;
-            font-weight: 500;
-            color: var(--secondary);
-            margin-bottom: 1rem;
-            margin-top: 2rem;
-        }
-
-        .document-section p {
-            font-size: 1rem;
-            line-height: 1.8;
-            color: rgba(255, 255, 255, 0.85);
-            margin-bottom: 1rem;
-        }
-
-        .document-section ul {
-            margin: 1rem 0 1rem 1.5rem;
-            list-style-type: disc;
-        }
-
-        .document-section ul li {
-            font-size: 1rem;
-            line-height: 1.8;
-            color: rgba(255, 255, 255, 0.85);
-            margin-bottom: 0.5rem;
-        }
-
-        .document-section strong {
-            color: #ffffff;
-            font-weight: 600;
-        }
-
-        .document-section code {
-            background: rgba(0, 180, 216, 0.1);
-            padding: 0.2rem 0.4rem;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-            color: var(--secondary);
-            font-size: 0.9em;
-        }
-
-        .document-section pre {
-            background: rgba(2, 5, 16, 0.8);
-            padding: 1rem;
-            border-radius: 6px;
-            overflow-x: auto;
-            margin: 1rem 0;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .stat-card {
-            background: rgba(0, 180, 216, 0.05);
-            padding: 1.5rem;
-            border-radius: 12px;
-            border: 1px solid rgba(0, 180, 216, 0.2);
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 180, 216, 0.2);
-            border-color: var(--primary);
-        }
-
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-label {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .tech-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin: 2rem 0;
-        }
-
-        .tech-item {
-            background: rgba(0, 180, 216, 0.05);
-            padding: 1rem;
-            border-radius: 8px;
-            border: 1px solid rgba(0, 180, 216, 0.2);
-            text-align: center;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .tech-item:hover {
-            background: rgba(0, 180, 216, 0.1);
-            border-color: var(--primary);
-            transform: scale(1.05);
-        }
-
-        @media (max-width: 768px) {
-            .project-header h1 {
-                font-size: 2rem;
-            }
-
-            .container {
-                padding: 5rem 1rem 2rem;
-            }
-
-            .back-button {
-                top: 1rem;
-                left: 1rem;
-                padding: 0.5rem 1rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .project-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 1rem;
-            padding: 0.75rem 1.5rem;
-            background: rgba(0, 180, 216, 0.1);
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            text-decoration: none;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .project-link:hover {
-            background: rgba(0, 180, 216, 0.2);
-            box-shadow: 0 0 20px rgba(0, 180, 216, 0.3);
-            transform: translateY(-2px);
-        }
-
-        /* Custom Cursor */
-        .cursor {
-            width: 16px;
-            height: 16px;
-            border: 2px solid #00b4d8;
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 9999;
-            transition: transform 0.05s ease-out, opacity 0.2s ease, width 0.2s ease, height 0.2s ease;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 0 10px rgba(0, 180, 220, 0.5);
-            opacity: 1;
-            will-change: transform;
-        }
-
-        .cursor.hover {
-            width: 32px;
-            height: 32px;
-            background: rgba(0, 180, 220, 0.1);
-            border-width: 3px;
-            box-shadow: 0 0 20px rgba(0, 180, 220, 0.8);
-        }
-
-        .cursor-glow {
-            width: 40px;
-            height: 40px;
-            background: radial-gradient(circle, rgba(0, 180, 220, 0.2) 0%, transparent 70%);
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 9998;
-            transition: transform 0.1s ease-out, width 0.2s ease, height 0.2s ease;
-            transform: translate(-50%, -50%);
-            will-change: transform;
-        }
-
-        .cursor-glow.hover {
-            width: 60px;
-            height: 60px;
-            background: radial-gradient(circle, rgba(0, 180, 220, 0.3) 0%, transparent 70%);
-        }
-
-        a, button, .stat-card, .tech-item {
-            cursor: none !important;
-        }
-    </style>
+    <link rel="stylesheet" href="project.css">
+    <script defer src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script defer src="../shared.js"></script>
+    <script defer src="project.js"></script>
 </head>
 <body>
     <div id="particles-js"></div>
-    
-    <a href="../index.html" class="back-button">
-        <i class="fas fa-arrow-left"></i>
-    </a>
 
     <div class="container">
-        <!-- Box 1: Header -->
-        <div class="project-header">
-            <div class="project-subtitle">COMPUTER VISION & ROBOTICS</div>
-            <h1>Gesture Controlled Robotic Arm</h1>
-            <div class="project-subtitle">Real Time Hand Tracking with MediaPipe and Arduino</div>
-            <div class="project-meta">
-                <span>✋ 21 Hand Landmarks</span>
-                <span>🤖 5 Servo Motors</span>
-                <span>⚡ 30+ FPS Tracking</span>
-            </div>
-            <a href="https://github.com/RishiShah99/GestureControlledRoboticArm" target="_blank" class="project-link">
-                <i class="fab fa-github"></i> View on GitHub
-            </a>
+        <a class="back-link" href="../index.html">[ Back to home ]</a>
+
+        <div class="eyebrow">2024</div>
+
+        <h1 class="title">Real-time gesture control of a 3D-printed robotic <span class="accent">hand</span>.</h1>
+
+        <div class="chips">
+            <span class="chip">Computer Vision</span>
+            <span class="chip">Robotics</span>
+            <span class="chip">Embedded Systems</span>
         </div>
 
-        <!-- Box 2: Overview -->
-        <section class="section">
-            <h2 class="section-header">Overview</h2>
-            <div class="highlight-box">
-                <p><strong>Gesture Controlled Robotic Arm</strong> bridges the gap between human gesture and robotic motion by creating a real time system that allows users to control a physical robotic hand through natural hand movements. Using computer vision and machine learning, the system tracks hand landmarks from webcam input and translates finger positions into servo commands, enabling intuitive human robot interaction.</p>
-            </div>
-            <p>The robotic arm was custom designed using CAD software and 3D printing, featuring individual servo motors for each finger. The system achieves near instantaneous response times, creating a seamless mirroring effect where the robotic hand mimics the user's gestures with minimal latency.</p>
-            
-            <p style="margin-top: 1rem;">Built on Google's MediaPipe Hands for landmark detection and Arduino for servo control, the system demonstrates how modern machine learning libraries can be combined with embedded systems to create responsive human robot interfaces without requiring expensive motion capture equipment.</p>
-        </section>
+        <p class="subtitle">21 MediaPipe hand landmarks per frame, a finger-state classifier that reduces them to a five-bit command, a tight serial protocol, and five servos on an Arduino driving a custom 3D-printed hand. Webcam in, mirrored motion out, no GPU.</p>
 
-        <!-- Box 3: Technology Stack -->
-        <section class="section">
-            <h2 class="section-header">Technology Stack</h2>
-            <div class="tech-grid">
-                <div class="tech-item">Python</div>
-                <div class="tech-item">MediaPipe</div>
-                <div class="tech-item">OpenCV</div>
-                <div class="tech-item">Arduino</div>
-                <div class="tech-item">C++</div>
-                <div class="tech-item">PySerial</div>
-                <div class="tech-item">Servo Motors</div>
-                <div class="tech-item">3D Printing (CAD)</div>
-            </div>
-        </section>
+        <!-- ============================================================== -->
+        <h2 class="section">1. Abstract</h2>
+        <p>A real-time gesture-control loop that maps a user's finger positions onto a custom 3D-printed robotic hand. Computer vision via MediaPipe Hands extracts 21 landmarks per frame, a per-finger classifier reduces those landmarks to a five-bit up-or-down command, a deterministic serial protocol carries the command to an Arduino, and five servos with antagonistic cable actuation drive a printed PLA hand that mirrors the gesture.</p>
 
-        <!-- Box 4: Main Document Content -->
-        <section class="document-section">
-            <h1>System Architecture</h1>
+        <p>The implementation is deliberately spare. No GPU. No deep model beyond MediaPipe's bundled networks. No continuous angle tracking; just five binary fingers. The five-character serial protocol (<code>$TTTTT</code>) is small enough that the buffer flushes every frame so the firmware always acts on the latest hand state rather than queuing stale commands. An external 5 V supply with decoupling capacitors absorbs the current spike when all five servos move at once, which is what kept the Arduino from brown-out resetting on the first hardware iteration.</p>
 
-            <h2>Computer Vision Pipeline</h2>
-            <p>The system uses Google's MediaPipe Hands, a state of the art hand tracking solution that detects 21 3D hand landmarks in real time. MediaPipe employs a two stage pipeline: palm detection followed by precise hand landmark localization. This architecture enables efficient processing at 30+ FPS on standard webcams.</p>
+        <p>The point of the project is the loop, not any single piece. Vision, classification, serial, firmware, and mechanical actuation chained end to end on commodity hardware. As an early portfolio piece this is also the project where the discipline of writing each layer simply enough that the next one can trust it became the rule for everything that came after.</p>
 
-            <p>Palm detection uses a lightweight CNN to identify hand regions in the frame, producing bounding boxes around detected palms. This initial detection is intentionally over inclusive to avoid missing hands. The detected regions then feed into the landmark model, which predicts 21 precise keypoints representing finger joints and palm geometry.</p>
+        <ul class="body-list">
+            <li><strong>21 hand landmarks per frame</strong> via MediaPipe Hands at <strong>30+ FPS</strong> on a standard CPU. No GPU required.</li>
+            <li><strong>Binary five-finger classification</strong> from tip-versus-joint landmark comparisons. Continuous angle tracking was tried first and produced jitter that the actuators could not follow; binary state classification stabilised the loop.</li>
+            <li><strong>Tight serial protocol.</strong> <code>$TTTTT</code> with five binary digits at 9600 baud. The <code>$</code> delimiter lets the Arduino recover message boundaries on partial reads.</li>
+            <li><strong>Five servos, one per finger,</strong> with antagonistic cable plus elastic-band actuation that mimics the flexor and extensor pairing in a biological hand.</li>
+            <li><strong>External 5 V supply with 100 microfarad decoupling</strong> near each servo cluster. The Arduino regulator alone cannot source the roughly 2.5 A peak when all five servos move simultaneously, and the caps suppress brown-out resets from the current spike.</li>
+        </ul>
 
-            <p>Each landmark provides x, y, and z coordinates. The z coordinate represents depth relative to the palm center, enabling 3D gesture recognition. For this project, we focus on 2D finger state detection using y coordinate comparisons, but the 3D data enables future enhancements like depth based gestures.</p>
+        <!-- ============================================================== -->
+        <h2 class="section">2. Introduction</h2>
+        <p>Robotic teleoperation usually means joysticks or expensive motion-capture rigs. Both put a cognitive layer between intent and motion. The user thinks in gestures and translates them, in real time, into something the rig understands. The translation is the friction. MediaPipe brings precise hand tracking to a webcam, and Arduino brings cheap servo control to anyone with a soldering iron; the combination removes most of the cost barrier that kept gesture-controlled robotics in research labs.</p>
+        <ul class="body-list">
+            <li><strong>Gesture is the most natural control surface for a hand.</strong> Mapping a user's fingers to a robotic hand's fingers preserves the user's mental model directly. The user does not learn the rig; the rig follows the user.</li>
+            <li><strong>The pieces are now commodity.</strong> Webcams, MediaPipe, Arduino, hobby servos, and PLA-printed mechanical parts are each cheap and well-documented in isolation. Stitching them into a working loop is the work.</li>
+            <li><strong>The discipline is what carries.</strong> Each layer in the loop has to be simple enough that the next layer can trust it. Continuous angles tempted the classifier; binary states made the firmware reliable. The constraint propagates.</li>
+        </ul>
 
-            <h2>Finger State Detection Algorithm</h2>
-            <p>The core logic determines whether each finger is extended or curled by comparing landmark positions. For each finger, we check if the fingertip landmark's y coordinate is above (lower pixel value) the middle joint landmark:</p>
+        <h3 class="subsection">2.1 Why binary state, not continuous angles</h3>
+        <p>The first attempt tracked joint angles continuously and mapped them to servo positions linearly. The result was visibly jittery: MediaPipe's landmark estimates carry a few pixels of frame-to-frame noise, which becomes a few degrees of servo command at the rate the camera ran. The servos cannot keep up with rapid small commands, and the human eye reads the result as buzzing. Collapsing each finger to a binary up-or-down state, decided by comparing tip and joint landmarks, removed the noise floor entirely. The gesture vocabulary shrinks (32 distinct hand poses instead of a continuum) but every pose in the smaller set is recognisable and reproducible.</p>
+        <ul class="body-list">
+            <li><strong>The signal-to-noise problem is the architecture's problem.</strong> A classifier downstream cannot fix what is upstream noise; collapsing to a discrete state lifts the signal above the noise floor at the source.</li>
+            <li><strong>The actuator's slew rate is the second constraint.</strong> Hobby servos move at roughly 60 degrees per 0.1 seconds. A continuous command stream above that rate is wasted; a discrete command stream at that rate is exactly what the hardware can follow.</li>
+            <li><strong>The gesture set stays useful.</strong> Fist, open hand, peace sign, point, thumbs-up, and the rest of the 32-pose space are what most gesture-controlled interfaces actually need.</li>
+        </ul>
 
-            <ul>
-                <li><strong>Thumb:</strong> Landmark 4 (tip) compared to landmark 3 (IP joint). Horizontal comparison used due to thumb's perpendicular orientation</li>
-                <li><strong>Index Finger:</strong> Landmark 8 (tip) compared to landmark 6 (PIP joint). Extended when tip is above joint</li>
-                <li><strong>Middle Finger:</strong> Landmark 12 (tip) compared to landmark 10 (PIP joint). Same vertical comparison</li>
-                <li><strong>Ring Finger:</strong> Landmark 16 (tip) compared to landmark 14 (PIP joint). Vertical comparison</li>
-                <li><strong>Pinky:</strong> Landmark 20 (tip) compared to landmark 18 (PIP joint). Vertical comparison</li>
-            </ul>
+        <h3 class="subsection">2.2 What is actually new</h3>
+        <p>MediaPipe is from Google. Arduino is Arduino. The 3D-printed cable-actuated hand geometry is borrowed from the open-source prosthetics community. The contribution is the end-to-end loop closed cheaply, and the design choices (binary classification, antagonistic actuation, external supply with decoupling) that make the loop reliable under commodity-hardware constraints.</p>
+        <ul class="body-list">
+            <li><strong>End-to-end loop on a webcam and an Arduino.</strong> No GPU, no specialised tracking hardware, no industrial servos. The full vision-to-actuator chain runs on parts a student can buy in an afternoon.</li>
+            <li><strong>Antagonistic cable plus elastic-band actuation.</strong> One servo per finger pulls the cable; the elastic provides return force. The biological flexor-extensor pairing replicated mechanically rather than with two servos per finger.</li>
+            <li><strong>Power discipline as a first-class layer.</strong> External 5 V supply, decoupling capacitors near each servo cluster. The hardware iteration that taught this lesson is part of why the project ships at all.</li>
+        </ul>
 
-            <p>This binary classification (up or down) simplifies control and increases reliability compared to continuous angle tracking. Intermediate positions default to "down" state, preventing jitter from ambiguous poses. The system processes this detection every frame, creating smooth real time updates as fingers move.</p>
+        <p>Every section below is the engineering of one layer in the loop.</p>
 
-            <h2>Serial Communication Protocol</h2>
-            <p>Python communicates with Arduino via serial connection at 9600 baud rate. The protocol uses a simple string format for robustness: <code>$TTTTT</code> where each T represents a finger state (1 for extended, 0 for curled). The dollar sign delimiter ensures the Arduino can identify message boundaries, preventing corruption from partial reads.</p>
+        <!-- ============================================================== -->
+        <h2 class="section">3. System</h2>
 
-            <p>For example, a fist (all fingers curled) transmits <code>$00000</code>, while an open hand transmits <code>$11111</code>. A peace sign (index and middle extended) transmits <code>$01100</code>. This five character encoding maps directly to the five servo motors, enabling straightforward parsing on the Arduino.</p>
+        <h3 class="subsection">3.1 Vision pipeline</h3>
+        <ul class="body-list">
+            <li><strong>MediaPipe Hands</strong> runs a two-stage palm detector followed by landmark localisation, producing 21 keypoints per hand with (x, y, z) coordinates per frame.</li>
+            <li><strong>Mirror flip on capture</strong> so that the user's right hand controls the rig's right side. The cognitive cost of mirrored teleoperation is real; the camera flip removes it.</li>
+            <li><strong>BGR to RGB conversion</strong> before MediaPipe (OpenCV reads BGR, MediaPipe expects RGB). Landmark complexity is set to level 1, the speed-versus-accuracy midpoint, because the classifier downstream only needs landmark relationships, not millimetre precision.</li>
+            <li><strong>Visual overlay</strong> draws the bounding box, the 21 landmark dots, and the current finger-state indicators on the webcam feed. The overlay is for debugging misdetections, not for the user; it stays on during development and off during demos.</li>
+        </ul>
 
-            <p>The serial buffer is flushed before each transmission to prevent buildup from faster Python updates than Arduino can process. This ensures the Arduino always acts on the most recent hand state rather than lagging behind with queued commands.</p>
+        <h3 class="subsection">3.2 Finger-state classifier</h3>
+        <p>Per-finger binary up-or-down decided from landmark geometry. No machine learning model, no trained classifier, just direct comparisons that exploit how the 21 landmarks are laid out.</p>
+        <ul class="body-list">
+            <li><strong>Thumb</strong> uses landmark 4 versus 3, compared horizontally. The thumb is perpendicular to the other fingers, so the vertical comparison the index through pinky use does not apply to it.</li>
+            <li><strong>Index, middle, ring, and pinky</strong> use tip-landmark <em>y</em> versus PIP-joint <em>y</em>. Tip above joint means the finger is extended; tip below means flexed.</li>
+            <li><strong>Intermediate poses default to "down"</strong> to prevent flicker. A finger that is genuinely half-extended is rare in normal gestures, and rounding to flexed is more visually stable than oscillating.</li>
+        </ul>
 
-            <h1>Hardware Implementation</h1>
+        <h3 class="subsection">3.3 Serial protocol</h3>
+        <p>Five-character payload <code>$TTTTT</code>, where each <code>T</code> is the ASCII digit <code>0</code> or <code>1</code>. The <code>$</code> delimiter lets the firmware locate message boundaries even on partial reads, and the serial buffer is flushed before each transmit so the firmware always acts on the latest hand state.</p>
+        <ul class="body-list">
+            <li><strong>Fist is <code>$00000</code>.</strong> Open hand is <code>$11111</code>. Peace sign is <code>$01100</code>. The protocol is small enough to be readable in the serial monitor while debugging.</li>
+            <li><strong>9600 baud.</strong> Minimal payload size keeps end-to-end latency well under the threshold at which mirroring stops feeling responsive.</li>
+            <li><strong>Buffer flush per transmit.</strong> The earlier iteration queued commands and produced visible lag when the user moved rapidly; flushing was the fix.</li>
+        </ul>
 
-            <h2>Custom Robotic Hand Design</h2>
-            <p>The robotic hand was designed in CAD software (Fusion 360) with articulated finger segments connected by hinges. Each finger has two to three segments mimicking human phalange structure. 3D printing using PLA plastic provides lightweight, rigid components that withstand repeated servo actuation.</p>
+        <h3 class="subsection">3.4 Firmware</h3>
+        <ul class="body-list">
+            <li><strong>Arduino Uno</strong> reads the serial port continuously, watches for the <code>$</code> delimiter, parses the next five characters, and writes 0 or 180 degrees to each servo via PWM.</li>
+            <li><strong>Servos on digital pins 2 through 6.</strong> One per finger. The pin assignment is hardcoded because the cable runs in the mechanical hand are physically wired to specific servos.</li>
+            <li><strong>External 5 V supply</strong> rated for at least 3 A. The Arduino regulator alone cannot source the roughly 2.5 A peak when all five servos move at once.</li>
+            <li><strong>100 microfarad decoupling capacitors</strong> near each servo cluster suppress brown-out resets from the current spike. This was learned by failing first: the early build kept rebooting itself mid-gesture, and the caps fixed it.</li>
+        </ul>
 
-            <p>Servo motors mount at the palm base, with fishing line or nylon thread running through guides along each finger. When servos rotate to 0 degrees (curled position), they pull the thread, causing fingers to curl inward. Rotating to 180 degrees releases tension, allowing elastic bands to extend fingers back to open position. This antagonistic system mimics flexor and extensor muscle pairs in biological hands.</p>
+        <h3 class="subsection">3.5 Mechanical hand</h3>
+        <p>Articulated finger segments designed in Fusion 360 and printed in PLA. Each finger has its own cable run from a palm-mounted servo, with elastic bands providing return force. The flexor-extensor pairing in a biological hand is replicated mechanically with one servo plus one elastic instead of two servos per finger. One degree of freedom per finger keeps the mechanical design simple and the gesture vocabulary recognisable to the user from across a room.</p>
 
-            <p>The mechanical design prioritizes simplicity over dexterity. Each finger has only one degree of freedom (curl angle) rather than independent joint control. This reduces complexity and cost while still enabling recognizable hand gestures like fists, peace signs, and pointing.</p>
+        <!-- ============================================================== -->
+        <h2 class="section">4. Evaluation</h2>
+        <p>Evaluation is qualitative and demo-driven, in keeping with what an early portfolio CV project can validate. Numbers below are measured on the build's own setup, not against any external benchmark for gesture-controlled robotic teleoperation.</p>
+        <ul class="body-list">
+            <li><strong>30+ FPS detection</strong> on a standard CPU with the integrated webcam; 60+ FPS observed on a CUDA-capable GPU, though no GPU is required for the loop to feel responsive.</li>
+            <li><strong>Sub-perceptible end-to-end latency</strong> on the standard test gestures. The mirroring feels live rather than delayed, which is the only useful subjective threshold for teleoperation.</li>
+            <li><strong>Recognisable gestures with no per-user calibration.</strong> Fist, open hand, peace sign, point, thumbs-up all classify reliably across hand sizes and skin tones without retraining MediaPipe.</li>
+            <li><strong>Primary failure modes identified.</strong> Poor lighting (histogram equalisation helps), partial occlusion (temporal smoothing fills brief drops), and rapid motion exceeding the servo slew rate (roughly 60 degrees per 0.1 seconds on hobby servos, which is the hardware ceiling).</li>
+        </ul>
 
-            <h2>Arduino Servo Control</h2>
-            <p>The Arduino Uno runs a C++ program that continuously reads the serial port for incoming finger state commands. When the delimiter character ($) is detected, the Arduino reads the next five characters representing finger states.</p>
+        <p>These numbers are honest about the harness. The frame rate is on the integrated camera and CPU of the development laptop; mileage will vary on weaker hardware. The "recognisable gesture" claim is qualitative across a few dozen hand poses, not a quantitative accuracy figure across a controlled dataset. Read the project as an early end-to-end systems exercise, not as a benchmark contribution to gesture-recognition research.</p>
 
-            <p>Each character is parsed as ASCII '0' or '1', converted to servo angles (0° or 180°), and written to the corresponding servo via PWM (Pulse Width Modulation). The Arduino's Servo library abstracts the PWM details, allowing simple <code>servo.write(angle)</code> calls.</p>
+        <!-- ============================================================== -->
+        <h2 class="section">5. Conclusion and Implications</h2>
+        <p>The same loop generalises far beyond hand-shadow puppets. Prosthetic control where amputees translate residual gestures into actuator commands without expensive EMG electrodes. Hazardous-environment teleoperation where lowering operator training overhead matters more than peak precision. Surgical training rigs where natural hand input replaces master-and-slave manipulators. Accessible robotics education where students can wire a complete vision-to-actuator pipeline in a weekend. In each case the safety-critical consequence is the same: a teleoperation loop that runs on commodity webcam and microcontroller hardware, with each layer simple enough that the failure modes are observable rather than buried, is the kind that can be debugged by the people who deploy it.</p>
 
-            <p>Servo pin assignments map to Arduino digital pins 2 through 6, one per finger. Power for servos comes from an external 5V supply rather than Arduino's regulator, as five servos can draw several amps under load, far exceeding the Arduino's capacity. Ground lines are shared between Arduino and power supply to ensure common reference voltage.</p>
+        <h3 class="subsection">5.1 Limitations</h3>
+        <ul class="body-list">
+            <li><strong>Binary state per finger.</strong> The 32-pose vocabulary covers most useful gestures but misses anything that depends on partial flexion (a precision pinch, a relaxed grip).</li>
+            <li><strong>Open-loop control.</strong> The hand does not sense whether the motion succeeded. A jammed cable or a slipped servo is not detected from the rig itself.</li>
+            <li><strong>Single hand, one degree of freedom per finger.</strong> No wrist control, no thumb opposition, no finger spread. The mechanical design trades expressiveness for reliability at this stage.</li>
+            <li><strong>Lighting dependence.</strong> MediaPipe degrades in low light, which propagates immediately into classifier flicker. The build assumes normal indoor lighting.</li>
+            <li><strong>Tethered to the host.</strong> The serial cable from the host to the Arduino is the current connection. Untethered operation requires a wireless link that has not been added yet.</li>
+        </ul>
 
-            <h2>Power Management</h2>
-            <p>Standard hobby servos (SG90 or similar) draw approximately 100 to 200 mA per unit when idle, and 500+ mA during motion or under load. Five servos can peak at 2.5 A, requiring a dedicated power supply rated for at least 3 A to provide safety margin.</p>
+        <h3 class="subsection">5.2 Future Work</h3>
+        <ul class="body-list">
+            <li><strong>Continuous angle control</strong> using MediaPipe's (x, y, z) for proportional servo positions instead of binary up-or-down. Requires a temporal smoothing filter that the binary classifier did not need.</li>
+            <li><strong>Stereo or depth camera</strong> (RealSense) for true 3D joint reconstruction and out-of-plane gesture support.</li>
+            <li><strong>Wireless link</strong> via ESP32 over Wi-Fi or Bluetooth, replacing the serial tether and unlocking remote teleoperation use cases.</li>
+            <li><strong>Force feedback.</strong> Current sensing on the servos and fingertip pressure sensors closing the loop back to a haptic glove on the user's hand.</li>
+            <li><strong>Wrist and thumb opposition</strong> as the next mechanical degrees of freedom, expanding the gesture vocabulary beyond five-finger flexion.</li>
+        </ul>
 
-            <p>The power supply's voltage must match servo specifications (typically 5V for small servos). Higher voltages increase torque but risk overheating. Lower voltages reduce holding force, causing fingers to droop under gravity or resistance.</p>
-
-            <p>Decoupling capacitors (100 µF electrolytic) across power and ground near servo clusters reduce voltage sag during simultaneous servo movements. Without capacitors, sudden current draws cause voltage dips that can reset the Arduino or cause erratic servo behavior.</p>
-
-            <h1>Software Implementation</h1>
-
-            <h2>Python Application Structure</h2>
-            <p>The main Python script initializes three components: OpenCV VideoCapture for webcam access, MediaPipe Hands solution for landmark detection, and PySerial connection to Arduino's COM port.</p>
-
-            <p>The main loop captures frames, flips them horizontally for mirror effect (making gestures feel natural), converts BGR to RGB color space (MediaPipe requirement), and processes through MediaPipe's hand detection model. If hands are detected, landmark coordinates are extracted and analyzed for finger states.</p>
-
-            <p>Visual feedback is crucial for usability. The script draws bounding boxes around detected hands, overlays landmark points as colored circles, and displays finger state indicators on screen. This real time visualization helps users understand what the system detects and debug misdetections.</p>
-
-            <p>Error handling manages edge cases: no hands detected (skip servo update), serial connection lost (attempt reconnect), or webcam access failure (display error message). Graceful degradation ensures the system remains usable even when components fail.</p>
-
-            <h2>Performance Optimization</h2>
-            <p>MediaPipe's GPU acceleration (when available) significantly boosts frame rates. On systems with CUDA capable GPUs, processing can reach 60+ FPS. CPU only mode still achieves 30 FPS on modern processors, sufficient for responsive control.</p>
-
-            <p>Reducing webcam resolution (640×480 instead of 1080p) decreases processing time without sacrificing detection accuracy. MediaPipe's models are trained on moderate resolution images, so excessive resolution provides diminishing returns while increasing computational load.</p>
-
-            <p>The landmark detection model has configurable complexity levels (0, 1, 2). Level 0 prioritizes speed, level 2 prioritizes accuracy. This project uses level 1 as a balance, achieving robust detection without unnecessary computation.</p>
-
-            <h1>Real World Applications</h1>
-
-            <h2>Prosthetic Control Systems</h2>
-            <p>Amputees with partial hand function could control prosthetic fingers through gesture recognition. By tracking the remaining fingers or wrist orientation, the system maps residual movements to prosthetic actuation. This eliminates the need for myoelectric sensors (EMG electrodes) which are expensive and require precise placement.</p>
-
-            <p>Compared to body powered prosthetics (cable and harness systems), gesture control offers more intuitive operation. Users think about hand gestures naturally rather than learning non intuitive cable movements. The visual feedback from MediaPipe tracking helps users refine their control during rehabilitation.</p>
-
-            <h2>Hazardous Environment Manipulation</h2>
-            <p>In nuclear facilities, chemical plants, or explosive ordnance disposal, robotic manipulators keep operators safe from danger. Gesture control provides intuitive teleoperation compared to joystick controllers, reducing training time and cognitive load during high stress operations.</p>
-
-            <p>The system could scale to control full robotic arms (not just hands) by mapping additional gestures to arm movements. Wrist rotation detected from hand orientation controls gripper rotation. Arm position follows palm location in camera frame. This extends gesture control from fingers to complete manipulation tasks.</p>
-
-            <h2>Surgical Robotics</h2>
-            <p>Minimally invasive surgery relies on robotic tools controlled by surgeons. Current systems use master slave controllers (surgeon manipulates handles, robot mimics at patient site). Gesture tracking could eliminate the controller hardware, allowing surgeons to work more naturally.</p>
-
-            <p>Precision requirements in surgery demand sub millimeter accuracy. While this project achieves centimeter level precision, higher resolution cameras and multiple viewpoint triangulation could reach surgical tolerances. Haptic feedback (force reflection from robot to user) would complete the control loop.</p>
-
-            <h2>Educational Demonstrations</h2>
-            <p>The project serves as an accessible introduction to computer vision, robotics, and embedded systems. Students learn practical integration of machine learning models (MediaPipe), microcontroller programming (Arduino), and mechanical design (3D printing).</p>
-
-            <p>The visual nature of hand tracking and robotic motion makes concepts tangible. Debugging becomes intuitive: if the robot finger doesn't move, check the servo, Arduino code, or serial connection. If the wrong finger moves, trace the landmark detection and state logic. This concrete feedback accelerates learning compared to abstract coding exercises.</p>
-
-            <h1>Challenges & Solutions</h1>
-
-            <h2>Lighting Sensitivity</h2>
-            <p>MediaPipe's performance degrades in poor lighting or high contrast scenes (backlit hands). The palm detection model fails when hands lack sufficient detail. Solution: preprocessing with histogram equalization normalizes brightness, improving detection consistency across lighting conditions.</p>
-
-            <p>Infrared lighting and cameras operating in near IR spectrum provide lighting independent detection. Since MediaPipe models were trained on visible light images, retraining on IR datasets would be necessary. Alternatively, structured light (projecting IR patterns) enables active depth sensing for robust 3D tracking.</p>
-
-            <h2>Occlusion and Multi Hand Scenarios</h2>
-            <p>When hands overlap or only partially appear in frame, landmark detection becomes unreliable. Missing landmarks cause the system to skip servo updates, freezing the robotic hand in its last position. Solution: temporal smoothing averages recent landmark positions, filling brief occlusions with interpolated values.</p>
-
-            <p>Controlling two robotic hands simultaneously requires distinguishing left from right hand detections. MediaPipe provides hand chirality labels (left or right), enabling separate servo control for dual arm systems. This expands capabilities to bimanual manipulation tasks.</p>
-
-            <h2>Servo Response Lag</h2>
-            <p>Hobby servos have maximum speed limits (60 degrees per 0.1 seconds typical). Rapid finger movements outpace servo actuation, creating visible lag between user gesture and robotic response. Higher speed servos (digital servos with 180 degrees per 0.1 seconds) reduce latency at increased cost.</p>
-
-            <p>Predictive control anticipates user intent from motion trajectories. If MediaPipe detects a finger moving upward (extended), the system can command the servo before the finger fully extends. This anticipatory response compensates for mechanical lag, creating tighter visual feedback loops.</p>
-
-            <h1>Future Enhancements</h1>
-
-            <h2>Continuous Angle Control</h2>
-            <p>Current binary states (extended or curled) limit expressiveness. Calculating actual finger bend angles from landmark geometry enables proportional servo control, replicating subtle gestures like partial curls or finger spreads. This requires inverse kinematics to map 2D landmarks to 3D joint angles.</p>
-
-            <p>The z coordinate data from MediaPipe (depth) provides partial 3D information, but full reconstruction needs stereo vision or depth cameras. Intel RealSense or similar depth sensors add precise 3D tracking, enabling accurate angle calculation even with hand rotations.</p>
-
-            <h2>Wireless Communication</h2>
-            <p>The serial cable tethers the robotic hand to the computer. Bluetooth modules (HC-05) or WiFi (ESP32) replace the cable with wireless links. This enables mobile robotic platforms or remote manipulation scenarios where physical connections are impractical.</p>
-
-            <p>Wireless introduces latency (10 to 50 ms typical for Bluetooth). For real time control, this must be minimized through efficient protocols and connection parameter tuning. Compression of finger state data (already minimal at 5 bytes) provides negligible benefit, but reducing transmission overhead improves responsiveness.</p>
-
-            <h2>Force Feedback Integration</h2>
-            <p>Haptic gloves with vibration motors or force exoskeletons provide tactile feedback when the robotic hand contacts objects. Current sensors on robotic fingers detect touch or resistance, transmitting this data back to the user. This bilateral control (user to robot, robot to user) creates immersive teleoperation experiences.</p>
-
-            <p>Implementing force feedback requires additional electronics: current sensors on servo motors detect load, pressure sensors on fingertips detect contact, and communication bandwidth doubles to accommodate bidirectional data flow. The payoff is significantly improved manipulation capabilities, as users can "feel" objects through the robot.</p>
-
-            <h1>Conclusion</h1>
-
-            <p>The Gesture Controlled Robotic Arm demonstrates how accessible tools like MediaPipe, OpenCV, and Arduino can create sophisticated human robot interaction systems. By leveraging pre trained machine learning models and commodity hardware, the project achieves real time gesture recognition and robotic control without specialized equipment or extensive training data.</p>
-
-            <p>From a technical perspective, the project showcases successful integration across multiple domains: computer vision for perception, serial communication for data transfer, embedded programming for actuation, and mechanical design for physical realization. Each component could be studied independently, but their synthesis creates emergent capabilities greater than the sum of parts.</p>
-
-            <p>The applications extend far beyond this demonstration, from medical prosthetics and surgical robotics to industrial teleoperation and educational platforms. As computer vision models improve and embedded systems become more powerful, gesture based control will increasingly replace traditional interfaces, making human robot collaboration more intuitive and accessible to users without specialized training.</p>
-        </section>
+        <!-- ============================================================== -->
+        <h2 class="section">6. Acknowledgments</h2>
+        <p>Hand-landmark tracking provided by <strong>Google MediaPipe Hands</strong>. The cable-actuated 3D-printed hand geometry draws on conventions from the open-source prosthetics community. Built independently.</p>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    <script>
-        // Custom cursor
-        const cursor = document.createElement('div');
-        cursor.classList.add('cursor');
-        document.body.appendChild(cursor);
-
-        const cursorGlow = document.createElement('div');
-        cursorGlow.classList.add('cursor-glow');
-        document.body.appendChild(cursorGlow);
-
-        document.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-            cursorGlow.style.left = e.clientX + 'px';
-            cursorGlow.style.top = e.clientY + 'px';
-        });
-
-        document.addEventListener('mousedown', () => {
-            cursor.style.transform = 'translate(-50%, -50%) scale(0.8)';
-            cursorGlow.style.transform = 'translate(-50%, -50%) scale(0.8)';
-        });
-
-        document.addEventListener('mouseup', () => {
-            cursor.style.transform = 'translate(-50%, -50%) scale(1)';
-            cursorGlow.style.transform = 'translate(-50%, -50%) scale(1)';
-        });
-
-        const interactiveElements = document.querySelectorAll('a, button, .stat-card, .tech-item');
-        interactiveElements.forEach(element => {
-            element.addEventListener('mouseenter', () => {
-                cursor.classList.add('hover');
-                cursorGlow.classList.add('hover');
-            });
-            element.addEventListener('mouseleave', () => {
-                cursor.classList.remove('hover');
-                cursorGlow.classList.remove('hover');
-            });
-        });
-
-        // Particles.js configuration
-        particlesJS('particles-js', {
-            particles: {
-                number: { value: 70, density: { enable: true, value_area: 800 } },
-                color: { value: '#00b4d8' },
-                shape: { type: 'circle' },
-                opacity: { value: 0.3, random: true },
-                size: { value: 3, random: true },
-                line_linked: {
-                    enable: true,
-                    distance: 150,
-                    color: '#00b4d8',
-                    opacity: 0.2,
-                    width: 1
-                },
-                move: {
-                    enable: true,
-                    speed: 2,
-                    direction: 'none',
-                    random: false,
-                    straight: false,
-                    out_mode: 'out',
-                    bounce: false
-                }
-            },
-            interactivity: {
-                detect_on: 'canvas',
-                events: {
-                    onhover: { enable: true, mode: 'grab' },
-                    onclick: { enable: true, mode: 'push' },
-                    resize: true
-                },
-                modes: {
-                    grab: { distance: 140, line_linked: { opacity: 0.5 } },
-                    push: { particles_nb: 4 }
-                }
-            },
-            retina_detect: true
-        });
-
-        // Back button scroll behavior
-        const backButton = document.querySelector('.back-button');
-        let lastScroll = 0;
-
-        // Smooth back button navigation
-        backButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            
-            // Create transition overlay
-            const overlay = document.createElement('div');
-            overlay.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(135deg, #020510 0%, #0a1628 100%);
-                z-index: 99999;
-                opacity: 0;
-                transition: opacity 0.3s ease;
-                pointer-events: none;
-            `;
-            document.body.appendChild(overlay);
-            
-            // Fade in overlay
-            setTimeout(() => {
-                overlay.style.opacity = '1';
-            }, 10);
-            
-            // Navigate after overlay is visible
-            setTimeout(() => {
-                window.location.href = '../index.html';
-            }, 200);
-        });
-
-        window.addEventListener('scroll', () => {
-            const currentScroll = window.pageYOffset;
-            
-            if (currentScroll > lastScroll && currentScroll > 100) {
-                // Scrolling down - hide button
-                backButton.classList.add('hidden');
-            } else {
-                // Scrolling up or at top - show button
-                backButton.classList.remove('hidden');
-            }
-            
-            lastScroll = currentScroll;
-        });
-    </script>
 </body>
 </html>

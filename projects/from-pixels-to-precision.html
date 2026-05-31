@@ -1,818 +1,180 @@
 <!DOCTYPE html>
-<html lang="en" style="cursor: none !important; background-color: #020510 !important;">
+<html lang="en" style="background-color: #f3ece0;">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>From Pixels to Precision - Surgical Tool Segmentation AI | Rishi Shah</title>
-    <meta name="description" content="Bronze Medal at CWSF - Neural network for real-time surgical tool segmentation in minimally invasive surgery. 95% accuracy, fluorescence-guided surgery support, <0.12s per image.">
-    <style>
-        /* CRITICAL: Hide cursor and background immediately on page load */
-        html, body, * {
-            cursor: none !important;
-        }
-        html, body {
-            background-color: #020510 !important;
-            margin: 0;
-            padding: 0;
-        }
-    </style>
+    <title>From Pixels to Precision · Real-time surgical tool segmentation | Rishi Shah</title>
+    <meta name="description" content="A U-Net for real-time surgical tool segmentation, trained on 300 hand-labeled frames captured through a Modus V exoscope with Synaptive Medical and Robarts Research Institute. ~95% DICE on the canonical case, under 0.12 s per frame. Canada-Wide Science Fair Bronze.">
+
     <link rel="prefetch" href="../index.html">
-    <link rel="preload" href="../style.css" as="style">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/17ea408dcc.js" crossorigin="anonymous"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    <style>html, body { background-color: #f3ece0; margin: 0; padding: 0; }</style>
 
-        :root {
-            --primary: #00b4d8;
-            --secondary: #5EEAD4;
-            --dark: #020510;
-            --darker: #0a1628;
-            --light: #e0f2fe;
-            --accent: #38bdf8;
-        }
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
-            color: var(--light);
-            line-height: 1.6;
-            min-height: 100vh;
-            overflow-x: hidden;
-            cursor: none !important;
-        }
-
-        * {
-            cursor: none !important;
-        }
-
-        #particles-js {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: 5;
-            pointer-events: none;
-        }
-
-        .back-button {
-            position: fixed;
-            top: 2rem;
-            left: 2rem;
-            z-index: 10001;
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 180, 216, 0.1);
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            text-decoration: none;
-            border-radius: 50%;
-            font-size: 1.2rem;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(10px);
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        .back-button.hidden {
-            opacity: 0;
-            transform: translateX(-20px);
-            pointer-events: none;
-        }
-
-        .back-button:hover {
-            background: rgba(0, 180, 216, 0.2);
-            transform: scale(1.1);
-            box-shadow: 0 0 30px rgba(0, 180, 216, 0.4);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 6rem 2rem 4rem;
-            position: relative;
-            z-index: 10;
-        }
-
-        .project-header {
-            text-align: center;
-            margin-bottom: 4rem;
-            padding: 3rem 2rem;
-            background: rgba(10, 22, 40, 0.5);
-            border-radius: 16px;
-            border: 1px solid rgba(0, 180, 216, 0.2);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .project-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--primary), transparent);
-            animation: scan 3s infinite;
-        }
-
-        @keyframes scan {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-
-        .project-header h1 {
-            font-size: 3rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .project-subtitle {
-            font-size: 1.2rem;
-            color: var(--secondary);
-            font-weight: 300;
-            margin-bottom: 0.5rem;
-        }
-
-        .project-meta {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-top: 1.5rem;
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .section {
-            margin-bottom: 2rem;
-            padding: 2rem;
-            background: rgba(10, 22, 40, 0.3);
-            border-radius: 12px;
-            border: 1px solid rgba(0, 180, 216, 0.1);
-        }
-
-        .section-header {
-            font-size: 2rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            color: var(--primary);
-            font-family: 'Courier New', monospace;
-        }
-
-        .highlight-box {
-            background: rgba(0, 180, 216, 0.05);
-            border-left: 4px solid var(--primary);
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-            border-radius: 8px;
-        }
-
-        /* Document-style formatting */
-        .document-section {
-            margin-bottom: 2rem;
-            padding: 3rem;
-            background: rgba(10, 22, 40, 0.3);
-            border-radius: 12px;
-            border: 1px solid rgba(0, 180, 216, 0.1);
-        }
-
-        .document-section h1 {
-            font-size: 2rem;
-            font-weight: 600;
-            color: var(--primary);
-            font-family: 'Courier New', monospace;
-            margin-bottom: 1.5rem;
-            margin-top: 2.5rem;
-        }
-
-        .document-section h1:first-child {
-            margin-top: 0;
-        }
-
-        .document-section h2 {
-            font-size: 1.3rem;
-            font-weight: 500;
-            color: var(--secondary);
-            margin-bottom: 1rem;
-            margin-top: 2rem;
-        }
-
-        .document-section p {
-            font-size: 1rem;
-            line-height: 1.8;
-            color: rgba(255, 255, 255, 0.85);
-            margin-bottom: 1rem;
-        }
-
-        .document-section ul {
-            margin: 1rem 0 1rem 1.5rem;
-            list-style-type: disc;
-        }
-
-        .document-section ul li {
-            font-size: 1rem;
-            line-height: 1.8;
-            color: rgba(255, 255, 255, 0.85);
-            margin-bottom: 0.5rem;
-        }
-
-        .document-section strong {
-            color: #ffffff;
-            font-weight: 600;
-        }
-
-        .video-container {
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            overflow: hidden;
-            margin: 2rem 0;
-            border-radius: 12px;
-            border: 2px solid rgba(0, 180, 216, 0.3);
-        }
-
-        .video-container video {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .stat-card {
-            background: rgba(0, 180, 216, 0.05);
-            padding: 1.5rem;
-            border-radius: 12px;
-            border: 1px solid rgba(0, 180, 216, 0.2);
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 180, 216, 0.2);
-            border-color: var(--primary);
-        }
-
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-label {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .tech-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin: 2rem 0;
-        }
-
-        .tech-item {
-            background: rgba(0, 180, 216, 0.05);
-            padding: 1rem;
-            border-radius: 8px;
-            border: 1px solid rgba(0, 180, 216, 0.2);
-            text-align: center;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .tech-item:hover {
-            background: rgba(0, 180, 216, 0.1);
-            border-color: var(--primary);
-            transform: scale(1.05);
-        }
-
-        .feature-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .feature-list li {
-            padding: 1rem;
-            margin: 0.5rem 0;
-            background: rgba(0, 180, 216, 0.03);
-            border-radius: 8px;
-            border-left: 3px solid var(--primary);
-            transition: all 0.3s ease;
-        }
-
-        .feature-list li:hover {
-            background: rgba(0, 180, 216, 0.08);
-            transform: translateX(10px);
-        }
-
-        .architecture-diagram {
-            background: rgba(2, 5, 16, 0.6);
-            border: 2px solid rgba(0, 180, 216, 0.3);
-            border-radius: 12px;
-            padding: 2rem;
-            margin: 2rem 0;
-            text-align: center;
-        }
-
-        .process-flow {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.4rem;
-            margin: 2rem 0;
-        }
-
-        .process-step {
-            padding: 1.5rem;
-            border-radius: 14px;
-            background: rgba(0, 180, 216, 0.06);
-            border: 1px solid rgba(0, 180, 216, 0.2);
-            transition: transform 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .process-step:hover {
-            transform: translateY(-6px);
-            border-color: var(--primary);
-            box-shadow: 0 10px 25px rgba(0, 180, 216, 0.25);
-        }
-
-        .step-number {
-            background: var(--primary);
-            color: var(--dark);
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        @media (max-width: 768px) {
-            .project-header h1 {
-                font-size: 2rem;
-            }
-
-            .container {
-                padding: 5rem 1rem 2rem;
-            }
-
-            .back-button {
-                top: 1rem;
-                left: 1rem;
-                padding: 0.5rem 1rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-        }
-
-        .project-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 1rem;
-            padding: 0.75rem 1.5rem;
-            background: rgba(0, 180, 216, 0.1);
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            text-decoration: none;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .project-link:hover {
-            background: rgba(0, 180, 216, 0.2);
-            box-shadow: 0 0 20px rgba(0, 180, 216, 0.3);
-            transform: translateY(-2px);
-        }
-
-        /* Custom Cursor */
-        .cursor {
-            width: 16px;
-            height: 16px;
-            border: 2px solid #00b4d8;
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 9999;
-            transition: transform 0.05s ease-out, opacity 0.2s ease, width 0.2s ease, height 0.2s ease;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 0 10px rgba(0, 180, 220, 0.5);
-            opacity: 1;
-            will-change: transform;
-        }
-
-        .cursor.hover {
-            width: 32px;
-            height: 32px;
-            background: rgba(0, 180, 220, 0.1);
-            border-width: 3px;
-            box-shadow: 0 0 20px rgba(0, 180, 220, 0.8);
-        }
-
-        .cursor-glow {
-            width: 40px;
-            height: 40px;
-            background: radial-gradient(circle, rgba(0, 180, 220, 0.2) 0%, transparent 70%);
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 9998;
-            transition: transform 0.1s ease-out, width 0.2s ease, height 0.2s ease;
-            transform: translate(-50%, -50%);
-            will-change: transform;
-        }
-
-        .cursor-glow.hover {
-            width: 60px;
-            height: 60px;
-            background: radial-gradient(circle, rgba(0, 180, 220, 0.3) 0%, transparent 70%);
-        }
-
-        a, button, .stat-card, .tech-item, .feature-list li {
-            cursor: none !important;
-        }
-    </style>
+    <link rel="stylesheet" href="project.css">
+    <script defer src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script defer src="../shared.js"></script>
+    <script defer src="project.js"></script>
 </head>
 <body>
     <div id="particles-js"></div>
-    
-    <a href="../index.html" class="back-button">
-        <i class="fas fa-arrow-left"></i>
-    </a>
 
     <div class="container">
-        <div class="project-header">
-            <div class="project-subtitle">CANADA-WIDE SCIENCE FAIR BRONZE MEDALIST</div>
-            <h1>From Pixels to Precision</h1>
-            <div class="project-subtitle">Neural Network for Real Time Surgical Tool Segmentation</div>
-            <div class="project-meta">
-                <span>🥉 Bronze Medal - CWSF</span>
-                <span>🏥 Synaptive Medical Partnership</span>
-                <span>⚡ 95% Accuracy</span>
-            </div>
-            <a href="https://projectboard.world/ysc/project/from-pixels-to-precision" target="_blank" class="project-link">
-                <i class="fas fa-external-link-alt"></i> View on Project Board
-            </a>
+        <a class="back-link" href="../index.html">[ Back to home ]</a>
+
+        <div class="eyebrow">2023</div>
+
+        <h1 class="title">Real-time surgical tool <span class="accent">segmentation</span> from live operating-room footage.</h1>
+
+        <div class="chips">
+            <span class="chip">Surgical Vision</span>
+            <span class="chip">Healthcare</span>
+            <span class="chip">Deep Learning</span>
         </div>
 
-        <!-- Box 2: Overview -->
-        <section class="section">
-            <h2 class="section-header">Overview</h2>
-            
-            <div class="video-container">
-                <video 
-                    id="project-video"
-                    controls
-                    autoplay
-                    muted
-                    loop>
+        <p class="subtitle">A U-Net trained on 300 hand-labeled frames captured through a Modus V exoscope at Synaptive Medical and Robarts Research Institute, segmenting tools from tissue at ~95% DICE in under 0.12 s per frame.</p>
+
+        <!-- ============================================================== -->
+        <h2 class="section">1. Abstract</h2>
+        <p>A convolutional segmentation network that traces surgical instruments out of background tissue, frame by frame, on real operating-room footage rather than phantoms or simulated images. Trained on a dataset hand-built from a live procedure: 300 frames, captured through a <strong>Modus V exoscope</strong> on representative tissue, each one segmented by hand in ITK-SNAP into a binary tool-versus-tissue mask. Validated against a fully held-out surgical video, and benchmarked across four lighting and tool-count scenarios that span the realistic range of intraoperative conditions.</p>
+
+        <p>The model is a <strong>U-Net</strong> (Ronneberger et al., 2015), picked because skip connections preserve the fine spatial detail that downsampling otherwise destroys, which is the part of the network that actually has to land the tool boundary. Encoder, decoder, skip connections. Adam with binary cross-entropy. Roughly two hours of training on a single GPU. Fluorescent-blue frames are converted to grayscale before training: the network learns the tool more cleanly from intensity than from hue, a finding that fell out of the data work rather than the architecture.</p>
+
+        <p>The novelty is not the architecture. It is the data, the partnership, and the deployment context. 300 hand-labeled frames from a real Synaptive Modus V exoscope on real tissue, not Cholec80 phantoms or synthetic renders. Coverage of regular illumination and fluorescence-guided surgery in the same model. A working real-time inference loop running on commodity hardware, demonstrated against held-out video that the network never saw during training.</p>
+
+        <ul class="body-list">
+            <li><strong>~95% DICE</strong> on the canonical single-tool, regular-illumination case.</li>
+            <li><strong>Under 0.12 s per 600 × 800 frame</strong>, about 500 frames per minute on commodity GPU.</li>
+            <li><strong>300 frames hand-segmented in ITK-SNAP</strong>, double-checked for ground-truth precision.</li>
+            <li><strong>Industry partnership with Synaptive Medical and Robarts Research Institute</strong>, captured on a Modus V exoscope.</li>
+            <li>Bronze Medal, <strong>Canada-Wide Science Fair</strong>.</li>
+        </ul>
+
+        <figure>
+            <div class="figure-card">
+                <video controls autoplay muted loop playsinline>
                     <source src="../images/tool_segmentation.mp4" type="video/mp4">
-                    <source src="../images/tool_segmentation.avi" type="video/x-msvideo">
-                    Your browser does not support the video tag.
                 </video>
             </div>
-            
-            <div class="highlight-box">
-                <p><strong>From Pixels to Precision</strong> addresses a critical challenge in minimally invasive surgery: nearly 30% of surgical complications are caused by misrecognition of artifacts during operations. This neural network segments surgical tools from their background in real time, providing surgeons with an AI guided assist system that enhances precision and reduces the risk of errors.</p>
+            <figcaption>Figure 1. Live segmentation overlay on held-out surgical video. Tool boundaries traced frame by frame at under 0.12 s per image.</figcaption>
+        </figure>
+
+        <!-- ============================================================== -->
+        <h2 class="section">2. Introduction</h2>
+        <p>Minimally invasive surgery is the procedure where the surgeon is asked to operate through a keyhole. The camera replaces direct sight, depth perception collapses to a 2D feed, and the instrument tip routinely leaves and reenters the visible field as it moves. Existing literature attributes roughly 30% of complications in this setting to in-procedure misrecognition: tools confused with tissue, edges lost under fluorescence, occlusion read as background.</p>
+        <ul class="body-list">
+            <li><strong>The surgeon's view is already lossy.</strong> A real-time overlay that traces the tool boundary at video rate gives back information the human eye is losing to camera distortion and shadow.</li>
+            <li><strong>Tool segmentation is the load-bearing primitive.</strong> Skill scoring, instrument tracking, autonomous assistance, and post-operative review all start from "where is the tool, pixel by pixel."</li>
+            <li><strong>The training set is the bottleneck, not the model.</strong> Public surgical-vision datasets skew toward laparoscopic or phantom footage. A model trained on real tissue, real lighting, and real fluorescence ends up in a different regime.</li>
+        </ul>
+
+        <h3 class="subsection">2.1 Why a U-Net</h3>
+        <p>U-Net is the natural pick for small biomedical datasets, which is precisely the regime here (300 frames after manual labeling, not 30,000). It was designed for exactly this constraint: per-pixel classification with limited training data, where the architecture itself has to compensate for what the data does not have.</p>
+        <ul class="body-list">
+            <li><strong>Encoder, decoder, skip connections.</strong> The encoder extracts hierarchical context through successive convolutions and pooling. The decoder upsamples back to input resolution via transpose convolutions. Skip connections at each level carry the high-frequency spatial detail that pooling would otherwise discard.</li>
+            <li><strong>The skips are what land the tool boundary.</strong> Without them the network can identify "there is a tool here" but the predicted mask drifts off the actual edge by several pixels. With them, the boundary stays sharp. This matters in surgical overlay because the surgeon is looking at the edge, not the centroid.</li>
+            <li><strong>Tiny parameter count for a segmentation network.</strong> The architecture is shallow enough to train end-to-end on a single GPU in roughly two hours, which kept the iteration loop tight during the data and lighting experiments.</li>
+        </ul>
+
+        <h3 class="subsection">2.2 What is actually new</h3>
+        <p>The architecture is from 2015. The contribution is in the dataset, the lighting range, and the partnership context that made both possible.</p>
+        <ul class="body-list">
+            <li><strong>300 frames from a real Modus V exoscope on real tissue.</strong> Captured during experimental procedures on pig brain tissue, representative of the lighting and focal regime in a real operating room. Not Cholec80. Not phantom data. Hand-labeled in ITK-SNAP into NIfTI and PNG binary masks, every segmentation double-checked.</li>
+            <li><strong>Both regular and fluorescence-guided imaging in the same model.</strong> Fluorescent-blue frames are converted to grayscale before training, because the tool boundary is sharper in intensity than in hue. That conversion step is what makes a single network handle both lighting modes without retraining; the finding came out of the data work, not the architecture.</li>
+            <li><strong>Industry and clinical collaboration as part of the build.</strong> Synaptive Medical (Toronto) provided the exoscope and the procedural context. Robarts Research Institute (Western University) provided the tissue and the clinical guidance. The model exists because the partnership produced training data that no public dataset has.</li>
+        </ul>
+
+        <p>Every section below is the engineering that lives on top of those three. The architecture is the smallest piece.</p>
+
+        <!-- ============================================================== -->
+        <h2 class="section">3. System</h2>
+
+        <h3 class="subsection">3.1 Architecture</h3>
+        <p>Standard U-Net. Three downsampling blocks (64, 128, 256 channels), a single 512-channel bottleneck, three upsampling blocks (256, 128, 64), and a final 1×1 convolution that produces the per-pixel tool probability. Skip connections at each level concatenate the encoder feature map with the decoder feature map at matching resolution. Adam, binary cross-entropy on the binary mask, single GPU.</p>
+
+        <figure>
+            <div class="figure-card">
+                <img src="../images/figures/pixels_fig2_unet.png" alt="U-Net diagram showing encoder downsampling through 64, 128, 256 channel blocks into a 512-channel bottleneck, decoder upsampling back through 256, 128, 64, with dashed skip connections at each level carrying boundary detail to the matching decoder block.">
             </div>
-            <p>As robotic and minimally invasive surgeries become increasingly common, they offer patients reduced pain, shorter hospital stays, and faster recovery times. However, these procedures are prone to errors caused by limited depth perception and visual distortion through surgical cameras. Inspired by how autonomous vehicles use AI for obstacle recognition, this project applies the same technology to revolutionize surgical procedures.</p>
-            
-            <p style="margin-top: 1rem;">The neural network supports both regular illumination and fluorescence guided surgery, making it ideal for modern surgical practices. With support from <strong>Synaptive Medical Inc.</strong> and <strong>Robarts Research Institute</strong>, the system was trained on real surgical footage captured through a Modus V exoscope.</p>
-        </section>
+            <figcaption>Figure 2. The architecture in one picture. Three encoder stages, a single bottleneck, three decoder stages, and the skip paths that preserve tool-edge detail through the upsampling pass.</figcaption>
+        </figure>
 
-        <section class="section">
-            <h2 class="section-header">Technology Stack</h2>
-            <div class="tech-grid">
-                <div class="tech-item">Python</div>
-                <div class="tech-item">Keras</div>
-                <div class="tech-item">TensorFlow</div>
-                <div class="tech-item">NumPy</div>
-                <div class="tech-item">MATLAB</div>
-                <div class="tech-item">ITK-SNAP</div>
-                <div class="tech-item">U-Net</div>
-                <div class="tech-item">OpenCV</div>
+        <h3 class="subsection">3.2 Data</h3>
+        <p>300 frames sampled from a procedural recording captured through the Modus V exoscope on representative pig brain tissue. Each frame hand-segmented in ITK-SNAP into a binary tool / background mask, then exported in both NIfTI (for downstream tooling) and PNG (for the training pipeline). Every segmentation reviewed twice for ground-truth precision before going into the training set.</p>
+        <ul class="body-list">
+            <li><strong>Fluorescent-blue frames converted to grayscale in MATLAB</strong> before training. The blue channel carries most of the fluorescent signal but very little tool-boundary information; the intensity channel carries the boundary cleanly. The network learned the tool more reliably from intensity than from the raw RGB.</li>
+            <li><strong>Adam optimizer, binary cross-entropy loss.</strong> Roughly two hours to train on a single GPU.</li>
+            <li><strong>No augmentation beyond grayscale conversion on the fluorescent split.</strong> The dataset is small enough that aggressive augmentation risked overfitting to synthetic artifacts rather than real intraoperative variation.</li>
+        </ul>
+
+        <h3 class="subsection">3.3 Test protocol</h3>
+        <p>Evaluation runs on a fully held-out surgical video, captured separately from the training procedure and never seen by the network during training. Frames are extracted, passed through the model individually, and the predicted masks recompiled into a side-by-side overlay against the original footage. Four scenarios are tested with 20 random images each:</p>
+        <ul class="body-list">
+            <li>Regular illumination, one tool.</li>
+            <li>Fluorescent blue, one tool.</li>
+            <li>Regular illumination, two tools.</li>
+            <li>Fluorescent blue, two tools.</li>
+        </ul>
+        <p>The canonical case (regular, one tool) is the closest analogue to a standard intraoperative view and the primary headline number. The other three scenarios test how the model degrades as the input departs from that canonical regime.</p>
+
+        <!-- ============================================================== -->
+        <h2 class="section">4. Evaluation</h2>
+        <p>Held-out surgical video, never seen during training. 20 random frames per scenario. Side-by-side overlay against the original used as the qualitative inspection mode, DICE on the binary mask as the quantitative metric.</p>
+
+        <figure>
+            <div class="figure-card">
+                <img src="../images/figures/pixels_fig3_latency.png" alt="Horizontal bar chart showing about 120 milliseconds per 600 by 800 frame, with dotted reference lines for 30 FPS at 33 ms, 15 FPS at 67 ms, and 5 FPS at 200 ms.">
             </div>
-        </section>
+            <figcaption>Figure 3. Inference cost per frame on commodity GPU. Comfortable for offline overlay and near real-time review, slower than 30 FPS live video.</figcaption>
+        </figure>
 
-        <!-- Box 4: Main Document Content -->
-        <section class="document-section">
-            <h1>Motivation & Significance</h1>
+        <ul class="body-list">
+            <li><strong>~95% DICE</strong> on the canonical single-tool, regular-illumination case.</li>
+            <li><strong>Under 0.12 s per 600 × 800 image</strong>, about 500 frames per minute on commodity GPU. Slower than 30 FPS live video, fast enough for surgical replay and near real-time overlay.</li>
+            <li><strong>Fluorescent blue, post-grayscale conversion, reaches comparable accuracy</strong> to regular illumination on the single-tool case. The grayscale conversion is what made fluorescence tractable for a single network.</li>
+            <li><strong>Accuracy degrades on multi-tool frames</strong>, with fluorescent-blue two-tool being the predicted worst case.</li>
+            <li><strong>Primary failure mode is motion blur at tool edges.</strong> Sharp boundary loss propagates into false positives and false negatives along the predicted mask edge.</li>
+        </ul>
 
-            <h2>The Problem</h2>
-            <p>Robotic surgeries offer numerous advantages over traditional procedures, including:</p>
-            <ul>
-                <li>Reduced blood loss and smaller incisions</li>
-                <li>Faster recovery rates and shorter hospital stays</li>
-                <li>Greater precision through robotic arm stabilization</li>
-            </ul>
+        <p>The 95% number is the canonical case on n = 20 random frames from a single held-out video, single seed, single procedural source. It is not a leaderboard claim against published surgical-vision benchmarks (those are scored on different datasets with different label conventions). Read it as "this model works at video-realistic accuracy on data from this Modus V procedure," not as a SOTA result.</p>
 
-            <p>However, these benefits come with significant challenges:</p>
-            <ul>
-                <li><strong>Limited Vision:</strong> Surgeons have restricted view of the surgical site due to camera distortion affecting depth and size perception of 3D structures</li>
-                <li><strong>High Error Rate:</strong> According to research on minimally invasive surgery performance errors, nearly 30% of surgical complications are caused by misrecognition during operations</li>
-                <li><strong>Risk of Damage:</strong> Misidentification can lead to nerve damage, incorrect surgical maneuvers, or damage to surrounding tissue</li>
-            </ul>
+        <!-- ============================================================== -->
+        <h2 class="section">5. Conclusion and Implications</h2>
+        <p>A real-time tool overlay trained on real surgical footage, rather than on phantoms or synthetic renders, is a concrete step toward safer minimally invasive procedures. If even a fraction of the 30% misrecognition share of intraoperative complications gets recovered by an overlay that reliably traces tool boundaries, the downstream effect is fewer nerve injuries, fewer collateral tissue insults, and fewer follow-on operations. The same architecture, retrained on appropriate data, generalises beyond tool segmentation into tumor delineation, organ boundaries for surgical planning, and quantitative tracking of disease progression on CT and MRI volumes. The build that matters most here is the data pipeline that made any of it trainable on a real surgical recording.</p>
 
-            <h2>The Solution</h2>
-            <p>Just as autonomous vehicles use AI to predict safe driving lanes based on obstacle recognition, this neural network acts as a guide to support surgeons' experience and skills. By accurately segmenting surgical tools from background tissue, the system:</p>
-            <ul>
-                <li><strong>Enhances Surgical Precision:</strong> Provides real time visual guidance to reduce misrecognition errors</li>
-                <li><strong>Increases Patient Safety:</strong> Minimizes risk of complications caused by visual confusion</li>
-                <li><strong>Supports Fluorescence Guided Surgery:</strong> Works with both regular and fluorescent illumination for modern surgical techniques</li>
-                <li><strong>Saves Time:</strong> Automated segmentation is dramatically faster than manual approaches, allowing surgeons to focus on critical aspects of procedures</li>
-            </ul>
+        <h3 class="subsection">5.1 Limitations</h3>
+        <ul class="body-list">
+            <li><strong>Single procedural source.</strong> All 300 training frames come from one Modus V recording on one tissue type. Generalisation to other instruments, anatomies, and procedures is unproven.</li>
+            <li><strong>n = 20 random frames per scenario, single seed.</strong> The 95% DICE number on the canonical case is a point estimate, not a variance-bounded benchmark.</li>
+            <li><strong>Motion blur dominates the error.</strong> There is no temporal model in the pipeline; each frame is segmented independently of its neighbours.</li>
+            <li><strong>Ground-truth quality is bounded by manual ITK-SNAP segmentations.</strong> Two reviews per frame mitigate this, but it is still a hand-labeled ceiling.</li>
+            <li><strong>Inference is near real-time, not video rate.</strong> 0.12 s per frame is comfortable for surgical replay and reduced-rate overlay. Live 30 FPS use would require kernel-level optimisation or a smaller backbone.</li>
+        </ul>
 
-            <h1>Neural Network Architecture</h1>
+        <h3 class="subsection">5.2 Future Work</h3>
+        <p>The limitations map directly onto the next phase of the build.</p>
+        <ul class="body-list">
+            <li><strong>Multi-source dataset</strong> spanning procedures, instruments, anatomies, and lighting conditions, captured under the same labeling protocol.</li>
+            <li><strong>Temporal consistency</strong> via a recurrent or video-aware head, to absorb motion blur and stabilise the mask across consecutive frames.</li>
+            <li><strong>Instance segmentation</strong> for multi-tool scenes with occlusion, replacing the current binary mask with per-instrument labels.</li>
+            <li><strong>Latency reduction</strong> through a leaner backbone or quantised inference to close the gap to 30 FPS live video.</li>
+        </ul>
 
-            <h2>U-Net Implementation</h2>
-            <p>The project utilizes <strong>U-Net architecture</strong>, a fully convolutional neural network specifically designed for medical image segmentation. Published in 2015, U-Net revolutionized deep learning for biomedical applications by learning effectively from small training samples.</p>
+        <!-- ============================================================== -->
+        <h2 class="section">6. Acknowledgments</h2>
+        <p>Surgical footage and procedural context provided by <strong>Synaptive Medical Inc.</strong> The Modus V exoscope captured every frame in the training set. Tissue and clinical guidance provided by <strong>Robarts Research Institute</strong> at Western University. Recognized with a <strong>Bronze Medal at the Canada-Wide Science Fair</strong>.</p>
 
-            <p><strong>Key Components:</strong></p>
-            <ul>
-                <li><strong>Encoder:</strong> Extracts hierarchical features through convolutional layers, progressively reducing spatial dimensions while increasing feature depth</li>
-                <li><strong>Decoder:</strong> Up samples features using transpose convolution, reconstructing spatial resolution for pixel level predictions</li>
-                <li><strong>Skip Connections:</strong> Directly links encoder features to decoder, preserving fine grained spatial details lost during down sampling, critical for accurate boundary segmentation</li>
-            </ul>
+        <p>The architecture is U-Net from <a class="inline" href="https://arxiv.org/abs/1505.04597" target="_blank" rel="noopener">Ronneberger et al., 2015</a>.</p>
 
-            <h2>Training Pipeline</h2>
-            <p>The network was trained using a systematic 4-step process:</p>
-            <ul>
-                <li><strong>Data Preparation:</strong> 300 images manually segmented using ITK-SNAP software</li>
-                <li><strong>Preprocessing:</strong> Fluorescent images converted to grayscale for intensity based learning</li>
-                <li><strong>Training:</strong> Keras + Python implementation, approximately 2 hours on GPU</li>
-                <li><strong>Validation:</strong> DICE coefficient comparison on test images</li>
-            </ul>
-
-            <h2>DICE Coefficient Evaluation</h2>
-            <p>Segmentation accuracy was measured using the <strong>DICE coefficient</strong>, a statistical measure of overlap between predicted and ground-truth segmentation masks. The DICE score ranges from 0 (no overlap) to 1 (perfect match), calculated as 2 times the intersection divided by the sum of both mask areas.</p>
-
-            <h1>Methodology</h1>
-
-            <h2>1. Manual Segmentation (Training Data Creation)</h2>
-            <p>Training data was captured using a <strong>Modus V exoscope by Synaptive Medical Inc.</strong> during experimental procedures on pig brain tissue, representative of real surgical environments.</p>
-            <ul>
-                <li><strong>ITK-SNAP Software:</strong> 300 images manually segmented by breaking down into RGB components for grayscale viewing</li>
-                <li><strong>Dual Format Storage:</strong> NifTI files (for ITK SNAP compatibility) and PNG files (for visualization)</li>
-                <li><strong>Binary Classification:</strong> Pixels labeled as either "surgical tool" or "background tissue"</li>
-                <li><strong>Quality Control:</strong> All segmentations double checked for accuracy to maximize ground truth precision</li>
-            </ul>
-
-            <h2>2. Fluorescence Challenge Solution</h2>
-            <p><strong>Initial Problem:</strong> Neural network struggled with fluorescent blue images due to color variance issues.</p>
-            <p><strong>Solution:</strong> Converted fluorescent images to grayscale using MATLAB, enabling the network to distinguish tools based on color intensity rather than color variance. This dramatically improved segmentation accuracy for fluorescence guided surgery scenarios.</p>
-
-            <h2>3. Training Process</h2>
-            <ul>
-                <li><strong>Framework:</strong> Keras with Python backend</li>
-                <li><strong>Training Duration:</strong> Approximately 2 hours on GPU</li>
-                <li><strong>Validation:</strong> Same training images re-inputted to compare prediction vs. ground truth segmentations</li>
-                <li><strong>Optimization:</strong> Adam optimizer with binary cross entropy loss function</li>
-            </ul>
-
-            <h2>4. Testing Protocol</h2>
-            <p>To evaluate real-world performance, a completely new surgical video (unseen during training) was tested:</p>
-            <ul>
-                <li>MATLAB code breaks video into PNG frames</li>
-                <li>Neural network segments each frame (less than 0.12s per image)</li>
-                <li>Segmented frames compiled back into video</li>
-                <li>Side by side analysis of original vs. segmented video</li>
-            </ul>
-
-            <p><strong>Test Categories:</strong> Four scenarios tested with 20 random images each:</p>
-            <ul>
-                <li>Regular illumination (pink) with one surgical tool</li>
-                <li>Fluorescent blue with one surgical tool</li>
-                <li>Regular illumination (pink) with two surgical tools</li>
-                <li>Fluorescent blue with two surgical tools</li>
-            </ul>
-
-            <h1>Results & Analysis</h1>
-
-            <h2>Performance Metrics</h2>
-            <ul>
-                <li><strong>Overall DICE Accuracy:</strong> Approximately 95%</li>
-                <li><strong>Processing Speed:</strong> Less than 1 minute to segment 500 images</li>
-                <li><strong>Per Image Time:</strong> 0.12s per 600×800 pixel image</li>
-                <li><strong>Test Scenarios:</strong> 4 different surgical environments</li>
-            </ul>
-
-            <h2>Key Findings</h2>
-            <p><strong>Exceptional Speed & Efficiency:</strong> The neural network demonstrated remarkable processing speed, segmenting approximately 500 images in under one minute. Each 600×800 pixel image required less than 0.12 seconds, which is fast enough for real-time surgical assistance.</p>
-
-            <p><strong>High Accuracy Under Normal Lighting:</strong> The network achieved particularly strong performance identifying surgical tools under regular illumination, with DICE coefficients hovering around 95%.</p>
-
-            <p><strong>Fluorescence Support After Preprocessing:</strong> Once fluorescent blue images were converted to grayscale, the network successfully segmented tools with comparable accuracy to regular illumination scenarios.</p>
-
-            <p><strong>Performance Degradation with Multiple Tools:</strong> As more surgical tools were added to the scene, accuracy became less consistent. However, pink images with two tools showed the smallest accuracy drop across all categories.</p>
-
-            <p><strong>Fluorescent Blue Two-Tool Challenge:</strong> The most difficult scenario was fluorescent blue images containing two tools, which showed the least consistent accuracy, validating the initial hypothesis.</p>
-
-            <h2>Limitations & Analysis</h2>
-            <ul>
-                <li><strong>Limited Training Diversity:</strong> All 300 training images came from a single video source, restricting the network's ability to generalize to unseen surgical scenarios, instruments, or anatomical regions</li>
-                <li><strong>Motion Blur Impact:</strong> The primary accuracy-limiting factor was motion blur affecting the edges between surgical tools and tissue, potentially causing false positives or negatives</li>
-                <li><strong>Manual Segmentation Dependency:</strong> Network accuracy directly depends on the precision of manual ground-truth segmentations. Any errors in training data propagate to predictions</li>
-                <li><strong>Complex Scenario Challenges:</strong> Performance degradation with multiple tools suggests limitations in handling complex surgical scenarios with tool occlusion or overlapping instruments</li>
-            </ul>
-
-            <h1>Opportunities for Improvement</h1>
-
-            <h2>1. Advanced Multi-Layer Architecture</h2>
-            <p>Implementing a deeper neural network with additional convolutional layers could detect more intricate patterns and features. This would improve the network's ability to handle motion blur by learning more robust edge detection and boundary refinement strategies.</p>
-
-            <h2>2. Dataset Expansion & Diversification</h2>
-            <p>Training on multiple video sources across different surgical procedures (brain, cardiac, abdominal, etc.), instrument types (forceps, scalpels, suction tools, etc.), lighting conditions (various fluorescence wavelengths, intensities), and camera systems would dramatically improve generalization and reduce false positives/negatives in novel scenarios.</p>
-
-            <h2>3. Enhanced Ground Truth Quality</h2>
-            <p>Improving the precision of original manual segmentations through multiple expert annotators with consensus voting, higher-resolution source imagery, semi-automated segmentation refinement tools, and validation against surgical tool CAD models.</p>
-
-            <h2>4. Motion Blur Mitigation</h2>
-            <p>Potential approaches include temporal consistency constraints using video frame sequences, deblurring preprocessing pipeline before segmentation, training data augmentation with synthetic motion blur, and recurrent neural network components for temporal context.</p>
-
-            <h2>5. Multi-Tool Handling</h2>
-            <p>To improve performance with multiple surgical instruments: instance segmentation (identifying each tool separately), attention mechanisms to focus on individual instruments, training specifically on crowded surgical scenes, and post-processing algorithms to separate overlapping tool predictions.</p>
-
-            <h1>Broader Applications</h1>
-
-            <h2>Surgical Tool Segmentation</h2>
-            <ul>
-                <li><strong>Reduced Misrecognition Errors:</strong> Addresses the 30% complication rate caused by artifact misidentification</li>
-                <li><strong>Enhanced Precision:</strong> Real-time visual guidance helps surgeons maintain spatial awareness during minimally invasive procedures</li>
-                <li><strong>Time Savings:</strong> Automated segmentation dramatically faster than manual approaches, letting surgeons focus on critical decision-making</li>
-                <li><strong>Training & Education:</strong> Annotated surgical videos for medical student training and skill assessment</li>
-            </ul>
-
-            <h2>Beyond Surgery: Medical Imaging</h2>
-            <p>The neural network framework extends far beyond surgical tool segmentation. <strong>Tumor Detection:</strong> Advanced neural networks can identify abnormalities in medical scans that are difficult for the human eye to detect, such as small tumors in early stages. <strong>Organ & Tissue Segmentation:</strong> Automatic delineation of organs, blood vessels, or tissue types in CT, MRI, or ultrasound imaging for diagnosis and surgical planning. <strong>Disease Diagnosis:</strong> Pattern recognition in radiological images for conditions like pneumonia, fractures, or degenerative diseases. <strong>Quantitative Analysis:</strong> Measuring organ volumes, tracking disease progression, or assessing treatment efficacy through precise segmentation.</p>
-
-            <h2>Industry Partnership Impact</h2>
-            <p>Collaboration with <strong>Synaptive Medical Inc.</strong> and <strong>Robarts Research Institute</strong> provided access to professional-grade Modus V exoscope surgical footage, real-world surgical environment data unavailable to typical research projects, validation of clinical relevance and potential commercial applications, and mentorship from medical imaging and neurosurgery experts.</p>
-
-            <h1>Conclusion</h1>
-            <p>From Pixels to Precision demonstrates that neural networks have transformative potential for surgical procedures and medical imaging. By achieving approximately 95% accuracy while processing images in under 0.12 seconds, the system proves that real-time AI assistance in surgery is not only possible but practical.</p>
-            
-            <p>This project addresses a critical healthcare challenge: the 30% complication rate in minimally invasive surgeries caused by misrecognition. By providing surgeons with accurate, real-time tool segmentation (including support for fluorescence-guided surgery), the neural network enhances patient safety, increases surgical precision, and allows medical professionals to focus on the most critical aspects of procedures.</p>
-
-            <p>The partnership with Synaptive Medical Inc. and Robarts Research Institute provided invaluable real-world surgical data and clinical validation. Recognition with a Bronze Medal at the Canada-Wide Science Fair affirms the innovation and potential impact of this work.</p>
-
-            <p>Beyond surgical tool segmentation, this research opens doors to broader medical imaging applications: tumor detection, organ segmentation, disease diagnosis, and quantitative analysis. As neural network architectures become more sophisticated and training datasets expand, the potential to revolutionize healthcare and improve countless lives becomes increasingly tangible.</p>
-        </section>
+        <pre><code>@inproceedings{ronneberger2015unet,
+  title     = {U-Net: Convolutional Networks for Biomedical Image Segmentation},
+  author    = {Ronneberger, Olaf and Fischer, Philipp and Brox, Thomas},
+  booktitle = {Medical Image Computing and Computer-Assisted Intervention (MICCAI)},
+  year      = {2015},
+  url       = {https://arxiv.org/abs/1505.04597}
+}</code></pre>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    <script>
-        // Custom cursor
-        const cursor = document.createElement('div');
-        cursor.classList.add('cursor');
-        document.body.appendChild(cursor);
-
-        const cursorGlow = document.createElement('div');
-        cursorGlow.classList.add('cursor-glow');
-        document.body.appendChild(cursorGlow);
-
-        document.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-            cursorGlow.style.left = e.clientX + 'px';
-            cursorGlow.style.top = e.clientY + 'px';
-        });
-
-        document.addEventListener('mousedown', () => {
-            cursor.style.transform = 'translate(-50%, -50%) scale(0.8)';
-            cursorGlow.style.transform = 'translate(-50%, -50%) scale(0.8)';
-        });
-
-        document.addEventListener('mouseup', () => {
-            cursor.style.transform = 'translate(-50%, -50%) scale(1)';
-            cursorGlow.style.transform = 'translate(-50%, -50%) scale(1)';
-        });
-
-        const interactiveElements = document.querySelectorAll('a, button, .stat-card, .tech-item');
-        interactiveElements.forEach(element => {
-            element.addEventListener('mouseenter', () => {
-                cursor.classList.add('hover');
-                cursorGlow.classList.add('hover');
-            });
-            element.addEventListener('mouseleave', () => {
-                cursor.classList.remove('hover');
-                cursorGlow.classList.remove('hover');
-            });
-        });
-
-        // Particles.js configuration
-        particlesJS('particles-js', {
-            particles: {
-                number: { value: 70, density: { enable: true, value_area: 800 } },
-                color: { value: '#00b4d8' },
-                shape: { type: 'circle' },
-                opacity: { value: 0.3, random: true },
-                size: { value: 3, random: true },
-                line_linked: {
-                    enable: true,
-                    distance: 150,
-                    color: '#00b4d8',
-                    opacity: 0.2,
-                    width: 1
-                },
-                move: {
-                    enable: true,
-                    speed: 2,
-                    direction: 'none',
-                    random: false,
-                    straight: false,
-                    out_mode: 'out',
-                    bounce: false
-                }
-            },
-            interactivity: {
-                detect_on: 'canvas',
-                events: {
-                    onhover: { enable: true, mode: 'grab' },
-                    onclick: { enable: true, mode: 'push' },
-                    resize: true
-                },
-                modes: {
-                    grab: { distance: 140, line_linked: { opacity: 0.5 } },
-                    push: { particles_nb: 4 }
-                }
-            },
-            retina_detect: true
-        });
-
-        // Back button scroll behavior
-        const backButton = document.querySelector('.back-button');
-        let lastScroll = 0;
-
-        // Smooth back button navigation
-        backButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            
-            // Create transition overlay
-            const overlay = document.createElement('div');
-            overlay.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(135deg, #020510 0%, #0a1628 100%);
-                z-index: 99999;
-                opacity: 0;
-                transition: opacity 0.3s ease;
-                pointer-events: none;
-            `;
-            document.body.appendChild(overlay);
-            
-            // Fade in overlay
-            setTimeout(() => {
-                overlay.style.opacity = '1';
-            }, 10);
-            
-            // Navigate after overlay is visible
-            setTimeout(() => {
-                window.location.href = '../index.html';
-            }, 200);
-        });
-
-        window.addEventListener('scroll', () => {
-            const currentScroll = window.pageYOffset;
-            
-            if (currentScroll > lastScroll && currentScroll > 100) {
-                // Scrolling down - hide button
-                backButton.classList.add('hidden');
-            } else {
-                // Scrolling up or at top - show button
-                backButton.classList.remove('hidden');
-            }
-            
-            lastScroll = currentScroll;
-        });
-    </script>
 </body>
 </html>
