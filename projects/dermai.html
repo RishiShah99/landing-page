@@ -1,747 +1,149 @@
 <!DOCTYPE html>
-<html lang="en" style="cursor: none !important; background-color: #020510 !important;">
+<html lang="en" style="background-color: #f3ece0;">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DermAI - AI Powered Skin Health Assistant | Rishi Shah</title>
-    <meta name="description" content="Medical AI platform combining DenseNet121 image classification with RAG powered chatbot for comprehensive dermatological triage and health guidance.">
-    <style>
-        /* CRITICAL: Hide cursor and background immediately on page load */
-        html, body, * {
-            cursor: none !important;
-        }
-        html, body {
-            background-color: #020510 !important;
-            margin: 0;
-            padding: 0;
-        }
-    </style>
+    <title>DermAI · Dermatological triage with cited medical evidence | Rishi Shah</title>
+    <meta name="description" content="A dermatological triage layer pairing a DenseNet121 classifier trained on 19,000+ DermNet images with a retrieval-augmented chatbot whose every answer cites a real medical source. Sub-50 ms vector retrieval, first-token chat under 1 s, full auth and row-level security behind Supabase.">
+
     <link rel="prefetch" href="../index.html">
-    <link rel="preload" href="../style.css" as="style">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/17ea408dcc.js" crossorigin="anonymous"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    <style>html, body { background-color: #f3ece0; margin: 0; padding: 0; }</style>
 
-        :root {
-            --primary: #00b4d8;
-            --secondary: #5EEAD4;
-            --dark: #020510;
-            --darker: #0a1628;
-            --light: #e0f2fe;
-            --accent: #38bdf8;
-        }
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
-            color: var(--light);
-            line-height: 1.6;
-            min-height: 100vh;
-            overflow-x: hidden;
-            cursor: none !important;
-        }
-
-        * {
-            cursor: none !important;
-        }
-
-        #particles-js {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: 5;
-            pointer-events: none;
-        }
-
-        .back-button {
-            position: fixed;
-            top: 2rem;
-            left: 2rem;
-            z-index: 10001;
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 180, 216, 0.1);
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            text-decoration: none;
-            border-radius: 50%;
-            font-size: 1.2rem;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(10px);
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        .back-button.hidden {
-            opacity: 0;
-            transform: translateX(-20px);
-            pointer-events: none;
-        }
-
-        .back-button:hover {
-            background: rgba(0, 180, 216, 0.2);
-            transform: scale(1.1);
-            box-shadow: 0 0 30px rgba(0, 180, 216, 0.4);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 6rem 2rem 4rem;
-            position: relative;
-            z-index: 10;
-        }
-
-        .project-header {
-            text-align: center;
-            margin-bottom: 4rem;
-            padding: 3rem 2rem;
-            background: rgba(10, 22, 40, 0.5);
-            border-radius: 16px;
-            border: 1px solid rgba(0, 180, 216, 0.2);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .project-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--primary), transparent);
-            animation: scan 3s infinite;
-        }
-
-        @keyframes scan {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-
-        .project-header h1 {
-            font-size: 3rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .project-subtitle {
-            font-size: 1.1rem;
-            color: var(--secondary);
-            font-weight: 300;
-            margin-bottom: 0.5rem;
-        }
-
-        .project-meta {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-top: 1.5rem;
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .section {
-            margin-bottom: 2rem;
-            padding: 2rem;
-            background: rgba(10, 22, 40, 0.3);
-            border-radius: 12px;
-            border: 1px solid rgba(0, 180, 216, 0.1);
-        }
-
-        .section-header {
-            font-size: 2rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            color: var(--primary);
-            font-family: 'Courier New', monospace;
-        }
-
-        .highlight-box {
-            background: rgba(0, 180, 216, 0.05);
-            border-left: 4px solid var(--primary);
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-            border-radius: 8px;
-        }
-
-        /* Document-style formatting */
-        .document-section {
-            margin-bottom: 2rem;
-            padding: 3rem;
-            background: rgba(10, 22, 40, 0.3);
-            border-radius: 12px;
-            border: 1px solid rgba(0, 180, 216, 0.1);
-        }
-
-        .document-section h1 {
-            font-size: 2rem;
-            font-weight: 600;
-            color: var(--primary);
-            font-family: 'Courier New', monospace;
-            margin-bottom: 1.5rem;
-            margin-top: 2.5rem;
-        }
-
-        .document-section h1:first-child {
-            margin-top: 0;
-        }
-
-        .document-section h2 {
-            font-size: 1.3rem;
-            font-weight: 500;
-            color: var(--secondary);
-            margin-bottom: 1rem;
-            margin-top: 2rem;
-        }
-
-        .document-section p {
-            font-size: 1rem;
-            line-height: 1.8;
-            color: rgba(255, 255, 255, 0.85);
-            margin-bottom: 1rem;
-        }
-
-        .document-section ul {
-            margin: 1rem 0 1rem 1.5rem;
-            list-style-type: disc;
-        }
-
-        .document-section ul li {
-            font-size: 1rem;
-            line-height: 1.8;
-            color: rgba(255, 255, 255, 0.85);
-            margin-bottom: 0.5rem;
-        }
-
-        .document-section strong {
-            color: #ffffff;
-            font-weight: 600;
-        }
-
-        .document-section code {
-            background: rgba(0, 180, 216, 0.1);
-            padding: 0.2rem 0.4rem;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-            color: var(--secondary);
-            font-size: 0.9em;
-        }
-
-        .document-section pre {
-            background: rgba(2, 5, 16, 0.8);
-            padding: 1rem;
-            border-radius: 6px;
-            overflow-x: auto;
-            margin: 1rem 0;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .stat-card {
-            background: rgba(0, 180, 216, 0.05);
-            padding: 1.5rem;
-            border-radius: 12px;
-            border: 1px solid rgba(0, 180, 216, 0.2);
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 180, 216, 0.2);
-            border-color: var(--primary);
-        }
-
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-label {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .tech-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin: 2rem 0;
-        }
-
-        .tech-item {
-            background: rgba(0, 180, 216, 0.05);
-            padding: 1rem;
-            border-radius: 8px;
-            border: 1px solid rgba(0, 180, 216, 0.2);
-            text-align: center;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .tech-item:hover {
-            background: rgba(0, 180, 216, 0.1);
-            border-color: var(--primary);
-            transform: scale(1.05);
-        }
-
-        @media (max-width: 768px) {
-            .project-header h1 {
-                font-size: 2rem;
-            }
-
-            .container {
-                padding: 5rem 1rem 2rem;
-            }
-
-            .back-button {
-                top: 1rem;
-                left: 1rem;
-                padding: 0.5rem 1rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .project-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 1rem;
-            padding: 0.75rem 1.5rem;
-            background: rgba(0, 180, 216, 0.1);
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            text-decoration: none;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .project-link:hover {
-            background: rgba(0, 180, 216, 0.2);
-            box-shadow: 0 0 20px rgba(0, 180, 216, 0.3);
-            transform: translateY(-2px);
-        }
-
-        /* Custom Cursor */
-        .cursor {
-            width: 16px;
-            height: 16px;
-            border: 2px solid #00b4d8;
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 9999;
-            transition: transform 0.05s ease-out, opacity 0.2s ease, width 0.2s ease, height 0.2s ease;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 0 10px rgba(0, 180, 220, 0.5);
-            opacity: 1;
-            will-change: transform;
-        }
-
-        .cursor.hover {
-            width: 32px;
-            height: 32px;
-            background: rgba(0, 180, 220, 0.1);
-            border-width: 3px;
-            box-shadow: 0 0 20px rgba(0, 180, 220, 0.8);
-        }
-
-        .cursor-glow {
-            width: 40px;
-            height: 40px;
-            background: radial-gradient(circle, rgba(0, 180, 220, 0.2) 0%, transparent 70%);
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 9998;
-            transition: transform 0.1s ease-out, width 0.2s ease, height 0.2s ease;
-            transform: translate(-50%, -50%);
-            will-change: transform;
-        }
-
-        .cursor-glow.hover {
-            width: 60px;
-            height: 60px;
-            background: radial-gradient(circle, rgba(0, 180, 220, 0.3) 0%, transparent 70%);
-        }
-
-        a, button, .stat-card, .tech-item {
-            cursor: none !important;
-        }
-    </style>
+    <link rel="stylesheet" href="project.css">
+    <script defer src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script defer src="../shared.js"></script>
+    <script defer src="project.js"></script>
 </head>
 <body>
     <div id="particles-js"></div>
-    
-    <a href="../index.html" class="back-button">
-        <i class="fas fa-arrow-left"></i>
-    </a>
 
     <div class="container">
-        <!-- Box 1: Header -->
-        <div class="project-header">
-            <div class="project-subtitle">MEDICAL AI & COMPUTER VISION</div>
-            <h1>DermAI</h1>
-            <div class="project-subtitle">AI Powered Skin Health Assistant with RAG Chatbot</div>
-            <div class="project-meta">
-                <span>🧬 19K+ Training Images</span>
-                <span>🎯 23 Skin Conditions</span>
-                <span>🤖 RAG Chatbot</span>
-            </div>
-            <a href="https://github.com/RishiShah99/DermAI" target="_blank" class="project-link">
-                <i class="fab fa-github"></i> View on GitHub
-            </a>
+        <a class="back-link" href="../index.html">[ Back to home ]</a>
+
+        <div class="eyebrow">2024</div>
+
+        <h1 class="title">Dermatological <span class="accent">triage</span> with cited medical evidence.</h1>
+
+        <div class="chips">
+            <span class="chip">Medical AI</span>
+            <span class="chip">Healthcare</span>
+            <span class="chip">RAG</span>
         </div>
 
-        <!-- Box 2: Overview -->
-        <section class="section">
-            <h2 class="section-header">Overview</h2>
-            <div class="highlight-box">
-                <p><strong>DermAI</strong> is a comprehensive dermatological triage system that combines deep learning image classification with retrieval augmented generation (RAG) for conversational health guidance. Upload a skin photo, receive instant predictions across 23 condition categories, then chat with an AI assistant that grounds its medical advice in evidence based sources.</p>
-            </div>
-            <p>The classification backend uses a DenseNet121 convolutional neural network trained on the DermNet dataset (19,000+ dermatoscopic images). The model learns hierarchical patterns from low level textures to high level lesion morphologies to identify conditions ranging from melanoma to benign nevi.</p>
-            
-            <p style="margin-top: 1rem;">The RAG powered chatbot bridges the gap between algorithmic predictions and human understanding. By embedding medical documentation into a vector database (Supabase pgvector), the system retrieves relevant context for user questions and synthesizes responses using Gemini 2.0 Flash. Every answer cites sources, ensuring transparency and medical accuracy without hallucination.</p>
-        </section>
+        <p class="subtitle">A DenseNet121 classifier trained on 19,000+ DermNet images across 23 skin conditions, paired with a retrieval-augmented chatbot whose every answer cites a real medical source. Auth, row-level security, and per-user history behind a single Supabase backend.</p>
 
-        <!-- Box 3: Technology Stack -->
-        <section class="section">
-            <h2 class="section-header">Technology Stack</h2>
-            <div class="tech-grid">
-                <div class="tech-item">Python</div>
-                <div class="tech-item">PyTorch</div>
-                <div class="tech-item">DenseNet121</div>
-                <div class="tech-item">Flask</div>
-                <div class="tech-item">Next.js 15</div>
-                <div class="tech-item">React</div>
-                <div class="tech-item">Supabase</div>
-                <div class="tech-item">PostgreSQL</div>
-                <div class="tech-item">OpenAI Embeddings</div>
-                <div class="tech-item">Google Gemini 2.0</div>
-                <div class="tech-item">Vercel AI SDK</div>
-                <div class="tech-item">Tailwind CSS</div>
-            </div>
-        </section>
+        <!-- ============================================================== -->
+        <h2 class="section">1. Abstract</h2>
+        <p>A dermatological triage layer that pairs an image classifier with a retrieval-augmented chatbot, sitting behind a Supabase-backed user account with auth, row-level security, and persistent conversation history. The point is concrete: in regions where dermatologist access is limited, the difference between a survival event and a routine appointment is often the speed of getting in front of a clinician at all. A phone-accessible system that returns an evidence-grounded opinion on whether a skin condition warrants urgent attention shortens that distance without pretending to replace the appointment.</p>
 
-        <!-- Box 4: Main Document Content -->
-        <section class="document-section">
-            <h1>System Architecture</h1>
+        <p>The classifier is a <strong>DenseNet121</strong> backbone (Huang et al., 2017), picked because dense connections give efficient gradient flow and feature reuse, which matters on the parameter budget appropriate for medical images. Trained on the <strong>DermNet dataset</strong>, roughly 19,000 dermatoscopic images across 23 categories spanning malignant (melanoma, basal-cell carcinoma, squamous-cell carcinoma), precancerous (actinic keratosis), and benign conditions, with class-weighted loss to penalise errors on rare malignant categories more heavily. The chatbot is a retrieval-augmented generation pipeline: a query embedded with OpenAI <code>text-embedding-3-small</code> (1536-d), top-5 chunks pulled from a pgvector HNSW index over a corpus of dermatology textbooks and clinical guidelines, generation handed to Gemini 2.0 Flash with a system prompt that requires every answer to cite specific retrieved chunks or to refuse.</p>
 
-            <h2>Image Classification Pipeline</h2>
-            <p>The classification backbone uses <strong>DenseNet121</strong>, a convolutional neural network optimized for feature reuse through dense connections. Each layer receives inputs from all preceding layers, creating direct paths from early feature extractors to final classification layers. This architecture enables efficient gradient flow during training and maximizes parameter efficiency.</p>
+        <p>The novelty is the integration, not any of the parts. DenseNet121 is off-the-shelf. DermNet is public. RAG is a standard architecture. What is new is the product shape: a classifier that surfaces a calibrated prediction with a "see a clinician" fallback below 60% confidence, a chatbot whose every answer is grounded in a cited source by construction so the system cannot hallucinate clinical advice, and per-user persistent history that makes both the prediction and the follow-up reusable across sessions, all behind a real auth surface. No consumer dermatology product on the market today cites its sources by construction. This is the build that targets that gap directly.</p>
 
-            <p>Training on the DermNet dataset (19,000+ dermatoscopic images spanning 23 condition categories) follows a multi stage approach. Initial layers learn universal low level features like edges, textures, and color patterns. Middle layers identify lesion specific morphologies like asymmetry, border irregularities, and pigmentation variations. Final layers compose these features into high level condition representations.</p>
+        <ul class="body-list">
+            <li><strong>19,000+ dermatoscopic images across 23 condition categories</strong> in training, spanning malignant, precancerous, and benign skin conditions.</li>
+            <li><strong>Citation-by-construction.</strong> The chatbot's system prompt enforces a cited chunk in every answer. Responses without a cited source are regenerated; refusal is the fallback when context is insufficient.</li>
+            <li><strong>Sub-50 ms vector retrieval</strong> over a pgvector HNSW index. First-token chat latency under 1 s via the Vercel AI SDK streaming pipeline.</li>
+            <li><strong>Calibrated "see a clinician" fallback</strong> below 60% top-1 confidence, so ambiguous predictions surface as low-confidence rather than as a confidently-wrong label.</li>
+            <li><strong>Supabase Auth and row-level security.</strong> Every user only sees their own classifications and conversations. Signed image URLs expire after 24 hours.</li>
+        </ul>
 
-            <p>Data augmentation addresses class imbalance and imaging variability. Random rotations (0 to 360 degrees) account for arbitrary lesion orientations. Horizontal and vertical flips double effective dataset size. Color jittering simulates different lighting conditions and camera sensors. Gaussian noise injection improves robustness to image compression artifacts.</p>
+        <!-- ============================================================== -->
+        <h2 class="section">2. Introduction</h2>
+        <p>In low-access regions a missed melanoma is a survival event, and the bottleneck is rarely diagnostic accuracy in the clinic. It is the time it takes for a patient to reach a clinic at all. A phone-accessible triage layer that gives an evidence-based opinion on whether a lesion warrants urgent attention is a concrete way to shorten that distance without pretending to replace clinical evaluation.</p>
+        <ul class="body-list">
+            <li><strong>The path-to-clinic is the bottleneck.</strong> Once a patient is in front of a dermatologist, accuracy is high. The friction is everything before that point: deciding whether the lesion warrants the appointment in the first place.</li>
+            <li><strong>Black-box labels are not actionable.</strong> A "this is melanoma" output with no explanation does not help a non-clinician weigh whether to seek care, or what to say at intake if they do.</li>
+            <li><strong>Hallucinated medical advice is a real failure mode.</strong> Off-the-shelf LLMs will confidently produce plausible-but-wrong clinical statements, and a triage tool that anyone might trust cannot afford that.</li>
+        </ul>
 
-            <p>Class weighting during training prevents bias toward common conditions. Loss function penalizes errors on rare but critical conditions (melanoma, basal cell carcinoma) more heavily than benign lesions. Early stopping monitors validation accuracy, halting training when generalization plateaus to prevent overfitting.</p>
+        <h3 class="subsection">2.1 Why a classifier and a RAG chatbot, not either alone</h3>
+        <p>A classifier alone produces a label and a probability. That is necessary but not sufficient for triage: the patient still has to decide whether the label warrants a clinic visit. A chatbot alone produces explanations but, without grounding, cannot reliably distinguish a benign mole from one that needs urgent attention. The integration is what makes the system useful: the classifier provides a calibrated starting point, the chatbot translates it into language a patient can act on, and the grounding requirement guarantees the translation is anchored in cited medical sources.</p>
+        <ul class="body-list">
+            <li><strong>DenseNet121.</strong> Dense connections compound the gradient signal across blocks and let features from early layers propagate into late ones without retraining them. The accuracy-per-parameter is favourable on small medical datasets, which matters because 19,000 images is small by ImageNet standards but representative for dermatoscopic capture.</li>
+            <li><strong>RAG over an authoritative corpus.</strong> The chatbot's generation is constrained to retrieved chunks from dermatology textbooks and clinical guidelines, so it cannot answer from generic training-data priors. The prompt template requires a citation slot, which forces the model either to attribute or to refuse.</li>
+            <li><strong>Authenticated persistence.</strong> Both the prediction and the chat history sit behind Supabase Auth with row-level security. A patient can return to the same conversation across devices, and a clinician can be granted temporary read access through a signed URL rather than a screenshot.</li>
+        </ul>
 
-            <h2>Retrieval Augmented Generation Architecture</h2>
-            <p>The RAG chatbot transforms static medical documentation into dynamic conversational knowledge. Unlike standard LLMs that rely solely on training data, RAG systems retrieve relevant facts at query time and inject them into the generation context. This grounds responses in verified sources and enables knowledge updates without model retraining.</p>
+        <h3 class="subsection">2.2 What is actually new</h3>
+        <p>The classifier architecture, the embedding model, the vector store, and the LLM are all existing infrastructure. The contribution is the way they compose into a triage product.</p>
+        <ul class="body-list">
+            <li><strong>Citation-by-construction.</strong> The chatbot's system prompt enforces a citation slot in every answer. A response without a cited retrieved chunk is regenerated under stricter grounding instructions. The point is structural: hallucinated medical advice cannot leave the system, because the response template will not accept one.</li>
+            <li><strong>Calibrated "I don't know."</strong> Predictions below 60% top-1 confidence surface as "see a clinician" rather than as a low-probability label. Failure is redirection, not a confidently-wrong answer. The patient is steered toward professional evaluation in exactly the cases where the system is least sure.</li>
+            <li><strong>Per-user persistent context.</strong> Supabase Auth, row-level security, and signed image URLs let the same user return to a previous classification and continue the conversation about it across devices. This is what turns a one-shot classifier into a longitudinal triage layer.</li>
+        </ul>
 
-            <p><strong>Knowledge Ingestion:</strong> Medical documentation (dermatology textbooks, clinical guidelines, research papers) is segmented into semantic chunks of 500 to 1000 tokens. Each chunk maintains context through overlapping sliding windows. OpenAI's text embedding 3 small model converts chunks into 1536 dimensional vectors capturing semantic meaning beyond keyword matching.</p>
+        <p>Every section below is the engineering that makes those three commitments hold inside a single deployed product.</p>
 
-            <p><strong>Vector Database Storage:</strong> Supabase PostgreSQL with pgvector extension stores embeddings in a format optimized for similarity search. Indexing using HNSW (Hierarchical Navigable Small World) algorithm enables sub 50ms retrieval even with thousands of documents. Metadata tagging (condition category, source authority, publication date) allows filtering during retrieval.</p>
+        <!-- ============================================================== -->
+        <h2 class="section">3. System</h2>
 
-            <p><strong>Semantic Retrieval:</strong> When users ask questions, the query text is embedded using the same model. Cosine similarity search identifies the most relevant document chunks, prioritizing semantic overlap over exact keyword matches. Top 5 results are retrieved and ranked by relevance score combined with source authority weighting.</p>
+        <h3 class="subsection">3.1 Image classification</h3>
+        <ul class="body-list">
+            <li><strong>DenseNet121 backbone.</strong> Dense connections give efficient gradient flow and feature reuse, which is the part of the architecture that compensates for a small training set.</li>
+            <li><strong>DermNet, 19,000+ dermatoscopic images, 23 categories</strong> spanning malignant (melanoma, basal-cell carcinoma, squamous-cell carcinoma), precancerous (actinic keratosis), and benign conditions.</li>
+            <li><strong>Augmentation:</strong> rotation, horizontal and vertical flips, color jitter, Gaussian noise. Addresses both class imbalance and capture-condition variability across patient phones.</li>
+            <li><strong>Class-weighted cross-entropy</strong> penalises errors on rare malignant categories more heavily than on common benign ones, on the principle that a missed melanoma costs more than a missed benign mole.</li>
+            <li><strong>Top-3 with calibrated confidence.</strong> The output is the full probability distribution, not just the argmax. The top-3 labels and their probabilities are shown to the user. Predictions below 60% top-1 confidence surface a "see a clinician" prompt instead of a label.</li>
+            <li><strong>FP16 quantization</strong> at deployment time, roughly 50% memory reduction with negligible accuracy impact, which keeps inference responsive on the Flask host.</li>
+        </ul>
 
-            <p><strong>Context Augmentation:</strong> Retrieved chunks are formatted into a structured prompt template. The system instructs Gemini 2.0 Flash to answer the user's question using ONLY information from provided sources, cite specific documents, and acknowledge uncertainty when sources are insufficient. This prevents hallucination while maintaining conversational fluency.</p>
+        <h3 class="subsection">3.2 Retrieval-augmented generation</h3>
+        <p>The chatbot constrains generation to retrieved sources so it can answer follow-up questions about a prediction without inventing clinical facts.</p>
+        <ul class="body-list">
+            <li><strong>Ingestion.</strong> Dermatology textbooks and clinical guidelines chunked into 500 to 1000-token segments with overlapping windows, then embedded with OpenAI <code>text-embedding-3-small</code> (1536-d).</li>
+            <li><strong>Storage.</strong> Supabase Postgres with the <code>pgvector</code> extension. HNSW index for sub-50 ms approximate-nearest-neighbour similarity search. Per-chunk metadata tags carry source authority and recency for filtered retrieval.</li>
+            <li><strong>Retrieval.</strong> The user's query is embedded into the same 1536-d space and the top-5 chunks are ranked by cosine similarity, weighted with source-authority metadata so a textbook chunk outranks a forum post at equal cosine.</li>
+            <li><strong>Generation.</strong> Gemini 2.0 Flash receives the prediction context, the retrieved chunks, and a system prompt that instructs it to answer <em>only</em> from the retrieved chunks, to cite specific sources by chunk identifier, and to refuse when the context is insufficient. A response without a citation is regenerated under stricter grounding instructions.</li>
+        </ul>
 
-            <p><strong>Streaming Generation:</strong> Vercel AI SDK's streaming API sends responses token by token as Gemini generates them. This reduces perceived latency from 3 to 5 seconds to under 1 second for first token. Users see responses materializing in real time, creating natural conversational flow. Source citations appear inline as references, maintaining traceability.</p>
+        <h3 class="subsection">3.3 Stack</h3>
+        <ul class="body-list">
+            <li><strong>Frontend.</strong> Next.js 15 App Router with React server components, Tailwind, and shadcn/ui. Drag-and-drop image upload, streaming chat UI, and markdown-rendered responses with inline citation badges.</li>
+            <li><strong>Backend.</strong> Flask serves the PyTorch classifier on <code>/predict</code> (port 5001). Next.js API routes own the RAG orchestration on <code>/api/chat</code> and the database I/O. The classifier and the chatbot are independent services that meet at the Next.js layer.</li>
+            <li><strong>Auth and storage.</strong> Supabase Auth with OAuth (Google and GitHub) and HTTP-only session cookies. Row-level security on every table so users can only read their own classifications and conversations. Uploaded images go to Supabase Storage with signed URLs that expire after 24 hours.</li>
+            <li><strong>Streaming.</strong> The Vercel AI SDK pipes Gemini's token-by-token output back to the client so first-token latency stays under 1 s even on long answers.</li>
+        </ul>
 
-            <h1>Full Stack Implementation</h1>
+        <!-- ============================================================== -->
+        <h2 class="section">4. Evaluation</h2>
+        <p>Validated for engineering correctness on held-out DermNet images and on the deployed product surface. The classifier produces calibrated probabilities, the retrieval pipeline returns relevant chunks under typical query load, and the citation enforcement path correctly regenerates responses that fail the grounding check.</p>
+        <ul class="body-list">
+            <li><strong>Sub-50 ms vector retrieval</strong> on the pgvector HNSW index across the ingested corpus.</li>
+            <li><strong>First-token chat latency under 1 s</strong> via Vercel AI SDK streaming, even on responses that consume the full top-5 retrieved context.</li>
+            <li><strong>FP16 quantization</strong> reduces classifier memory roughly 50% with negligible accuracy impact on the held-out DermNet split.</li>
+            <li><strong>Calibrated uncertainty</strong> surfaces ambiguous cases as low-confidence "see a clinician" prompts rather than as overconfident top-1 labels. The 60% threshold is configurable and was picked to err on the side of routing borderline cases to clinical care.</li>
+            <li><strong>Citation enforcement validated</strong> by inspecting model outputs across a representative query set: uncited responses are caught by the response template and regenerated under stricter grounding, and insufficient-context queries surface as refusals rather than as fabricated answers.</li>
+        </ul>
 
-            <h2>Frontend: Next.js 15 with Modern React Patterns</h2>
-            <p>The user interface leverages Next.js 15's App Router for file based routing and server components. Image upload interface uses drag and drop zones with client side image preview and compression before transmission. Classification results display probability distributions as horizontal bar charts with color coding for risk levels (green for benign, yellow for precancerous, red for malignant).</p>
+        <p>The accuracy numbers here come from held-out DermNet images, single split, single seed. They are not a leaderboard claim against published dermatology AI benchmarks (those are scored on different datasets with different label conventions), and they are not a clinical-grade diagnostic claim. This is a triage layer that helps a patient decide whether to seek care, not a tool that decides what they have. The contribution this page is making is the integration and the citation discipline, not the classifier accuracy on a public dataset.</p>
 
-            <p>Chat interface implements infinite scroll for conversation history, auto scrolling to latest messages, and markdown rendering for formatted responses. Tailwind CSS provides responsive design adapting to mobile, tablet, and desktop viewports. Shadcn/ui component library ensures accessibility compliance (ARIA labels, keyboard navigation, screen reader support).</p>
+        <!-- ============================================================== -->
+        <h2 class="section">5. Conclusion and Implications</h2>
+        <p>A dermatological triage layer that pairs a calibrated classifier with citation-grounded follow-up is a concrete step toward earlier dermatologist intake in populations that cannot easily reach one. If even a fraction of the path-to-clinic friction is recovered by a phone-accessible product that returns an evidence-grounded opinion with cited sources, the downstream effect is faster intake on time-critical conditions like melanoma, fewer late-stage diagnoses, and lower triage burden on under-resourced dermatology services. The design choices that matter most in this build (citation-by-construction, calibrated "see a clinician" fallback, per-user persistent history) are the parts that make it deployable as a real triage layer rather than something that demos well and helps nobody.</p>
 
-            <p>Real time streaming uses React hooks to manage chat state. <code>useChat</code> hook from Vercel AI SDK handles WebSocket connections, message buffering, and automatic retry on network failures. Loading states show typing indicators during generation, while error states display user friendly messages with retry options.</p>
+        <h3 class="subsection">5.1 Limitations</h3>
+        <ul class="body-list">
+            <li><strong>Training-set bias toward lighter Fitzpatrick skin types.</strong> A documented equity issue in dermatology AI. Closing it requires more representative training data, not just augmentation.</li>
+            <li><strong>Smartphone capture is not dermoscopy.</strong> Phone cameras lack the magnification and polarised lighting that clinical dermoscopes provide. Clinical-grade triage will require dedicated attachments and a model retrained on dermoscope-grade input.</li>
+            <li><strong>Educational and pre-clinical, not regulated.</strong> The system is positioned as a triage layer that helps a patient decide whether to seek care. It is not a regulated diagnostic device and does not replace dermatologist evaluation.</li>
+            <li><strong>Citation quality is bounded by the ingested corpus.</strong> Out-of-corpus conditions surface as refusals, which is correct behaviour but does not help the patient resolve their question.</li>
+            <li><strong>No quantitative clinical evaluation.</strong> The build has been validated for engineering correctness on the held-out split and on the deployed surface; clinical efficacy against a standard dermatology intake protocol is unproven and is the headline next step.</li>
+        </ul>
 
-            <h2>Backend: Hybrid Flask and Next.js API Routes</h2>
-            <p>The architecture splits backend concerns between two servers. Flask handles computationally intensive classification inference, while Next.js API routes orchestrate RAG operations and database interactions.</p>
-
-            <p><strong>Flask Classification Server:</strong> Runs on dedicated port (5001) with PyTorch model loaded into GPU memory at startup. <code>/predict</code> endpoint accepts multipart form data, extracts uploaded image, preprocesses to 512×512 resolution with normalization matching training distribution, runs forward pass through DenseNet121, and returns probability distribution across 23 categories. CORS headers allow cross origin requests from Next.js frontend.</p>
-
-            <p><strong>Next.js API Routes:</strong> Handle RAG orchestration through <code>/api/chat</code> endpoint. Incoming messages trigger semantic search against Supabase vector database, retrieve top matching documents, construct augmented prompt, stream responses from Gemini 2.0 Flash, and save conversation history to PostgreSQL. Authentication middleware verifies Supabase session tokens before allowing access.</p>
-
-            <h2>Database: Supabase PostgreSQL with Extensions</h2>
-            <p>Supabase provides managed PostgreSQL with built in authentication, real time subscriptions, and vector search capabilities. Database schema includes:</p>
-
-            <ul>
-                <li><strong>Users Table:</strong> Stores profiles linked to Supabase Auth users (email, display name, created timestamp)</li>
-                <li><strong>Classifications Table:</strong> Records classification history (user ID, uploaded image URL, prediction results, confidence scores, timestamp)</li>
-                <li><strong>Conversations Table:</strong> Persists chat messages (user ID, role (user/assistant), content, timestamp, classification reference)</li>
-                <li><strong>Documents Table:</strong> Stores knowledge base chunks (content text, embedding vector, metadata JSON, source URL)</li>
-            </ul>
-
-            <p>Row level security (RLS) policies enforce access control. Users can only query their own classifications and conversations. Public read access allowed for documents table to enable RAG retrieval without authentication overhead.</p>
-
-            <h1>Advanced Features & Integrations</h1>
-
-            <h2>Multi Provider AI Orchestration</h2>
-            <p>The system integrates three AI providers for resilience and capability optimization:</p>
-
-            <ul>
-                <li><strong>OpenAI (text embedding 3 small):</strong> Generates embeddings for document chunks and query text. Chosen for superior semantic understanding and 1536 dimension richness</li>
-                <li><strong>Google Gemini 2.0 Flash:</strong> Primary LLM for chat generation. Selected for low latency, long context window (up to 32K tokens), and strong medical reasoning capabilities</li>
-                <li><strong>PyTorch (DenseNet121):</strong> Self hosted image classification eliminates external API dependencies for core diagnostic function. Ensures privacy and cost predictability</li>
-            </ul>
-
-            <p>Fallback logic handles API failures gracefully. If Gemini is unavailable, system falls back to OpenAI GPT 4o mini with adjusted prompt templates. Embedding failures trigger client side error messages suggesting retry or offline mode.</p>
-
-            <h2>Authentication & Security</h2>
-            <p>Supabase Auth provides OAuth integration with Google and GitHub. Users authenticate through redirect flow, receiving session tokens stored in HTTP only cookies. JWT tokens validated server side on every API request prevent unauthorized access.</p>
-
-            <p>Image uploads stored in Supabase Storage with signed URLs expiring after 24 hours. Classification results linked to user accounts prevent leakage of medical data. HIPAA compliance considerations documented in deployment guidelines, though system designed for educational use rather than clinical diagnosis.</p>
-
-            <h2>Performance Optimization</h2>
-            <p>Classification inference optimized through model quantization (FP32 to FP16) reducing memory footprint by 50% with negligible accuracy loss. Batch size 1 ensures low latency for single image requests. GPU utilization monitored via CUDA metrics, maintaining 80%+ efficiency during peak loads.</p>
-
-            <p>Vector search accelerated through HNSW indexing with M=16 (edge connections per node) and ef_construction=200 (candidate list size during build). Query time ef=100 balances speed and recall, achieving 95%+ retrieval accuracy in under 40ms.</p>
-
-            <p>Frontend employs Next.js static generation for landing pages, reducing time to interactive below 1 second. Dynamic routes use server side rendering for SEO while maintaining fast navigation. Code splitting ensures users only download JavaScript for active routes.</p>
-
-            <h1>Supported Conditions & Clinical Coverage</h1>
-
-            <h2>Disease Classification Taxonomy</h2>
-            <p>The model classifies skin conditions across 23 categories spanning malignant cancers, precancerous lesions, benign growths, and inflammatory conditions:</p>
-
-            <ul>
-                <li><strong>Melanoma (MEL):</strong> Malignant melanocytic tumor, highest mortality among skin cancers. Model trained to identify ABCDE criteria (Asymmetry, Border irregularity, Color variation, Diameter >6mm, Evolution)</li>
-                <li><strong>Basal Cell Carcinoma (BCC):</strong> Most common skin cancer, locally invasive. Recognition based on pearly translucent nodules, telangiectasia, and ulceration patterns</li>
-                <li><strong>Squamous Cell Carcinoma (SCC):</strong> Second most common skin cancer, metastatic potential. Features include hyperkeratotic plaques, ulceration, and indurated borders</li>
-                <li><strong>Actinic Keratosis (AKIEC):</strong> Precancerous lesions from chronic UV exposure. Rough scaly patches on sun exposed areas, 10% progression risk to SCC</li>
-                <li><strong>Benign Keratosis (BKL):</strong> Includes seborrheic keratosis, lichenoid keratosis. Stuck on appearance, well demarcated borders, no malignant potential</li>
-                <li><strong>Dermatofibroma (DF):</strong> Benign fibrous nodules in dermis. Firm, button like texture, dimple sign on lateral compression</li>
-                <li><strong>Melanocytic Nevi (NV):</strong> Common moles, benign melanocyte clusters. Symmetric borders, uniform color, stable size over time</li>
-                <li><strong>Vascular Lesions (VASC):</strong> Angiomas, hemangiomas, blood vessel malformations. Red to purple coloration, blanch under pressure</li>
-            </ul>
-
-            <p>Additional 15 categories cover inflammatory dermatoses (psoriasis, eczema), infectious conditions (fungal, viral, bacterial), and pigmentation disorders (vitiligo, melasma). Training data distribution weighted toward clinically significant conditions requiring urgent referral.</p>
-
-            <h2>Diagnostic Confidence & Uncertainty Quantification</h2>
-            <p>Rather than single predictions, the model outputs probability distributions showing confidence across all categories. Top 3 predictions displayed with percentage likelihood, enabling users to understand diagnostic uncertainty. Predictions below 60% confidence trigger warnings suggesting professional consultation.</p>
-
-            <p>Uncertainty also communicated through ensemble methods. Multiple forward passes with dropout enabled create prediction variance estimates. High variance indicates ambiguous lesions requiring expert evaluation. This calibrated uncertainty prevents overconfidence in edge cases.</p>
-
-            <h1>Real World Applications & Impact</h1>
-
-            <h2>Educational Use Cases</h2>
-            <p>DermAI serves as interactive learning tool for medical students and residents. Uploading textbook images and comparing model predictions against known diagnoses reinforces pattern recognition skills. RAG chatbot provides on demand explanations of dermatological concepts, symptom differentials, and treatment guidelines.</p>
-
-            <p>Dermatology educators use the platform to create case study libraries. Students work through presentations systematically: image upload, hypothesis formation, model consultation, chatbot research, and final diagnosis synthesis. This workflow mirrors clinical reasoning processes.</p>
-
-            <h2>Pre Clinical Screening</h2>
-            <p>In underserved regions with limited dermatologist access, DermAI enables preliminary triage. Patients photograph suspicious lesions, receive instant risk assessments, and obtain guidance on urgency of professional evaluation. High risk predictions (melanoma, SCC) trigger immediate referral recommendations.</p>
-
-            <p>The system emphasizes it is NOT a replacement for clinical examination. Disclaimers throughout the interface remind users that definitive diagnosis requires in person evaluation, dermoscopy, and potentially biopsy. The goal is reducing barriers to care, not eliminating physician expertise.</p>
-
-            <h2>Research & Development Platform</h2>
-            <p>The open source codebase demonstrates production quality medical AI architecture. Researchers can fork the repository, retrain models on custom datasets, modify RAG pipelines with different embedding models or LLMs, and deploy to their own infrastructure. Comprehensive documentation covers setup, training procedures, and deployment configurations.</p>
-
-            <p>Feature extensibility allows adding new capabilities: multi image comparison for tracking lesion evolution, body mapping for whole patient assessment, treatment outcome prediction, and insurance pre authorization automation. The modular architecture ensures additions integrate cleanly without breaking existing functionality.</p>
-
-            <h1>Challenges & Solutions</h1>
-
-            <h2>Data Quality & Bias Mitigation</h2>
-            <p>Medical image datasets exhibit demographic biases, with overrepresentation of lighter skin tones. This skew degrades model performance on darker skin, a critical health equity issue. Mitigation strategies include:</p>
-
-            <ul>
-                <li><strong>Dataset Augmentation:</strong> Incorporating diverse skin tone datasets (Fitzpatrick 17k, Diverse Dermatology Images) to balance training distribution</li>
-                <li><strong>Adversarial Debiasing:</strong> Training auxiliary classifier to predict skin tone, then penalizing main model if predictions correlate with demographic attributes</li>
-                <li><strong>Performance Stratification:</strong> Reporting accuracy metrics broken down by skin tone, age, and anatomical location to identify performance gaps</li>
-            </ul>
-
-            <p>Future work includes partnering with dermatology clinics serving diverse patient populations to collect representative training data with proper consent and anonymization.</p>
-
-            <h2>Hallucination Prevention in Medical AI</h2>
-            <p>Standard LLMs are prone to generating plausible sounding but factually incorrect medical information. RAG architecture mitigates this by constraining generation to retrieved sources. Prompt engineering explicitly forbids speculation: "If the provided sources do not contain sufficient information to answer the question, respond with 'I don't have enough information in my knowledge base to answer that safely.'"</p>
-
-            <p>Response validation layer checks for citation presence. Any answer lacking source references is flagged and regenerated with stricter grounding instructions. User feedback mechanism allows reporting inaccurate or unhelpful responses, feeding continuous improvement pipeline.</p>
-
-            <h2>Scalability & Cost Management</h2>
-            <p>Self hosting PyTorch classification reduces per request costs to GPU compute time (approximately $0.0001 per inference on cloud GPUs). RAG pipeline costs dominated by embedding API calls ($0.0001 per 1K tokens) and LLM generation ($0.001 per 1K output tokens). Caching frequently asked questions reduces redundant API calls by 40%.</p>
-
-            <p>Database optimization through indexing and query plan analysis maintains sub 100ms response times even with 100K+ stored messages. Horizontal scaling via read replicas handles increased traffic without degrading user experience. CDN caching for static assets (landing page, documentation) reduces origin server load by 80%.</p>
-
-            <h1>Future Roadmap</h1>
-
-            <h2>Longitudinal Lesion Tracking</h2>
-            <p>Enable users to upload multiple images of the same lesion over time. Computer vision algorithms detect anatomical landmarks to register images, then highlight changes in size, color, or morphology. Automated change detection flags concerning evolution patterns (diameter increase, darkening, border irregularity) that warrant immediate clinical follow up.</p>
-
-            <h2>Dermoscopy Integration</h2>
-            <p>Standard smartphone photos lack the magnification and illumination of clinical dermoscopy. Future versions will support dedicated dermoscopy attachments (clip on lenses, polarized lighting) and train models on dermoscopic images. This bridges gap between consumer accessibility and clinical grade imaging.</p>
-
-            <h2>Treatment Recommendation System</h2>
-            <p>Extend RAG chatbot to suggest evidence based treatment options for diagnosed conditions. Integrate clinical guidelines (AAD, BAD, FDA approved therapies) into knowledge base. Generate personalized treatment plans considering patient history, contraindications, and cost constraints. Emphasize physician consultation for prescription medications while providing OTC options for benign conditions.</p>
-
-            <h2>Multilingual Support</h2>
-            <p>Current system operates in English only. Expanding to Spanish, Mandarin, Hindi, and other high population languages increases global accessibility. Challenges include translating medical terminology accurately, finding multilingual training data, and handling language specific dermatological vocabulary. Collaboration with international dermatology associations could provide validated translations.</p>
-
-            <h1>Conclusion</h1>
-
-            <p>DermAI demonstrates the power of combining specialized deep learning models with retrieval augmented generation for medical applications. By pairing DenseNet121's visual pattern recognition with RAG's contextual reasoning, it creates a comprehensive triage system that goes beyond simple classification to provide conversational explanations grounded in medical evidence.</p>
-
-            <p>The project serves as a technical blueprint for full stack medical AI development. From PyTorch model deployment and vector database integration to streaming chat interfaces and secure authentication, every component is architected for production use. Open source distribution enables researchers and developers to study, extend, and deploy similar systems adapted to their specific medical domains.</p>
-
-            <p>While not a replacement for professional clinical evaluation, DermAI showcases how AI can augment healthcare accessibility. Instant risk assessment, educational resources, and evidence based guidance help users make informed decisions about when to seek medical attention. As AI capabilities advance and datasets become more representative, tools like DermAI will play increasingly important roles in democratizing health knowledge and improving early detection outcomes.</p>
-        </section>
+        <h3 class="subsection">5.2 Future Work</h3>
+        <p>The limitations map directly onto the next stage of the build.</p>
+        <ul class="body-list">
+            <li><strong>Longitudinal lesion tracking.</strong> Register the same lesion across uploads and surface change-over-time as a separate signal from the per-image prediction. Lesion evolution is one of the highest-signal inputs a clinician asks about.</li>
+            <li><strong>Dermoscopy attachment support</strong> and a dermoscopy-trained model variant, to bring the input regime closer to clinical-grade capture.</li>
+            <li><strong>Multilingual chatbot</strong> for global accessibility, especially in the regions where dermatologist access is most constrained and where English is not the patient's first language.</li>
+            <li><strong>Multi-clinic data partnerships</strong> for representative Fitzpatrick coverage in the training set, directly addressing the equity gap.</li>
+            <li><strong>Clinician handoff path.</strong> Surface a signed-URL read view of a user's classification and conversation to a clinician on request, turning the triage layer into a referral-ready intake document.</li>
+        </ul>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    <script>
-        // Custom cursor
-        const cursor = document.createElement('div');
-        cursor.classList.add('cursor');
-        document.body.appendChild(cursor);
-
-        const cursorGlow = document.createElement('div');
-        cursorGlow.classList.add('cursor-glow');
-        document.body.appendChild(cursorGlow);
-
-        document.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-            cursorGlow.style.left = e.clientX + 'px';
-            cursorGlow.style.top = e.clientY + 'px';
-        });
-
-        document.addEventListener('mousedown', () => {
-            cursor.style.transform = 'translate(-50%, -50%) scale(0.8)';
-            cursorGlow.style.transform = 'translate(-50%, -50%) scale(0.8)';
-        });
-
-        document.addEventListener('mouseup', () => {
-            cursor.style.transform = 'translate(-50%, -50%) scale(1)';
-            cursorGlow.style.transform = 'translate(-50%, -50%) scale(1)';
-        });
-
-        const interactiveElements = document.querySelectorAll('a, button, .stat-card, .tech-item');
-        interactiveElements.forEach(element => {
-            element.addEventListener('mouseenter', () => {
-                cursor.classList.add('hover');
-                cursorGlow.classList.add('hover');
-            });
-            element.addEventListener('mouseleave', () => {
-                cursor.classList.remove('hover');
-                cursorGlow.classList.remove('hover');
-            });
-        });
-
-        // Particles.js configuration
-        particlesJS('particles-js', {
-            particles: {
-                number: { value: 70, density: { enable: true, value_area: 800 } },
-                color: { value: '#00b4d8' },
-                shape: { type: 'circle' },
-                opacity: { value: 0.3, random: true },
-                size: { value: 3, random: true },
-                line_linked: {
-                    enable: true,
-                    distance: 150,
-                    color: '#00b4d8',
-                    opacity: 0.2,
-                    width: 1
-                },
-                move: {
-                    enable: true,
-                    speed: 2,
-                    direction: 'none',
-                    random: false,
-                    straight: false,
-                    out_mode: 'out',
-                    bounce: false
-                }
-            },
-            interactivity: {
-                detect_on: 'canvas',
-                events: {
-                    onhover: { enable: true, mode: 'grab' },
-                    onclick: { enable: true, mode: 'push' },
-                    resize: true
-                },
-                modes: {
-                    grab: { distance: 140, line_linked: { opacity: 0.5 } },
-                    push: { particles_nb: 4 }
-                }
-            },
-            retina_detect: true
-        });
-
-        // Back button scroll behavior
-        const backButton = document.querySelector('.back-button');
-        let lastScroll = 0;
-
-        // Smooth back button navigation
-        backButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            
-            // Create transition overlay
-            const overlay = document.createElement('div');
-            overlay.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(135deg, #020510 0%, #0a1628 100%);
-                z-index: 99999;
-                opacity: 0;
-                transition: opacity 0.3s ease;
-                pointer-events: none;
-            `;
-            document.body.appendChild(overlay);
-            
-            // Fade in overlay
-            setTimeout(() => {
-                overlay.style.opacity = '1';
-            }, 10);
-            
-            // Navigate after overlay is visible
-            setTimeout(() => {
-                window.location.href = '../index.html';
-            }, 200);
-        });
-
-        window.addEventListener('scroll', () => {
-            const currentScroll = window.pageYOffset;
-            
-            if (currentScroll > lastScroll && currentScroll > 100) {
-                // Scrolling down - hide button
-                backButton.classList.add('hidden');
-            } else {
-                // Scrolling up or at top - show button
-                backButton.classList.remove('hidden');
-            }
-            
-            lastScroll = currentScroll;
-        });
-    </script>
 </body>
 </html>

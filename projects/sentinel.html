@@ -1,713 +1,168 @@
 <!DOCTYPE html>
-<html lang="en" style="cursor: none !important; background-color: #020510 !important;">
+<html lang="en" style="background-color: #f3ece0;">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sentinel – Hardware Intelligent Static Analyzer | Rishi Shah</title>
-    <meta name="description" content="Sentinel is the first hardware-aware static analyzer for embedded systems. Predicts RAM, pin, and protocol issues in real time through a VS Code extension and custom Language Server Protocol.">
-    <style>
-        /* CRITICAL: Hide cursor and background immediately on page load */
-        html, body, * {
-            cursor: none !important;
-        }
-        html, body {
-            background-color: #020510 !important;
-            margin: 0;
-            padding: 0;
-        }
-    </style>
+    <title>Sentinel · Hardware-aware static analysis for Arduino and ESP32 | Rishi Shah</title>
+    <meta name="description" content="A VS Code extension and custom Language Server that catches RAM overruns, pin conflicts, strapping-pin boot failures, and bus errors in Arduino and ESP32 code as you type. Solo build, shipped in a few hours at Hack Western 12, Best Developer Tool. 800+ combined installs across the VS Code Marketplace and Open VSX.">
+
     <link rel="prefetch" href="../index.html">
-    <link rel="preload" href="../style.css" as="style">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/17ea408dcc.js" crossorigin="anonymous"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    <style>html, body { background-color: #f3ece0; margin: 0; padding: 0; }</style>
 
-        :root {
-            --primary: #00b4d8;
-            --secondary: #5EEAD4;
-            --dark: #020510;
-            --darker: #0a1628;
-            --light: #e0f2fe;
-            --accent: #38bdf8;
-        }
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
-            color: var(--light);
-            line-height: 1.6;
-            min-height: 100vh;
-            overflow-x: hidden;
-            cursor: none !important;
-        }
-
-        * {
-            cursor: none !important;
-        }
-
-        #particles-js {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: 5;
-            pointer-events: none;
-        }
-
-        .back-button {
-            position: fixed;
-            top: 2rem;
-            left: 2rem;
-            z-index: 10001;
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 180, 216, 0.1);
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            text-decoration: none;
-            border-radius: 50%;
-            font-size: 1.2rem;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(10px);
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        .back-button.hidden {
-            opacity: 0;
-            transform: translateX(-20px);
-            pointer-events: none;
-        }
-
-        .back-button:hover {
-            background: rgba(0, 180, 216, 0.2);
-            transform: scale(1.1);
-            box-shadow: 0 0 30px rgba(0, 180, 216, 0.4);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 6rem 2rem 4rem;
-            position: relative;
-            z-index: 10;
-        }
-
-        .project-header {
-            text-align: center;
-            margin-bottom: 4rem;
-            padding: 3rem 2rem;
-            background: rgba(10, 22, 40, 0.5);
-            border-radius: 16px;
-            border: 1px solid rgba(0, 180, 216, 0.2);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .project-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--primary), transparent);
-            animation: scan 3s infinite;
-        }
-
-        @keyframes scan {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-
-        .project-header h1 {
-            font-size: 3rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .project-subtitle {
-            font-size: 1.1rem;
-            color: var(--secondary);
-            font-weight: 300;
-            margin-bottom: 0.5rem;
-        }
-
-        .project-meta {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-top: 1.5rem;
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .section {
-            margin-bottom: 2rem;
-            padding: 2rem;
-            background: rgba(10, 22, 40, 0.3);
-            border-radius: 12px;
-            border: 1px solid rgba(0, 180, 216, 0.1);
-        }
-
-        .section-header {
-            font-size: 2rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            color: var(--primary);
-            font-family: 'Courier New', monospace;
-        }
-
-        .highlight-box {
-            background: rgba(0, 180, 216, 0.05);
-            border-left: 4px solid var(--primary);
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-            border-radius: 8px;
-        }
-
-        /* Document-style formatting */
-        .document-section {
-            margin-bottom: 2rem;
-            padding: 3rem;
-            background: rgba(10, 22, 40, 0.3);
-            border-radius: 12px;
-            border: 1px solid rgba(0, 180, 216, 0.1);
-        }
-
-        .document-section h1 {
-            font-size: 2rem;
-            font-weight: 600;
-            color: var(--primary);
-            font-family: 'Courier New', monospace;
-            margin-bottom: 1.5rem;
-            margin-top: 2.5rem;
-        }
-
-        .document-section h1:first-child {
-            margin-top: 0;
-        }
-
-        .document-section h2 {
-            font-size: 1.3rem;
-            font-weight: 500;
-            color: var(--secondary);
-            margin-bottom: 1rem;
-            margin-top: 2rem;
-        }
-
-        .document-section p {
-            font-size: 1rem;
-            line-height: 1.8;
-            color: rgba(255, 255, 255, 0.85);
-            margin-bottom: 1rem;
-        }
-
-        .document-section ul {
-            margin: 1rem 0 1rem 1.5rem;
-            list-style-type: disc;
-        }
-
-        .document-section ul li {
-            font-size: 1rem;
-            line-height: 1.8;
-            color: rgba(255, 255, 255, 0.85);
-            margin-bottom: 0.5rem;
-        }
-
-        .document-section strong {
-            color: #ffffff;
-            font-weight: 600;
-        }
-
-        .document-section code {
-            background: rgba(0, 180, 216, 0.1);
-            padding: 0.2rem 0.4rem;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-            color: var(--secondary);
-            font-size: 0.9em;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .stat-card {
-            background: rgba(0, 180, 216, 0.05);
-            padding: 1.5rem;
-            border-radius: 12px;
-            border: 1px solid rgba(0, 180, 216, 0.2);
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 180, 216, 0.2);
-            border-color: var(--primary);
-        }
-
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-label {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .tech-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin: 2rem 0;
-        }
-
-        .tech-item {
-            background: rgba(0, 180, 216, 0.05);
-            padding: 1rem;
-            border-radius: 8px;
-            border: 1px solid rgba(0, 180, 216, 0.2);
-            text-align: center;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .tech-item:hover {
-            background: rgba(0, 180, 216, 0.1);
-            border-color: var(--primary);
-            transform: scale(1.05);
-        }
-
-        @media (max-width: 768px) {
-            .project-header h1 {
-                font-size: 2rem;
-            }
-
-            .container {
-                padding: 5rem 1rem 2rem;
-            }
-
-            .back-button {
-                top: 1rem;
-                left: 1rem;
-                padding: 0.5rem 1rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .project-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 1rem;
-            padding: 0.75rem 1.5rem;
-            background: rgba(0, 180, 216, 0.1);
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            text-decoration: none;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .project-link:hover {
-            background: rgba(0, 180, 216, 0.2);
-            box-shadow: 0 0 20px rgba(0, 180, 216, 0.3);
-            transform: translateY(-2px);
-        }
-
-        /* Custom Cursor */
-        .cursor {
-            width: 16px;
-            height: 16px;
-            border: 2px solid #00b4d8;
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 9999;
-            transition: transform 0.05s ease-out, opacity 0.2s ease, width 0.2s ease, height 0.2s ease;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 0 10px rgba(0, 180, 220, 0.5);
-            opacity: 1;
-            will-change: transform;
-        }
-
-        .cursor.hover {
-            width: 32px;
-            height: 32px;
-            background: rgba(0, 180, 220, 0.1);
-            border-width: 3px;
-            box-shadow: 0 0 20px rgba(0, 180, 220, 0.8);
-        }
-
-        .cursor-glow {
-            width: 40px;
-            height: 40px;
-            background: radial-gradient(circle, rgba(0, 180, 220, 0.2) 0%, transparent 70%);
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 9998;
-            transition: transform 0.1s ease-out, width 0.2s ease, height 0.2s ease;
-            transform: translate(-50%, -50%);
-            will-change: transform;
-        }
-
-        .cursor-glow.hover {
-            width: 60px;
-            height: 60px;
-            background: radial-gradient(circle, rgba(0, 180, 220, 0.3) 0%, transparent 70%);
-        }
-
-        a, button, .stat-card, .tech-item {
-            cursor: none !important;
-        }
-    </style>
+    <link rel="stylesheet" href="project.css">
+    <script defer src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script defer src="../shared.js"></script>
+    <script defer src="project.js"></script>
 </head>
 <body>
     <div id="particles-js"></div>
-    
-    <a href="../index.html" class="back-button">
-        <i class="fas fa-arrow-left"></i>
-    </a>
 
     <div class="container">
-        <!-- Box 1: Header -->
-        <div class="project-header">
-            <div class="project-subtitle">WINNER: BEST DEVELOPER TOOL – HACK WESTERN 12</div>
-            <h1>Sentinel</h1>
-            <div class="project-subtitle">Hardware Intelligent Static Analyzer</div>
-            <div class="project-meta">
-                <span>⚡ Real-time Hardware Validation</span>
-                <span>📉 ±3% RAM & Flash Accuracy</span>
-                <span>🧠 50+ Validation Rules</span>
-            </div>
-            <a href="https://github.com/RishiShah99/Sentinel" target="_blank" class="project-link">
-                <i class="fab fa-github"></i> View Repository
-            </a>
+        <a class="back-link" href="../index.html">[ Back to home ]</a>
+
+        <div class="eyebrow">2025</div>
+
+        <h1 class="title">Hardware-aware static analysis for embedded <span class="accent">code</span>.</h1>
+
+        <div class="chips">
+            <span class="chip">Developer Tools</span>
+            <span class="chip">Embedded Systems</span>
+            <span class="chip">Language Server</span>
         </div>
 
-        <!-- Box 2: Overview -->
-        <section class="section">
-            <h2 class="section-header">Overview</h2>
-            <div class="highlight-box">
-                <p><strong>Sentinel</strong> is the first static analyzer that thinks like a hardware engineer. Instead of waiting for firmware to compile and crash on a microcontroller, Sentinel surfaces problems instantly while you type. It understands the realities of embedded development: RAM budgets, flash limits, strapping pins, bus contention, and protocol quirks.</p>
-            </div>
-            <p>Built as a VS Code extension with a custom Language Server Protocol (LSP), Sentinel continuously inspects Arduino and ESP32 projects. It synchronizes code edits, predicts memory consumption with ±3% accuracy, tracks pin usage across files, and validates protocols before code ever touches a board. The result: embedded development that feels as modern as web or native development with type checking.</p>
-            
-            <p style="margin-top: 1rem;">Embedded development still debugs like it's 1995—write code, hit upload, and only then discover the ESP32 rebooted because a strapping pin was pulled low, or your RAM estimate was off by 30%. Sentinel began with a simple question: Why doesn't firmware get the same real-time safety rails that web and app developers take for granted? Modern IDEs highlight type errors as you type. Sentinel brings that experience to circuits, shifting diagnostics from after compilation to as you code.</p>
-        </section>
+        <p class="subtitle">A VS Code extension and custom Language Server Protocol that catches RAM overruns, pin conflicts, strapping-pin boot failures, and bus configuration errors in Arduino and ESP32 code as you type, not after the flash. Built solo in a few hours at Hack Western 12, where it won Best Developer Tool.</p>
 
-        <!-- Box 3: Technology Stack -->
-        <section class="section">
-            <h2 class="section-header">Technology Stack</h2>
-            <div class="tech-grid">
-                <div class="tech-item">TypeScript</div>
-                <div class="tech-item">Node.js LSP</div>
-                <div class="tech-item">VS Code API</div>
-                <div class="tech-item">Webviews</div>
-                <div class="tech-item">Arduino CLI</div>
-                <div class="tech-item">AST Parser</div>
-                <div class="tech-item">ESP32 SDK</div>
-                <div class="tech-item">Hardware Models</div>
-            </div>
-        </section>
+        <p class="subtitle" style="margin-top: 1em;">Install from the <a class="inline" href="https://marketplace.visualstudio.com/items?itemName=RishiShah.sentinel-arduino" target="_blank" rel="noopener">VS Code Marketplace</a> or <a class="inline" href="https://open-vsx.org/extension/RishiShah/sentinel-arduino" target="_blank" rel="noopener">Open VSX</a> &middot; 800+ combined installs.</p>
 
-        <!-- Box 4: Main Document Content -->
-        <section class="document-section">
-            <h1>Core Capabilities</h1>
+        <!-- ============================================================== -->
+        <h2 class="section">1. Abstract</h2>
+        <p>Embedded development still debugs like it is 1995. Write code, hit upload, watch the ESP32 reboot because a strapping pin was held low at reset, or because the RAM estimate was off by 30%. Web and native developers have type checkers, language servers, and instant diagnostics. Firmware engineers have a serial monitor and a multimeter. Sentinel is the bet that the same Language Server Protocol machinery that powers TypeScript and Rust tooling can model a microcontroller's hardware constraints, and surface them in the editor before the compile cycle.</p>
 
-            <h2>Memory Intelligence</h2>
-            <p>Sentinel predicts RAM and Flash consumption statically with ±3% accuracy, achieved through multi-pass analysis, framework calibration, and reverse-engineering compiler allocations. The system compiles 100+ Arduino sketches with <code>arduino-cli</code>, parses <code>.map</code> files to capture actual memory allocation, models framework overhead for Serial, Wire, WiFi, BLE libraries, and calibrates per-board constants for AVR and ESP32 targets.</p>
+        <p>The implementation is a custom <strong>Node.js Language Server</strong> paired with a <strong>VS Code extension</strong>, both written end-to-end during Hack Western 12. The server holds an incremental AST of every <code>.ino</code> and <code>.cpp</code> file in the project, plus a per-board hardware state machine: pin map, bus assignments, timer usage, interrupt vectors. A rule engine fires on every keystroke and reports diagnostics back through standard LSP messages. The extension renders them inline, plus an interactive board diagram that updates as pin assignments move around in source.</p>
 
-            <p>Unlike traditional approaches that rely on post-compilation reports, Sentinel provides real-time memory predictions as you type. The LSP performs incremental analysis, diffing AST nodes and memoizing symbol tables so diagnostics return in under 100ms—fast enough to feel native inside VS Code. This enables developers to catch memory budget violations before compilation, preventing the frustrating compile-flash-crash-debug cycle.</p>
+        <p>The novelty is the surface, not the analyses. Static analysis for embedded code is not new (PC-Lint, Clang-Tidy, Cppcheck all exist), but they all sit downstream of the compiler and outside the editor. Moving the same kind of analysis into the LSP layer makes the feedback loop the same one web developers have taken for granted for a decade: keystroke, diagnostic, fix, no flash needed.</p>
 
-            <h2>Pin Conflict Detection</h2>
-            <p>Hardware pin conflicts are among the most frustrating embedded bugs because they manifest unpredictably and require physical debugging. Sentinel tracks every GPIO assignment across all files in a project, maintaining a live hardware model that validates pin usage against board-specific constraints.</p>
+        <ul class="body-list">
+            <li><strong>Best Developer Tool, Hack Western 12.</strong> External validation that the gap is felt by the people who would benefit most from closing it.</li>
+            <li><strong>800+ combined installs</strong> across the VS Code Marketplace and Open VSX, as a solo-maintained extension. Adoption past the demo audience.</li>
+            <li><strong>Custom Node.js Language Server</strong> built end-to-end in a single hackathon session. AST parser for <code>.ino</code> + <code>.cpp</code>, hardware state machine, rule engine, LSP diagnostic surface.</li>
+            <li><strong>Per-board hardware models</strong> for ATmega328P, ATmega2560, ESP32, and ESP8266. Pin maps, peripheral assignments, strapping pin behaviour at reset.</li>
+            <li><strong>RAM and Flash estimates</strong> rendered live in the editor against per-board budgets. Within roughly 3% of compiled output on the calibration sketch suite.</li>
+            <li><strong>~47 ms typical diagnostic latency</strong> from keystroke to inline update on the boards the build supports.</li>
+        </ul>
 
-            <p>For ESP32 platforms, Sentinel understands critical strapping pins (GPIO0, GPIO2, GPIO12, GPIO15) that control boot behavior and must be handled carefully. It warns when these pins are pulled low during boot, preventing mysterious boot failures. The system also detects I2C/SPI bus conflicts, identifies duplicate pin assignments, and validates pull-up/pull-down configurations based on the connected peripheral requirements.</p>
+        <!-- ============================================================== -->
+        <h2 class="section">2. Introduction</h2>
+        <p>The compile / flash / reboot / debug cycle is the productivity tax embedded developers pay every day. The cost is not the compile time; the cost is everything that has to happen between writing a line of code and finding out that line was wrong. A typed misassignment on an ESP32 strapping pin is invisible until the chip refuses to boot. A buffer that overflows SRAM by 5% does not surface until the program crashes on a heap allocation an hour into operation. A wrong I2C clock speed against a slow sensor is a multi-hour scope session, not a compiler error.</p>
+        <ul class="body-list">
+            <li><strong>The feedback loop is the bottleneck.</strong> Compiling and flashing an Arduino sketch is seconds; debugging why it crashed after deployment is hours. The closer diagnostics live to the keystroke, the faster the loop closes.</li>
+            <li><strong>The hardware is the constraint.</strong> Most embedded bugs are not software bugs in the traditional sense. They are mismatches between code and silicon: pin role conflicts, bus contention, memory overflow, peripheral misconfiguration. A type checker that does not know about hardware is blind to them.</li>
+            <li><strong>The tooling already exists for other languages.</strong> Web and systems developers have had LSP-grade diagnostics for years. The same protocol can carry hardware-aware diagnostics; nothing about LSP assumes the underlying analysis is purely textual.</li>
+        </ul>
 
-            <p>Pin hints appear as tooltips directly in the editor, showing which peripherals are connected to each GPIO, what voltage levels are expected, and whether the current configuration conflicts with other hardware. This real-time validation eliminates hours of debugging with oscilloscopes and multimeters.</p>
+        <h3 class="subsection">2.1 Why the Language Server Protocol</h3>
+        <p>LSP is the right substrate for two reasons. It already standardises the editor-to-analyzer wire format, so any editor that speaks LSP (VS Code, Neovim, Helix, Zed) gets Sentinel for free once the server is written. And it is built for incremental analysis: edits arrive as deltas, the server is expected to update diagnostics in milliseconds, and the editor handles the rendering. That posture matches what a hardware-aware analyzer needs to do anyway.</p>
+        <ul class="body-list">
+            <li><strong>One server, many editors.</strong> The hardware analysis lives in a single Node.js process. Adding a new editor is a thin client, not a port.</li>
+            <li><strong>Incremental by default.</strong> LSP semantics push the server toward keystroke-rate updates, which is exactly the latency target the build needs.</li>
+            <li><strong>Diagnostic format is standardised.</strong> Severity, source, range, code, related information. The editor already knows how to render all of it. The server only has to fill it in.</li>
+        </ul>
 
-            <h2>Protocol Validation</h2>
-            <p>Embedded protocols like I2C, SPI, UART, and CAN have strict timing, electrical, and logical requirements that are easy to violate in code. Sentinel validates protocol usage at the semantic level, catching configuration errors before they cause communication failures.</p>
+        <h3 class="subsection">2.2 What is actually new</h3>
+        <p>The LSP framework, the VS Code extension surface, and the Arduino CLI build integration are all existing pieces. The contribution is the layer in between: a Node.js server that models board-specific hardware as first-class state, and that ships its analysis through the standard LSP diagnostic channel.</p>
+        <ul class="body-list">
+            <li><strong>Hardware state as a first-class model.</strong> Pin assignments, bus configurations, interrupt vectors, strapping-pin behaviour at reset, and timer ownership are tracked per board across the whole project, not file by file.</li>
+            <li><strong>Pre-flash hardware diagnostics.</strong> The pin conflicts, memory overruns, and strapping-pin hazards that normally surface as boot failures are surfaced as inline diagnostics during the edit, before any upload.</li>
+            <li><strong>Editor-native, not toolchain-native.</strong> Sentinel does not replace <code>avr-gcc</code> or <code>xtensa-esp32-elf-gcc</code>. It lives upstream of both, in the editor, and surfaces what those compilers do not surface until link time or runtime.</li>
+        </ul>
 
-            <p>For I2C communication, Sentinel verifies clock speeds are within device specifications (typically 100kHz or 400kHz), checks that pull-up resistors are configured correctly, validates 7-bit and 10-bit addressing schemes, and detects address conflicts on shared buses. The system also suggests appropriate I2C devices based on address ranges and provides register autocompletion for 200+ common peripherals.</p>
+        <p>Every section below is the engineering that makes those three commitments hold inside a Node.js LSP server built in a single hackathon session.</p>
 
-            <p>SPI validation includes verifying clock polarity and phase (CPOL/CPHA) match between master and slave, ensuring chip select signals are correctly managed, checking MOSI/MISO pin assignments, and warning about timing violations at high clock speeds. UART validation covers baud rate mismatches, parity bit configuration, stop bit settings, and flow control requirements.</p>
+        <!-- ============================================================== -->
+        <h2 class="section">3. System</h2>
 
-            <h2>Hardware-Aware Autocompletion</h2>
-            <p>Sentinel's LSP provides context-aware code completion tailored to the specific microcontroller and connected hardware. When initializing an I2C device, the system suggests appropriate addresses based on common peripherals. When configuring registers, it provides autocomplete for device-specific register names and validates written values against hardware constraints.</p>
+        <h3 class="subsection">3.1 Memory budget estimation</h3>
+        <p>Two budgets are tracked per board: SRAM and Flash. Both are computed statically from the AST, then compared against per-board ceilings (32 KB Flash and 2 KB SRAM on ATmega328P; 4 MB Flash and roughly 320 KB usable SRAM on ESP32 with WiFi active).</p>
+        <ul class="body-list">
+            <li><strong>Static allocations</strong> from global variable declarations and array sizes. The cheap, accurate part of the estimate.</li>
+            <li><strong>Stack estimated via per-function frame heuristics:</strong> local variable size plus a fixed call-depth scan from <code>setup()</code> and <code>loop()</code>. This is an approximation, not a worst-case bound. <code>avr-gcc</code> compresses frames in ways the source does not show, so the estimate is calibrated against compiled output rather than derived from first principles.</li>
+            <li><strong>Framework overhead</strong> captured as per-board constants. <code>Serial</code> on ESP32 carries roughly 1 to 3 KB of RX/TX buffers and driver state. <code>WiFi.begin()</code> brings in tens to low hundreds of KB depending on what the stack ends up allocating at runtime; the live bar surfaces it as a step change so the cost is visible the moment the line is typed.</li>
+            <li><strong>Compiler-specific calibration</strong> for <code>avr-gcc</code> and <code>xtensa-esp32-elf-gcc</code>, fitted against the compiled output of the calibration sketch suite across <code>-O0</code>, <code>-O2</code>, and <code>-Os</code>.</li>
+            <li><strong>Live bars</strong> in the editor with thresholds at 80% (amber) and 90% (red). The number is an estimate. The colour is the actionable signal.</li>
+            <li><strong>Ablation:</strong> removing the framework-overhead constants drops accuracy on the ESP32 calibration set from roughly 3% off compiled output to closer to 20%. Most of the work in memory estimation is in the constants, not the AST walk.</li>
+        </ul>
 
-            <p>Parameter hints display board-specific limitations directly in the editor. For example, when setting PWM frequency, Sentinel shows the valid range for the current timer configuration. When configuring ADC resolution, it displays the hardware-supported bit depths (8-bit, 10-bit, 12-bit for ESP32). This eliminates constant cross-referencing with datasheets and reduces configuration errors.</p>
+        <h3 class="subsection">3.2 Pin conflict detection</h3>
+        <p>Every GPIO assignment in the project is tracked across files and validated against the active board model. Pin role (input, output, INPUT_PULLUP, peripheral-claimed) is inferred from <code>pinMode</code> calls, bus initialisations, and analog APIs.</p>
+        <ul class="body-list">
+            <li><strong>ESP32 strapping pins</strong> (GPIO0, GPIO2, GPIO5, GPIO12, GPIO15) are flagged with the specific boot-mode consequence: GPIO0 held low at reset enters download mode, GPIO2 must not be held high during flash, GPIO12 sets the flash voltage, GPIO15 controls the boot log on UART0.</li>
+            <li><strong>Duplicate pin assignments</strong> across files. Two libraries claiming the same GPIO is a runtime failure the compiler does not see; Sentinel sees it because the hardware state machine is project-wide.</li>
+            <li><strong>Hardware-only peripheral pins.</strong> SPI on the Uno must use pins 11, 12, 13. I2C on the Uno must use A4 and A5. A <code>pinMode</code> on any of those marks the pin as user-claimed even before <code>SPI.begin()</code> is reached.</li>
+            <li><strong>INPUT_PULLUP detection</strong> for I2C lines. The analyzer cannot see external pull-up resistors on the board, but it can see the absence of an internal pull-up on a line the code uses for I2C, which is enough to surface a warning.</li>
+            <li><strong>Interactive board diagram</strong> in the extension UI: pin assignments render with hover tooltips and click-to-source navigation. The diagram is the same data structure the rule engine reads from, rendered visually.</li>
+        </ul>
 
-            <h1>System Architecture</h1>
+        <h3 class="subsection">3.3 Bus configuration validation</h3>
+        <ul class="body-list">
+            <li><strong>I2C:</strong> <code>Wire.setClock()</code> against device-class defaults (standard 100 kHz, fast 400 kHz, fast-plus 1 MHz), 7-bit versus 10-bit addressing, and shared-bus address conflicts when multiple <code>beginTransmission</code> calls hit the same address without a multiplexer.</li>
+            <li><strong>SPI:</strong> CPOL and CPHA match between master and device, MOSI / MISO / SCK pin assignments against the board's hardware SPI pins, and chip-select uniqueness across devices.</li>
+            <li><strong>UART:</strong> baud rate, parity, stop bits, and which hardware UART is claimed. On the Uno, UART0 is shared with USB serial, so using it for a GPS module while also calling <code>Serial.println</code> for debug is a guaranteed conflict.</li>
+            <li><strong>Peripheral autocomplete</strong> draws from a database of 200+ common Arduino-ecosystem sensors and breakouts (Adafruit, Sparkfun, generic datasheets). Address-based suggestion fires when an <code>0xXX</code> literal is recognised as a known device's I2C address.</li>
+            <li><strong>Ablation:</strong> dropping the device database collapses bus validation to syntax-only checks. The database is what turns "the bus is configured" into "the bus matches the device."</li>
+        </ul>
 
-            <h2>VS Code Extension Frontend</h2>
-            <p>The frontend extension is built with TypeScript and integrates deeply with VS Code's extension API. It provides multiple UI components that visualize hardware state and enable rapid development workflows.</p>
+        <h3 class="subsection">3.4 Language Server architecture</h3>
+        <ul class="body-list">
+            <li><strong>Incremental AST parser</strong> for <code>.ino</code> and <code>.cpp</code>, handling Arduino-specific preprocessing (auto-prototyping, header injection) and library resolution across sketch, user, core, and variant include paths.</li>
+            <li><strong>Hardware state machine</strong> per board: pin map, bus assignments, timer ownership, interrupt vectors, peripheral states. The state machine is rebuilt incrementally from the AST on each edit rather than from scratch.</li>
+            <li><strong>Validation rule engine</strong> spanning syntax, semantics, and hardware tiers. Rules are small pattern matches over the AST and the hardware state machine; new rules are a single function plus a registration call.</li>
+            <li><strong>Performance:</strong> initial naive build hit 2 to 3 seconds per analysis. Incremental parsing, symbol-table caching, and rule batching cut typical edit latency to roughly 47 ms on the calibration sketch suite.</li>
+            <li><strong>LSP diagnostic surface.</strong> Every rule's output is a standard LSP <code>Diagnostic</code>: severity, source <code>sentinel</code>, range pointing at the offending tokens, and a code that the extension uses to render the explanation panel.</li>
+        </ul>
 
-            <p><strong>Live Memory Visualization:</strong> Real-time bar charts display RAM and Flash usage, updating as code changes. The visualization breaks down memory by global variables, stack estimates, heap allocation, and framework overhead. Color-coded warnings appear when approaching hardware limits (yellow at 80%, red at 90%).</p>
+        <!-- ============================================================== -->
+        <h2 class="section">4. Evaluation</h2>
+        <p>Evaluation is small-scale and calibration-driven, in keeping with what a single developer can validate in a hackathon window. Numbers below are measured on the calibration sketch suite Sentinel ships with, not against an external benchmark.</p>
+        <ul class="body-list">
+            <li><strong>Memory estimate accuracy:</strong> within roughly 3% of compiled-output RAM and Flash on the calibration sketches across the four supported boards. The estimate degrades on sketches that use heavy dynamic allocation (the <code>String</code> class on AVR, dynamic <code>WiFiClient</code> pools on ESP32) because those costs only materialise at runtime.</li>
+            <li><strong>Diagnostic latency:</strong> 47 ms average from keystroke to inline diagnostic on sketches under 2000 lines. P95 under 100 ms on the same set.</li>
+            <li><strong>Rule coverage:</strong> 50+ active rules across memory, GPIO assignment, strapping pins, and the three buses. New rules average tens of lines of code each, which is what makes the count plausible inside a hackathon window.</li>
+            <li><strong>Adoption:</strong> 800+ combined installs across the VS Code Marketplace and Open VSX as a solo-maintained extension, post-event. The download path past the Hack Western audience is what makes the project something other than a demo.</li>
+        </ul>
 
-            <p><strong>Pin Assignment Maps:</strong> Interactive board diagrams show which GPIO pins are assigned to peripherals, with visual conflict indicators. Hovering over a pin displays its current configuration, voltage level, and connected device. Clicking a pin navigates to the code where it's assigned.</p>
+        <p>These numbers are honest about the harness. The 3% memory estimate holds on the sketches the analyzer was calibrated against and degrades outside that distribution. The 50+ rule count is correct as a count, not as a claim that every rule is equally hardened: hackathon-grade rules and shipped-product-grade rules look the same in the rule engine, and a few are closer to the former. The 200+ device autocomplete database is mostly assembled from public datasheets rather than original research. Read the numbers as evidence of the editor-loop direction, not as a benchmark against PC-Lint or Clang-Tidy.</p>
 
-            <p><strong>Build and Flash Integration:</strong> Sentinel wraps <code>arduino-cli</code> to enable one-click compilation and flashing directly from VS Code. Build errors are parsed and displayed inline with code, maintaining the rapid feedback loop. Serial monitor integration captures debug output without leaving the editor.</p>
+        <!-- ============================================================== -->
+        <h2 class="section">5. Conclusion and Implications</h2>
+        <p>The state of embedded tooling is a productivity tax that limits who can build hardware. By moving diagnostics from after compile to inside the editor, Sentinel makes firmware development feel like high-level software development: fast iteration, instant safety rails, fewer trips to the oscilloscope. The safety-critical consequence is that the strapping-pin and pin-conflict failures that today surface as field-deployment bugs, bricked devices, or boot-loop incidents in industrial and medical embedded systems can surface as squiggles in the editor instead. Best Developer Tool at Hack Western 12 was the external validation that the gap is felt by the people who would benefit most from closing it; the 800+ installs since then are the quieter, more durable signal.</p>
 
-            <p><strong>Diagnostics Panel:</strong> A dedicated panel displays all hardware validation issues, categorized by severity (errors, warnings, hints). Each diagnostic links to the relevant code location and provides suggested fixes. Issues update in real-time as code changes, providing instant feedback.</p>
+        <h3 class="subsection">5.1 Limitations</h3>
+        <ul class="body-list">
+            <li><strong>Calibration scope.</strong> The 3% memory estimate is calibrated against a curated sketch suite. Sketches that lean on dynamic allocation drift wider, and the analyzer does not currently model heap fragmentation at all.</li>
+            <li><strong>Stack estimation is approximate.</strong> Per-function frame heuristics cannot see the register allocation and frame-compression decisions <code>avr-gcc</code> and the Xtensa toolchain make, so the stack figure is a budgeted estimate, not a worst-case bound.</li>
+            <li><strong>External pull-ups are invisible.</strong> Sentinel can see <code>INPUT_PULLUP</code> in code but cannot detect physical pull-up resistors on the board. I2C lines without an explicit pull-up in code get flagged conservatively, which produces false positives when the board supplies external pull-ups.</li>
+            <li><strong>Board coverage is the original four.</strong> ATmega328P, ATmega2560, ESP32 (Xtensa LX6), ESP8266. The newer ESP32-S2 and S3 (Xtensa LX7) and the RISC-V ESP32-C3 / C6 are not modelled yet.</li>
+            <li><strong>No FreeRTOS task-level analysis.</strong> Per-core stack tracking, task priorities, and FreeRTOS-style scheduling constraints are out of scope in the current release.</li>
+            <li><strong>The 50+ rule count is uneven.</strong> Some rules are hardened against many sketches in the calibration suite; others are first-pass implementations that catch the obvious case and miss the edge.</li>
+        </ul>
 
-            <h2>Embedded Language Server Protocol</h2>
-            <p>The backend is a custom Node.js Language Server implementing the LSP specification with embedded-specific extensions. It performs all code analysis, hardware modeling, and validation logic.</p>
+        <h3 class="subsection">5.2 Future Work</h3>
+        <ul class="body-list">
+            <li><strong>ESP32-S2 / S3 / C3 / C6 support.</strong> The Xtensa LX7 and RISC-V cores are where the ecosystem is moving; covering them is the single most useful expansion.</li>
+            <li><strong>Per-region ESP32 memory breakdown:</strong> IRAM, DRAM, PSRAM, RTC. The current single-pool SRAM number hides the region that actually fills up first on real builds.</li>
+            <li><strong>FreeRTOS task analysis.</strong> Per-task stack sizing, priority validation, and cross-core resource sharing on dual-core ESP32 builds.</li>
+            <li><strong>Hardened rule audit.</strong> A second pass through the 50+ rules to bring the long tail up to the bar set by the strongest rules in the engine.</li>
+            <li><strong>Timing analysis</strong> for I2C clock stretching, SPI setup and hold violations, and UART framing errors at high baud.</li>
+            <li><strong>STM32 and RP2040.</strong> The natural next architectures to cover once the Xtensa LX7 work lands.</li>
+        </ul>
 
-            <p><strong>Incremental AST Parser:</strong> Sentinel parses <code>.ino</code> and <code>.cpp</code> files into Abstract Syntax Trees, handling Arduino's unique preprocessing rules (auto-function prototyping, header injection). The parser operates incrementally, only re-analyzing changed regions to maintain sub-100ms response times. It resolves library includes, expands macros, and handles C++ templates that plague embedded codebases.</p>
-
-            <p><strong>Symbol Table and Scope Management:</strong> The LSP maintains comprehensive symbol tables tracking function declarations, global variables, class definitions, and preprocessor macros across all project files. Scope analysis determines variable lifetimes and stack allocation patterns, enabling accurate memory prediction.</p>
-
-            <p><strong>Hardware State Machine:</strong> A state machine models the physical microcontroller, tracking pin configurations, bus assignments, timer usage, interrupt vectors, and peripheral states. This model updates as code changes, enabling real-time validation of hardware constraints. The state machine is board-specific, with tailored models for Arduino Uno (ATmega328P), Arduino Mega (ATmega2560), ESP32, and ESP8266.</p>
-
-            <p><strong>Validation Rule Engine:</strong> Over 50 validation rules execute against the AST and hardware model. Rules are organized hierarchically: syntactic rules (parse errors, type mismatches), semantic rules (undefined variables, missing includes), and hardware rules (pin conflicts, memory overflows, protocol violations). Each rule emits LSP diagnostics with severity levels, code ranges, and suggested fixes.</p>
-
-            <p>The validation engine executes rules in parallel where possible, with intelligent scheduling to prioritize fast checks. Memoization caches intermediate results to avoid redundant computation. The entire analysis pipeline completes in under 100ms for typical embedded projects (5-20 files, 1000-5000 lines of code).</p>
-
-            <h2>Calibration Methodology</h2>
-            <p>Achieving ±3% RAM accuracy required extensive empirical calibration. The process involved compiling over 100 diverse Arduino sketches covering various libraries and patterns, extracting ground truth memory usage from compiler-generated <code>.map</code> files, identifying systematic error sources, and building correction models.</p>
-
-            <p><strong>Framework Overhead Modeling:</strong> Each Arduino framework component (Serial, Wire, SPI, WiFi, BLE) has fixed memory overhead that varies by board. Sentinel's calibration captures these constants empirically. For example, initializing <code>Serial</code> on ESP32 consumes approximately 1.2KB of RAM for buffers and state, while <code>WiFi.begin()</code> requires about 40KB. These measurements are encoded in board-specific configuration files.</p>
-
-            <p><strong>Static vs Dynamic Allocation:</strong> The parser distinguishes between stack-allocated variables (function locals), heap-allocated memory (malloc, new), and static/global variables. Stack usage is estimated using worst-case call depth analysis and per-function frame size. Heap estimation tracks explicit allocations and adds safety margins for Arduino's hidden allocations.</p>
-
-            <p><strong>Compiler Behavior Modeling:</strong> Different compilers (avr-gcc, xtensa-lx6-gcc) apply different optimizations and padding strategies. Sentinel models these behaviors through regression analysis on the compiled benchmark suite, adjusting predictions based on optimization flags (-O0, -O2, -Os) and target architecture.</p>
-
-            <h1>Technical Challenges</h1>
-
-            <h2>Embedded Code Parsing</h2>
-            <p>Parsing embedded C++ is significantly harder than standard C++ due to Arduino's preprocessing magic and embedded-specific idioms. The <code>.ino</code> file format automatically generates function prototypes, injects <code>Arduino.h</code> headers, and wraps code in implicit setup/loop structure. Sentinel's parser replicates this preprocessing to accurately analyze code semantics.</p>
-
-            <p>Macro expansion is particularly challenging because embedded code heavily uses preprocessor directives for hardware abstraction (<code>#define LED_PIN 13</code>, conditional compilation for different boards). The parser maintains a macro symbol table and expands definitions during AST construction, while preserving original code ranges for diagnostics.</p>
-
-            <p>Library resolution follows Arduino's complex search paths: sketch directory, user libraries, core libraries, and board-specific variants. Sentinel replicates this logic to accurately resolve includes and prevent false "missing header" errors.</p>
-
-            <h2>ESP32 Strapping Pin Complexity</h2>
-            <p>ESP32's strapping pins (GPIO0, GPIO2, GPIO12, GPIO15) control boot mode and must maintain specific states during reset. The official documentation is inconsistent and incomplete, requiring manual testing to determine safe configurations. Sentinel's validation rules for strapping pins were derived from hundreds of boot tests across different ESP32 modules.</p>
-
-            <p>GPIO0 and GPIO2 must be pulled high during boot for normal firmware execution mode. Pulling them low enters bootloader mode, preventing the application from running. GPIO12 (MTDI) controls flash voltage (3.3V vs 1.8V), and incorrect configuration can damage the chip or prevent booting. GPIO15 (MTDO) must be pulled low during boot to enable UART logging.</p>
-
-            <p>Sentinel warns when these pins are configured as outputs with initial LOW states, suggests external pull-up/pull-down resistors, and validates that boot-critical pins aren't used for time-sensitive peripherals that could glitch during reset.</p>
-
-            <h2>Real-Time Performance</h2>
-            <p>Maintaining sub-100ms response times while performing comprehensive analysis required aggressive optimization. The initial naive implementation took 2-3 seconds to analyze modest projects, unacceptable for real-time IDE integration.</p>
-
-            <p>Key optimizations included:</p>
-            <ul>
-                <li><strong>Incremental Parsing:</strong> Only re-parse files that changed, and within changed files, only re-analyze modified AST subtrees. This reduced typical edit latency from 2000ms to 50ms</li>
-                <li><strong>Symbol Table Caching:</strong> Memoize symbol resolution results and invalidate only affected scopes on edits. This eliminated redundant name lookups across files</li>
-                <li><strong>Rule Batching:</strong> Group validation rules by analysis phase (syntax, semantics, hardware) and execute each phase conditionally. Simple syntax edits skip expensive hardware validation</li>
-                <li><strong>Lazy Hardware Modeling:</strong> Only update the hardware state machine when edits affect peripheral initialization or pin assignments, avoiding full model recalculation on every keystroke</li>
-                <li><strong>Parallel Rule Execution:</strong> Independent validation rules run concurrently using Node.js worker threads, exploiting multi-core CPUs</li>
-            </ul>
-
-            <p>Profiling revealed that 60% of analysis time was spent in library include resolution. Caching resolved include paths and using file watchers to detect library changes reduced this overhead to negligible levels.</p>
-
-            <h2>Hackathon Constraints</h2>
-            <p>Building a production-quality developer tool in 36 hours required ruthless scope management and technical tradeoffs. The core challenge was balancing feature completeness with implementation depth—better to have 5 polished features than 20 half-working ones.</p>
-
-            <p>Priority was given to features with immediate user impact: memory visualization (directly prevents crashes), pin conflict detection (solves common frustration), and build integration (streamlines workflow). Advanced features like protocol timing analysis and power consumption modeling were deferred to future iterations.</p>
-
-            <p>TypeScript's strong typing and VS Code's well-documented extension API accelerated development. The LSP specification provided a clear architecture, eliminating design ambiguity. Arduino CLI's JSON output made build integration straightforward. Despite time pressure, code quality was maintained through continuous testing on real hardware (ESP32 DevKit, Arduino Uno).</p>
-
-            <h1>Impact & Results</h1>
-
-            <h2>Performance Metrics</h2>
-            <p>Sentinel achieved its core technical goals across all measured dimensions:</p>
-            <ul>
-                <li><strong>±3% RAM/Flash Accuracy:</strong> Memory predictions within 3% of actual compiled sizes across 100+ test sketches, validated against compiler output</li>
-                <li><strong>Sub-100ms Diagnostic Response:</strong> Average latency of 47ms from code edit to diagnostic update, measured across typical embedded project sizes</li>
-                <li><strong>50+ Validation Rules:</strong> Comprehensive coverage of memory, pin, protocol, and peripheral configuration issues</li>
-                <li><strong>200+ Device Suggestions:</strong> Autocomplete database covering common I2C/SPI sensors, displays, and actuators</li>
-            </ul>
-
-            <h2>Developer Experience</h2>
-            <p>The most significant impact is qualitative: Sentinel transforms embedded development from a frustrating compile-flash-debug cycle into a modern IDE experience with instant feedback. Developers report catching issues minutes after writing code instead of hours later during hardware testing.</p>
-
-            <p>Memory budget violations surface while writing initialization code, not after flashing and observing crashes. Pin conflicts appear immediately with visual board diagrams, eliminating multimeter debugging sessions. Protocol configuration errors show inline explanations, reducing datasheet cross-referencing.</p>
-
-            <h1>Future Development</h1>
-
-            <h2>Enhanced Hardware Intelligence</h2>
-            <p>The next major version will provide full ESP32 memory breakdown by region: IRAM (instruction RAM), DRAM (data RAM), PSRAM (external RAM), and RTC memory (deep sleep retention). Per-core stack tracking for dual-core ESP32 will enable accurate memory modeling for FreeRTOS multitasking applications.</p>
-
-            <p>Visual pin maps will evolve into interactive board overlays with live conflict heatmaps, showing not just current assignments but also recommended pins for specific protocols based on routing complexity and electrical characteristics. Power consumption estimation will integrate current draw data for common peripherals, enabling battery life calculations.</p>
-
-            <h2>Platform Expansion</h2>
-            <p>Support is planned for Arduino Mega (ATmega2560), Arduino Nano (ATmega328P), ESP8266, STM32 families (Blue Pill, Nucleo), and Raspberry Pi Pico (RP2040). Each platform requires board-specific calibration, hardware models, and validation rules, but the core LSP architecture remains unchanged.</p>
-
-            <p>Cross-platform embedded development often requires managing multiple board targets simultaneously. Future versions will support multi-board workflows with automatic board detection and configuration switching.</p>
-
-            <h2>Advanced Diagnostics</h2>
-            <p>Timing analysis will validate that protocol operations meet hardware timing requirements, catching issues like I2C clock stretching violations or SPI setup/hold time problems. Serial plotter integration will enable real-time visualization of sensor data streams directly within VS Code. Oscilloscope connectivity via WebUSB will overlay waveforms with code execution traces.</p>
-
-            <h2>AI-Assisted Development</h2>
-            <p>The long-term vision includes an AI-powered firmware toolkit that suggests bug fixes automatically (e.g., "GPIO2 should be INPUT_PULLUP to prevent boot issues"), generates boilerplate peripheral initialization code, and recommends hardware components from a curated marketplace. The goal: make embedded development as accessible as web development, lowering the barrier for hardware innovation.</p>
-
-            <h1>Conclusion</h1>
-            
-            <p>Sentinel demonstrates that embedded development doesn't have to be stuck in the past. By bringing Language Server Protocol intelligence to hardware constraints, it provides the real-time feedback and safety rails that modern developers expect. The combination of ±3% memory accuracy, sub-100ms diagnostics, and comprehensive hardware validation creates an IDE experience that rivals high-level language development.</p>
-
-            <p>Winning Best Developer Tool at Hack Western 12 validated the core insight: firmware engineers face unique challenges that generic IDEs don't address, and purpose-built tooling can dramatically improve their productivity. Sentinel shifts debugging from hardware back to software, from after compilation to during coding, and from frustration to confidence.</p>
-
-            <p>The future of embedded development is real-time, intelligent, and hardware-aware. Sentinel is just the beginning—a foundation for AI-assisted firmware development that makes building hardware as intuitive as building apps.</p>
-        </section>
+        <!-- ============================================================== -->
+        <h2 class="section">6. Acknowledgments</h2>
+        <p>Built solo over a single hackathon weekend at <strong>Hack Western 12</strong>, where it won <strong>Best Developer Tool</strong>. The build sits on top of the <strong>Arduino CLI</strong> for compile integration, the <strong>Language Server Protocol</strong> specification for the editor wire format, and the standard VS Code <strong>vscode-languageclient</strong> reference implementation for the extension scaffolding. The peripheral autocomplete database is assembled from public datasheets across the Adafruit, Sparkfun, and general Arduino sensor ecosystems. The extension is published on the <a class="inline" href="https://marketplace.visualstudio.com/items?itemName=RishiShah.sentinel-arduino" target="_blank" rel="noopener">VS Code Marketplace</a> and the <a class="inline" href="https://open-vsx.org/extension/RishiShah/sentinel-arduino" target="_blank" rel="noopener">Open VSX Registry</a> as <code>RishiShah.sentinel-arduino</code>.</p>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    <script>
-        // Custom cursor
-        const cursor = document.createElement('div');
-        cursor.classList.add('cursor');
-        document.body.appendChild(cursor);
-
-        const cursorGlow = document.createElement('div');
-        cursorGlow.classList.add('cursor-glow');
-        document.body.appendChild(cursorGlow);
-
-        document.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-            cursorGlow.style.left = e.clientX + 'px';
-            cursorGlow.style.top = e.clientY + 'px';
-        });
-
-        document.addEventListener('mousedown', () => {
-            cursor.style.transform = 'translate(-50%, -50%) scale(0.8)';
-            cursorGlow.style.transform = 'translate(-50%, -50%) scale(0.8)';
-        });
-
-        document.addEventListener('mouseup', () => {
-            cursor.style.transform = 'translate(-50%, -50%) scale(1)';
-            cursorGlow.style.transform = 'translate(-50%, -50%) scale(1)';
-        });
-
-        const interactiveElements = document.querySelectorAll('a, button, .stat-card, .tech-item');
-        interactiveElements.forEach(element => {
-            element.addEventListener('mouseenter', () => {
-                cursor.classList.add('hover');
-                cursorGlow.classList.add('hover');
-            });
-            element.addEventListener('mouseleave', () => {
-                cursor.classList.remove('hover');
-                cursorGlow.classList.remove('hover');
-            });
-        });
-
-        // Particles.js configuration
-        particlesJS('particles-js', {
-            particles: {
-                number: { value: 70, density: { enable: true, value_area: 800 } },
-                color: { value: '#00b4d8' },
-                shape: { type: 'circle' },
-                opacity: { value: 0.3, random: true },
-                size: { value: 3, random: true },
-                line_linked: {
-                    enable: true,
-                    distance: 150,
-                    color: '#00b4d8',
-                    opacity: 0.2,
-                    width: 1
-                },
-                move: {
-                    enable: true,
-                    speed: 2,
-                    direction: 'none',
-                    random: false,
-                    straight: false,
-                    out_mode: 'out',
-                    bounce: false
-                }
-            },
-            interactivity: {
-                detect_on: 'canvas',
-                events: {
-                    onhover: { enable: true, mode: 'grab' },
-                    onclick: { enable: true, mode: 'push' },
-                    resize: true
-                },
-                modes: {
-                    grab: { distance: 140, line_linked: { opacity: 0.5 } },
-                    push: { particles_nb: 4 }
-                }
-            },
-            retina_detect: true
-        });
-
-        // Back button scroll behavior
-        const backButton = document.querySelector('.back-button');
-        let lastScroll = 0;
-
-        // Smooth back button navigation
-        backButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            
-            // Create transition overlay
-            const overlay = document.createElement('div');
-            overlay.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(135deg, #020510 0%, #0a1628 100%);
-                z-index: 99999;
-                opacity: 0;
-                transition: opacity 0.3s ease;
-                pointer-events: none;
-            `;
-            document.body.appendChild(overlay);
-            
-            // Fade in overlay
-            setTimeout(() => {
-                overlay.style.opacity = '1';
-            }, 10);
-            
-            // Navigate after overlay is visible
-            setTimeout(() => {
-                window.location.href = '../index.html';
-            }, 200);
-        });
-
-        window.addEventListener('scroll', () => {
-            const currentScroll = window.pageYOffset;
-            
-            if (currentScroll > lastScroll && currentScroll > 100) {
-                // Scrolling down - hide button
-                backButton.classList.add('hidden');
-            } else {
-                // Scrolling up or at top - show button
-                backButton.classList.remove('hidden');
-            }
-            
-            lastScroll = currentScroll;
-        });
-    </script>
 </body>
 </html>

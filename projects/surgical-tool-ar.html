@@ -1,672 +1,171 @@
 <!DOCTYPE html>
-<html lang="en" style="cursor: none !important; background-color: #020510 !important;">
+<html lang="en" style="background-color: #f3ece0;">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SurgicalToolAR - Mixed Reality Proximity Awareness | Rishi Shah</title>
-    <meta name="description" content="Unity + Vuforia mixed reality prototype for surgical tool proximity awareness with real-time distance measurement and safety zone warnings.">
-    <style>
-        /* CRITICAL: Hide cursor and background immediately on page load */
-        html, body, * {
-            cursor: none !important;
-        }
-        html, body {
-            background-color: #020510 !important;
-            margin: 0;
-            padding: 0;
-        }
-    </style>
+    <title>SurgicalToolAR · Proximity-aware AR for surgical training | Rishi Shah</title>
+    <meta name="description" content="A marker-based AR prototype built in Unity with Vuforia. Tracks a 3D brain model and a simulated surgical probe, computes real-time tool-to-tissue distance, and surfaces SAFE / CAUTION / DANGER safety states on a tablet HUD with hysteresis.">
+
     <link rel="prefetch" href="../index.html">
-    <link rel="preload" href="../style.css" as="style">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/17ea408dcc.js" crossorigin="anonymous"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    <style>html, body { background-color: #f3ece0; margin: 0; padding: 0; }</style>
 
-        :root {
-            --primary: #00b4d8;
-            --secondary: #5EEAD4;
-            --dark: #020510;
-            --darker: #0a1628;
-            --light: #e0f2fe;
-            --accent: #38bdf8;
-        }
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
-            color: var(--light);
-            line-height: 1.6;
-            min-height: 100vh;
-            overflow-x: hidden;
-            cursor: none !important;
-        }
-
-        * {
-            cursor: none !important;
-        }
-
-        #particles-js {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: 5;
-            pointer-events: none;
-        }
-
-        .back-button {
-            position: fixed;
-            top: 2rem;
-            left: 2rem;
-            z-index: 10001;
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 180, 216, 0.1);
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            text-decoration: none;
-            border-radius: 50%;
-            font-size: 1.2rem;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(10px);
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        .back-button.hidden {
-            opacity: 0;
-            transform: translateX(-20px);
-            pointer-events: none;
-        }
-
-        .back-button:hover {
-            background: rgba(0, 180, 216, 0.2);
-            transform: scale(1.1);
-            box-shadow: 0 0 30px rgba(0, 180, 216, 0.4);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 6rem 2rem 4rem;
-            position: relative;
-            z-index: 10;
-        }
-
-        .project-header {
-            text-align: center;
-            margin-bottom: 4rem;
-            padding: 3rem 2rem;
-            background: rgba(10, 22, 40, 0.5);
-            border-radius: 16px;
-            border: 1px solid rgba(0, 180, 216, 0.2);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .project-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 180, 216, 0.1), transparent);
-            animation: shimmer 3s infinite;
-        }
-
-        @keyframes shimmer {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-
-        .project-header h1 {
-            font-size: 3.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 1rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        .project-subtitle {
-            color: var(--secondary);
-            font-size: 1.2rem;
-            margin-bottom: 0.5rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-weight: 300;
-        }
-
-        .project-meta {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-top: 1.5rem;
-            flex-wrap: wrap;
-        }
-
-        .project-meta span {
-            background: rgba(0, 180, 216, 0.1);
-            padding: 0.5rem 1.5rem;
-            border-radius: 25px;
-            border: 1px solid var(--primary);
-            font-size: 0.95rem;
-        }
-
-        .project-link {
-            display: inline-block;
-            margin-top: 1.5rem;
-            padding: 0.8rem 2rem;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: var(--dark);
-            text-decoration: none;
-            border-radius: 25px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .project-link:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(0, 180, 216, 0.3);
-        }
-
-        .section {
-            margin-bottom: 4rem;
-            background: rgba(10, 22, 40, 0.3);
-            padding: 3rem;
-            border-radius: 16px;
-            border: 1px solid rgba(0, 180, 216, 0.2);
-        }
-
-        .section-header {
-            font-family: 'Courier New', monospace;
-            font-size: 2rem;
-            color: var(--primary);
-            margin-bottom: 2rem;
-        }
-
-        .video-container {
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            overflow: hidden;
-            margin: 2rem 0;
-            border-radius: 12px;
-            border: 2px solid rgba(0, 180, 216, 0.3);
-        }
-
-        .video-container video {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .highlight-box {
-            background: linear-gradient(135deg, rgba(0, 180, 216, 0.1) 0%, rgba(94, 234, 212, 0.1) 100%);
-            border-left: 4px solid var(--primary);
-            padding: 1.5rem;
-            margin: 2rem 0;
-            border-radius: 8px;
-        }
-
-        .highlight-box p {
-            margin: 0;
-            font-size: 1.1rem;
-            line-height: 1.8;
-        }
-
-        .tech-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        .tech-item {
-            background: rgba(0, 180, 216, 0.05);
-            padding: 1rem;
-            border-radius: 8px;
-            border: 1px solid rgba(0, 180, 216, 0.2);
-            text-align: center;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .tech-item:hover {
-            background: rgba(0, 180, 216, 0.1);
-            border-color: var(--primary);
-            transform: scale(1.05);
-        }
-
-        .document-section {
-            background: rgba(10, 22, 40, 0.3);
-            padding: 4rem 3rem;
-            border-radius: 16px;
-            border: 1px solid rgba(0, 180, 216, 0.2);
-        }
-
-        .document-section h1 {
-            font-size: 2rem;
-            font-weight: 600;
-            color: var(--primary);
-            font-family: 'Courier New', monospace;
-            margin-bottom: 1.5rem;
-            margin-top: 2.5rem;
-        }
-
-        .document-section h1:first-child {
-            margin-top: 0;
-        }
-
-        .document-section h2 {
-            font-size: 1.3rem;
-            font-weight: 500;
-            color: var(--secondary);
-            margin-bottom: 1rem;
-            margin-top: 2rem;
-        }
-
-        .document-section p {
-            margin-bottom: 1.5rem;
-            line-height: 1.8;
-        }
-
-        .document-section ul {
-            margin: 1rem 0 2rem 2rem;
-            line-height: 2;
-        }
-
-        .document-section li {
-            margin-bottom: 0.8rem;
-        }
-
-        .document-section strong {
-            color: var(--secondary);
-            font-weight: 600;
-        }
-
-        .stat-card {
-            background: rgba(0, 180, 216, 0.05);
-            padding: 1.5rem;
-            border-radius: 12px;
-            border: 1px solid rgba(0, 180, 216, 0.2);
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 180, 216, 0.2);
-            border-color: var(--primary);
-        }
-
-        .stat-card p {
-            margin: 0;
-        }
-
-        .stat-card p + p {
-            margin-top: 1rem;
-        }
-
-        .feature-list {
-            margin: 1rem 0 2rem 2rem;
-            line-height: 2;
-        }
-
-        .feature-list li {
-            margin-bottom: 0.8rem;
-        }
-
-        .cursor {
-            position: fixed;
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--primary);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 10002;
-            transition: all 0.1s ease;
-            transform: translate(-50%, -50%);
-            mix-blend-mode: difference;
-        }
-
-        .cursor-glow {
-            position: fixed;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 10001;
-            transition: all 0.15s ease;
-            transform: translate(-50%, -50%);
-            background: radial-gradient(circle, rgba(0, 180, 220, 0.15) 0%, transparent 70%);
-        }
-
-        .cursor.hover {
-            width: 40px;
-            height: 40px;
-            background: rgba(0, 180, 220, 0.1);
-            border-color: var(--secondary);
-        }
-
-        .cursor-glow.hover {
-            width: 60px;
-            height: 60px;
-            background: radial-gradient(circle, rgba(0, 180, 220, 0.3) 0%, transparent 70%);
-        }
-
-        a, button, .stat-card, .tech-item {
-            cursor: none !important;
-        }
-
-        @media (max-width: 768px) {
-            .project-header h1 {
-                font-size: 2rem;
-            }
-
-            .section {
-                padding: 2rem 1.5rem;
-            }
-
-            .document-section {
-                padding: 2rem 1.5rem;
-            }
-
-            .tech-grid {
-                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="project.css">
+    <script defer src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script defer src="../shared.js"></script>
+    <script defer src="project.js"></script>
 </head>
 <body>
     <div id="particles-js"></div>
-    
-    <a href="../index.html" class="back-button">
-        <i class="fas fa-arrow-left"></i>
-    </a>
 
     <div class="container">
-        <div class="project-header">
-            <div class="project-subtitle">MIXED REALITY MEDICAL PROTOTYPE</div>
-            <h1>SurgicalToolAR</h1>
-            <div class="project-subtitle">Proximity Aware AR System for Surgical Training</div>
-            <div class="project-meta">
-                <span>🔬 Unity + Vuforia</span>
-                <span>📱 Android Tablet Demo</span>
-                <span>⚡ Real Time Tracking</span>
-            </div>
+        <a class="back-link" href="../index.html">[ Back to home ]</a>
+
+        <div class="eyebrow">2024</div>
+
+        <h1 class="title">Proximity-aware AR for surgical <span class="accent">training</span>.</h1>
+
+        <div class="chips">
+            <span class="chip">Mixed Reality</span>
+            <span class="chip">Healthcare</span>
+            <span class="chip">Surgical Vision</span>
         </div>
 
-        <!-- Box 2: Overview -->
-        <section class="section">
-            <h2 class="section-header">Overview</h2>
-            
-            <div class="video-container">
-                <video 
-                    id="project-video"
-                    controls
-                    autoplay
-                    muted
-                    loop>
+        <p class="subtitle">Most AR medical demos stop at "here's a brain floating on a marker." This one tracks a simulated probe against that brain in real time, computes tool-to-tissue distance, and raises safety warnings on a tablet HUD.</p>
+
+        <!-- ============================================================== -->
+        <h2 class="section">1. Abstract</h2>
+        <p>A marker-based AR prototype built in Unity with Vuforia tracking, deployed as an Android tablet APK. A 3D brain model is anchored to a printed base marker; a physical pen with fiducial fins is tracked as a surrogate surgical probe. The system computes live tip-to-anatomy distance, classifies it into <strong>SAFE / CAUTION / DANGER</strong> zones with hysteresis, and surfaces both the numeric reading and the zone state in a high-contrast HUD. The point is concrete: surgical-AR training tools that go past visualization into spatial awareness give the trainee feedback about <em>where the tool is, relative to what matters</em>, which is the part of operative judgement the trainee actually has to build before the first patient.</p>
+
+        <p>Tracking is <strong>Vuforia</strong> image targets at 6-DOF. The brain anatomy sits on a printed BrainTarget; the pen carries two redundant markers (FrontTarget and BackTarget) so a temporarily occluded face never breaks the track. Distance is computed with <code>Collider.ClosestPoint()</code> against capsule and sphere colliders approximating the brain. Fast enough for live feedback at frame rate, and accurate enough to distinguish the safety bands the training scenario cares about. Hysteresis on the zone transitions prevents the HUD from flickering between bands when the tip hovers near a threshold.</p>
+
+        <p>The novelty is the loop, not the rendering. Every commercial surgical-AR demo on the market stops at "here is the anatomy floating on a marker." Few of them close the loop into spatial reasoning about the tool, and none of the consumer-grade ones do it on a $400 Android tablet with paper-printed image targets. This is the build that closes that loop on commodity hardware: live visualization, plus per-frame distance, plus a classified safety state, plus a HUD that surfaces both for a trainee under variable lighting.</p>
+
+        <ul class="body-list">
+            <li><strong>6-DOF pose tracking on three image targets:</strong> one BrainTarget for anatomy, FrontTarget and BackTarget for tool redundancy. Marker loss on one face of the tool does not break the track.</li>
+            <li><strong>Real-time mm-scale distance</strong> via <code>Collider.ClosestPoint()</code> against capsule and sphere colliders on the brain. Frame-rate-stable on commodity Android.</li>
+            <li><strong>Hysteresis on zone transitions</strong> prevents flickering between SAFE, CAUTION, and DANGER states when the tip hovers near a threshold.</li>
+            <li><strong>Multi-touch gesture controls:</strong> pinch-to-scale, drag-to-rotate, lock, and measurement-mode toggle. Trainee-facing, not researcher-facing.</li>
+            <li><strong>Self-contained Android tablet APK.</strong> No headset, no operating-room infrastructure, no PC tether. Single install reaches a trainee at a desk.</li>
+        </ul>
+
+        <figure>
+            <div class="figure-card">
+                <video controls autoplay muted loop playsinline>
                     <source src="../images/SurgicalToolAR.mp4" type="video/mp4">
-                    Your browser does not support the video tag.
                 </video>
             </div>
-            
-            <div class="highlight-box">
-                <p><strong>SurgicalToolAR</strong> is a marker based augmented reality prototype that tracks a 3D brain model and a physical pen as a simulated surgical probe. The system calculates real time distance measurements in millimeters and displays dynamic safety warnings (SAFE, CAUTION, DANGER) based on proximity thresholds. This goes beyond basic AR visualization by adding spatial awareness between tracked instruments and anatomical targets.</p>
-            </div>
-            <p>Most AR medical demos stop at "here's a brain floating on a marker." That looks impressive in presentations, but it's not actually useful in clinical settings. Real surgical guidance needs interaction awareness: Where is the tool? How close is it to critical tissue? Can we give meaningful real time feedback?</p>
-            
-            <p style="margin-top: 1rem;">This prototype demonstrates the next step. Instead of just displaying anatomy, it tracks tool position relative to the 3D model, computes proximity in real time, and provides safety zone feedback. The system includes touch controls for rotation, scaling, locking, and measurement modes, creating a functional proof of concept for proximity aware surgical training.</p>
-        </section>
+            <figcaption>Figure 1. Tablet AR view. As the pen approaches the tracked brain model, the HUD updates the distance in millimetres and the zone indicator transitions through SAFE, CAUTION, and DANGER.</figcaption>
+        </figure>
 
-        <section class="section">
-            <h2 class="section-header">Technology Stack</h2>
-            <div class="tech-grid">
-                <div class="tech-item">Unity</div>
-                <div class="tech-item">Vuforia</div>
-                <div class="tech-item">C#</div>
-                <div class="tech-item">Android</div>
-            </div>
-        </section>
+        <!-- ============================================================== -->
+        <h2 class="section">2. Introduction</h2>
+        <p>AR for surgical visualization has a ceiling. A 3D model floating on a fiducial is visually striking but clinically inert. What surgical training actually needs is <em>interaction awareness</em>: where the tool is, how close it is to the structure that matters, and whether the trainee is on the right side of a threshold. Until the demo can answer those three questions in real time, it remains a presentation prop rather than a training tool.</p>
+        <ul class="body-list">
+            <li><strong>Visualization without interaction is inert.</strong> Rendering anatomy on a marker shows what is there. It does not tell the trainee what to do.</li>
+            <li><strong>The trainee is building spatial judgement.</strong> The part of operative skill that takes the longest to develop is millimetre-scale awareness of the tip relative to the anatomy. That is what a training surface has to teach.</li>
+            <li><strong>Commodity hardware unlocks reach.</strong> An Android tablet with paper-printed image targets reaches more trainees in more places than a HoloLens, a wet lab, or an OR rotation can.</li>
+        </ul>
 
-        <!-- Box 4: Main Document Content -->
-        <section class="document-section">
-            <h1>The Problem</h1>
+        <h3 class="subsection">2.1 Why marker tracking, not headset SLAM</h3>
+        <p>Vuforia image targets sit at one extreme of the AR tracking spectrum: cheap, robust, deterministic, and obviously markered. Headset SLAM (HoloLens, Quest 3, ARKit) sits at the other: hands-free and operating-room compatible, but expensive and harder to debug. For a tablet training prototype, the marker-tracking trade is the right one.</p>
+        <ul class="body-list">
+            <li><strong>Vuforia 6-DOF on a tablet</strong> is robust under typical handheld motion and frame-rate-stable on commodity Android. The trainee does not need to wear anything.</li>
+            <li><strong>Three image targets, redundantly placed.</strong> One on the anatomy, two on the tool. Marker loss on one face of the tool does not break the track, because <code>ToolRigFollower</code> picks the best-visible target each frame and the others are interpolated.</li>
+            <li><strong>Deterministic registration.</strong> A printed marker is a known anchor in the camera frame. There is no SLAM drift to debug, no calibration step at session start, no failure mode where the anatomy slides off the desk.</li>
+        </ul>
 
-            <p>Mixed reality surgical visualization faces a fundamental limitation: displaying anatomy in 3D space is the easy part. The hard part is making it interactive and clinically meaningful.</p>
+        <h3 class="subsection">2.2 What is actually new</h3>
+        <p>The marker tracking and the rendering pipeline are off-the-shelf. The contribution is the per-frame spatial reasoning layered on top, and the HUD that makes it actionable for a trainee.</p>
+        <ul class="body-list">
+            <li><strong>Per-frame proximity.</strong> <code>Collider.ClosestPoint()</code> against a capsule and sphere approximation of the brain runs at frame rate. The tip-to-anatomy distance is a live number, not a one-shot measurement.</li>
+            <li><strong>Classified safety state with hysteresis.</strong> SAFE, CAUTION, and DANGER thresholds are tunable. Band transitions only commit after the distance has sustained the new band, so the HUD does not flicker when the trainee hovers their pen near a threshold.</li>
+            <li><strong>Trainee-facing HUD, not researcher-facing telemetry.</strong> Bottom-right of the screen carries a large numeric readout and a color-coded zone indicator. Bottom-left carries Reset, Lock, and Measure-mode toggles. The legibility budget is "readable on a tablet under variable lighting," not "complete in a research paper."</li>
+        </ul>
 
-            <p>Specifically, you need:</p>
-            <ul>
-                <li><strong>Spatial awareness:</strong> Where is the surgical tool positioned relative to the anatomy?</li>
-                <li><strong>Proximity detection:</strong> How close is the instrument to critical tissue or target regions?</li>
-                <li><strong>Real time feedback:</strong> Can the system provide simple, actionable warnings like safe, caution, or danger zones?</li>
-            </ul>
+        <p>Every section below is the engineering that makes those three commitments hold inside the tablet.</p>
 
-            <p>Without these features, AR surgical demos remain impressive visualizations but lack practical utility. This project addresses that gap by building proximity aware interaction into the AR experience.</p>
+        <!-- ============================================================== -->
+        <h2 class="section">3. System</h2>
 
-            <h1>The Solution</h1>
+        <h3 class="subsection">3.1 AR anchoring</h3>
+        <ul class="body-list">
+            <li><strong>BrainTarget.</strong> Printed base marker. Anchors the 3D brain model in world space.</li>
+            <li><strong>FrontTarget and BackTarget.</strong> Dual markers on opposite faces of the pen tool. Either face is sufficient to recover the tool pose, so a temporarily occluded face does not break the track.</li>
+            <li><strong>6-DOF pose per target</strong> from Vuforia. Spatial relationships between brain and tool remain consistent under typical camera or marker motion.</li>
+        </ul>
 
-            <p>I built a marker based AR prototype using Unity and Vuforia that combines anatomical visualization with real time tool tracking and proximity analysis.</p>
+        <h3 class="subsection">3.2 Tool tracking</h3>
+        <ul class="body-list">
+            <li><code>ToolRigFollower</code> picks the best-visible marker each frame (highest tracking confidence reported by Vuforia) and smoothly follows its pose into the tool rig.</li>
+            <li>Marker loss is handled with interpolation and graceful reacquisition rather than snapping. The tool rig coasts on its last known velocity for a few frames if both markers vanish.</li>
+            <li>Temporal smoothing on the raw pose suppresses the high-frequency jitter that would otherwise show up at the tool tip when the camera is still.</li>
+        </ul>
 
-            <h2>Core Features</h2>
+        <h3 class="subsection">3.3 Proximity logic</h3>
+        <ul class="body-list">
+            <li>The tool tip is a dedicated transform parented to the tool rig at the probe's working point, so the distance query measures from the actual point of interest, not from the marker centroid.</li>
+            <li>The brain is approximated with capsule and sphere colliders. Fast distance queries, sufficient resolution for training scenarios that care about gross proximity, not surface curvature.</li>
+            <li>Distance is computed with <code>Collider.ClosestPoint()</code> every frame and classified against tunable SAFE, CAUTION, and DANGER thresholds.</li>
+            <li>Hysteresis on the threshold crossings: a band transition only commits when the distance has sustained the new band for a configurable hold-time. This is what prevents the HUD from oscillating when the tip is held near a boundary.</li>
+        </ul>
 
-            <ul class="feature-list">
-                <li>Anchors a 3D brain model to a printed base marker for stable AR positioning</li>
-                <li>Tracks a physical pen (with marker fins) as a surrogate surgical tool in 3D space</li>
-                <li>Calculates real time distance from tool tip to nearest brain surface using collision geometry</li>
-                <li>Displays distance measurements in millimeters with color coded safety zones</li>
-                <li>Provides touch controls for rotation, scaling, interaction locking, and measurement mode</li>
-                <li>Runs as an Android tablet APK for portable demonstration and testing</li>
-            </ul>
+        <h3 class="subsection">3.4 HUD</h3>
+        <ul class="body-list">
+            <li><strong>Bottom-left.</strong> Reset, Lock, and Measure-mode toggles. Lock freezes the anatomy in its current placement during a measurement. Measure-mode switches the HUD between live distance and a held-snapshot reading.</li>
+            <li><strong>Bottom-right.</strong> A large numeric distance readout in millimetres, plus a color-coded zone indicator (green for SAFE, amber for CAUTION, red for DANGER).</li>
+            <li><strong>Transparent black panels and high-contrast typography</strong> so the HUD stays readable under the variable lighting of a classroom, a lab bench, or a study desk.</li>
+        </ul>
 
-            <p>The result is a system that doesn't just show anatomy, it tracks tool approach and gives meaningful spatial feedback, which is much closer to what actual surgical guidance systems need to do.</p>
+        <h3 class="subsection">3.5 Gesture controls</h3>
+        <ul class="body-list">
+            <li><strong>Pinch-to-scale</strong> on the anatomy model so the trainee can match the visualization to the marker arrangement on their desk.</li>
+            <li><strong>Drag-to-rotate</strong> around the marker axis for inspecting the anatomy from different angles without moving the camera.</li>
+            <li><strong>Lock toggle</strong> to freeze the current placement during a measurement, so a careful approach is not disturbed by accidental input.</li>
+            <li><strong>Measure-mode toggle</strong> to switch the HUD between the live distance reading and a held-snapshot reading captured at the moment of the toggle.</li>
+        </ul>
 
-            <h1>Technical Implementation</h1>
+        <!-- ============================================================== -->
+        <h2 class="section">4. Evaluation</h2>
+        <p>Validated qualitatively on Android tablet hardware. The system holds tracking under typical handheld motion, the distance reading updates at frame rate, and the zone transitions remain stable thanks to the hysteresis layer. No quantitative trainee study yet. This is a proof-of-concept for proximity-aware AR interaction on commodity tablets, not a validated training instrument.</p>
+        <ul class="body-list">
+            <li><strong>Vuforia tracking holds</strong> under the typical motion of a seated trainee at a desk with the markers within roughly 30 cm of the camera, in normal indoor lighting.</li>
+            <li><strong>Distance reading updates at frame rate</strong> on the target Android tablet, with no observable lag between probe motion and HUD update.</li>
+            <li><strong>Zone transitions are stable</strong> across the typical SAFE-to-CAUTION and CAUTION-to-DANGER hover ranges. The hysteresis hold-time prevents the band from oscillating when the tip is held near a threshold.</li>
+            <li><strong>Multi-touch gestures</strong> (pinch, drag, lock, measure-mode) behave as expected across the four configurations exercised during development.</li>
+        </ul>
 
-            <h2>AR Anchoring with Vuforia</h2>
-            <p>The system uses three image targets:</p>
-            <ul>
-                <li><strong>Base marker:</strong> Tracks the 3D brain model position and orientation (BrainTarget)</li>
-                <li><strong>Tool markers:</strong> Front and back tracking markers attached to a physical pen (FrontTarget, BackTarget)</li>
-            </ul>
-            <p>Vuforia provides 6DOF pose estimation (position and rotation) for each target, allowing the system to maintain accurate spatial relationships even as the camera or markers move.</p>
+        <p>This is a self-contained training prototype on a single tablet, not a clinical evaluation. It is not a surgical guidance system, not an OR-ready instrument, and not on an FDA track. The contribution is the proximity-plus-safety-state loop on commodity hardware, not a benchmark number against any clinical AR system. Quantitative validation against a trainee cohort is the obvious next step.</p>
 
-            <h2>Brain Interaction Controls</h2>
-            <p>I implemented multi touch gesture controls for manipulating the AR brain:</p>
-            <ul>
-                <li><strong>PinchScale:</strong> Two finger pinch gestures for zooming in and out</li>
-                <li><strong>DragRotate:</strong> Single finger drag for free rotation around axes</li>
-                <li><strong>LockController:</strong> Toggle to freeze all interactions for stable measurement</li>
-                <li><strong>MeasureModeController:</strong> Locks scale to ensure consistent distance calculations</li>
-            </ul>
+        <!-- ============================================================== -->
+        <h2 class="section">5. Conclusion and Implications</h2>
+        <p>A tablet AR prototype that closes the proximity loop is a concrete step toward more accessible surgical training. If even a fraction of the spatial-judgement learning curve that a trainee normally builds on cadavers, simulators, or expensive headset-based platforms can be moved earlier in training onto a $400 Android tablet with paper markers, the downstream effect is more reps before the first patient, more consistent feedback across the cohort, and a lower threshold for a teaching surgeon to drop in and supervise. The design choices that matter most in this build (marker tracking instead of SLAM, hysteresis on zone transitions, trainee-facing HUD instead of researcher telemetry) are the parts that make it usable as a training surface rather than as a research demo.</p>
 
-            <h2>Tool Tracking System</h2>
-            <p>The tracking rig handles marker based tool pose estimation:</p>
-            <ul>
-                <li><strong>Dual marker setup:</strong> Front and back markers provide redundancy and orientation</li>
-                <li><strong>ToolRigFollower script:</strong> Intelligently selects the best visible marker and smoothly follows its pose</li>
-                <li><strong>Marker loss handling:</strong> Manages tracking dropout with smooth interpolation and reacquisition</li>
-                <li><strong>Jitter reduction:</strong> Applies temporal smoothing to reduce snapping and visual noise</li>
-            </ul>
+        <h3 class="subsection">5.1 Limitations</h3>
+        <ul class="body-list">
+            <li><strong>Whole-brain colliders only.</strong> The current capsule and sphere approximation classifies "distance to brain," not "distance to a specific anatomical region." A 3 mm warning to the motor cortex specifically would require per-region colliders driven by a segmented anatomy mesh.</li>
+            <li><strong>Single tool geometry.</strong> The safety thresholds were tuned for the specific pen-and-marker tool used in development. Different instrument geometries would need their own calibration.</li>
+            <li><strong>Marker tracking constrains operating context.</strong> The system requires line-of-sight to the image targets in normal indoor lighting. Heavily textured backgrounds, occluded markers, or surgical-suite lighting are out of scope.</li>
+            <li><strong>No quantitative trainee study.</strong> The build has been validated for engineering correctness on the tablet; training efficacy against existing modalities like cadaver labs or commercial simulators is unproven.</li>
+            <li><strong>Proof-of-concept scope.</strong> The prototype is positioned as a training surface, not as a regulated medical device, and does not provide intraoperative guidance.</li>
+        </ul>
 
-            <h2>Proximity Detection Logic</h2>
-            <p>This is where the system becomes clinically relevant:</p>
-            <ul>
-                <li><strong>Tool tip representation:</strong> A dedicated transform marks the precise point of the simulated probe</li>
-                <li><strong>Collision approximation:</strong> The brain is represented using capsule and sphere colliders for fast distance queries</li>
-                <li><strong>Distance calculation:</strong> Uses Unity's ClosestPoint() to find the nearest surface point from the tip to the brain geometry</li>
-                <li><strong>Safety thresholds:</strong> Distance values are classified into SAFE, CAUTION, and DANGER zones based on predefined thresholds</li>
-                <li><strong>Smoothing and hysteresis:</strong> Prevents status flickering by requiring sustained threshold crossing before changing safety states</li>
-            </ul>
+        <h3 class="subsection">5.2 Future Work</h3>
+        <p>The limitations map directly onto the next stage of the build.</p>
+        <ul class="body-list">
+            <li><strong>Anatomical segmentation.</strong> Replace whole-brain colliders with per-region colliders driven by an MRI-segmented anatomy mesh, enabling region-specific distance warnings ("3 mm from the motor cortex," "8 mm from the optic chiasm").</li>
+            <li><strong>Per-tool calibration.</strong> Lookup table of instrument geometries to safety thresholds, configurable from the HUD at session start, so the same tablet supports more than one training scenario.</li>
+            <li><strong>Markerless tracking.</strong> Port to HoloLens or a SLAM-capable tablet for hands-free use during deliberate practice, while keeping the marker path for low-cost classroom deployment.</li>
+            <li><strong>Trajectory logging.</strong> Record every tip pose during a session for post-hoc review, comparison against a reference trajectory, and quantitative skill-progression tracking.</li>
+            <li><strong>Cohort study.</strong> Validate proximity-aware AR training against a standard simulator on a trainee cohort, the single biggest step from "engineering prototype" to "training claim."</li>
+        </ul>
 
-            <p>The output is a real time distance measurement (in mm) and a color coded safety indicator displayed in the AR HUD.</p>
-
-            <h2>User Interface</h2>
-            <p>The HUD provides clean, readable feedback without cluttering the AR view:</p>
-            <ul>
-                <li><strong>Bottom left buttons:</strong> Reset, Lock, and Measure mode controls</li>
-                <li><strong>Bottom right status panel:</strong> Large distance readout and safety zone indicator</li>
-                <li><strong>Visual design:</strong> Transparent black background with high contrast text for outdoor/variable lighting</li>
-                <li><strong>Color coding:</strong> Green for safe, yellow/orange for caution, red for danger zones</li>
-            </ul>
-
-            <h1>What This Accomplishes</h1>
-
-            <p>The key achievement here is demonstrating that AR surgical visualization can move beyond passive 3D models to active spatial interaction systems.</p>
-
-            <div class="stat-card">
-                <p><strong>This is not just:</strong> "AR model on a marker"</p>
-                <p><strong>This is:</strong> AR anatomy + tracked instrument + live distance feedback + safety state classification</p>
-            </div>
-
-            <p>That difference makes this a significantly stronger prototype for medical extended reality applications compared to typical classroom AR projects. It shows an understanding of what clinical utility actually requires, proximity awareness, safety feedback, and robust tracking under real world conditions.</p>
-
-            <h1>Potential Applications</h1>
-
-            <h2>Current Prototype Use Cases</h2>
-            <ul>
-                <li><strong>Medical education:</strong> Teaching students safe approach angles and proximity awareness with anatomical models</li>
-                <li><strong>Surgical simulation demos:</strong> Showcasing how mixed reality can provide safety overlays during procedures</li>
-                <li><strong>Human factors research:</strong> Testing whether visual proximity warnings improve precision in controlled studies</li>
-            </ul>
-
-            <h2>Future Development Paths</h2>
-            <p>If I were to continue this project, here are the logical next steps:</p>
-
-            <ul>
-                <li><strong>Anatomical region segmentation:</strong> Replace simple colliders with detailed segmented regions (tumor, vessels, cortex, critical zones) for region specific warnings</li>
-                <li><strong>Tool specific calibration:</strong> Support different surgical instrument geometries with unique tip offsets and safety thresholds per tool type</li>
-                <li><strong>Markerless tracking:</strong> Migrate from printed markers to HoloLens or SLAM based world tracking for hands free operation</li>
-                <li><strong>Multi region proximity:</strong> Track distance to specific anatomical structures, not just the whole brain, enabling warnings like "3mm from tumor boundary"</li>
-                <li><strong>Trajectory logging:</strong> Record tool paths, minimum distances, and warning events for post procedure analysis and training feedback</li>
-            </ul>
-
-            <h1>Technical Takeaways</h1>
-
-            <p>Beyond the AR implementation itself, this project taught me several valuable lessons about building spatial computing applications:</p>
-
-            <ul>
-                <li><strong>Marker based tracking is robust:</strong> Vuforia's image targets work remarkably well for prototyping, even with occlusion and variable lighting</li>
-                <li><strong>Smoothing is critical:</strong> Raw tracking data is too noisy for direct use. Temporal smoothing and hysteresis make a huge difference in user experience</li>
-                <li><strong>Collision approximation works:</strong> You don't need perfect mesh distance fields. Capsule and sphere colliders are fast enough for real time feedback and accurate enough for training scenarios</li>
-                <li><strong>UI matters in AR:</strong> Transparent overlays, large text, and status color coding are essential for readability in mixed reality environments</li>
-                <li><strong>Clinical context drives design:</strong> Understanding what surgeons actually need (proximity, not just visualization) shaped every technical decision in this project</li>
-            </ul>
-
-            <h1>Conclusion</h1>
-
-            <p>SurgicalToolAR demonstrates that augmented reality for medical applications needs to go beyond visualization and provide actionable spatial awareness. By combining marker based tracking, real time proximity detection, and safety zone feedback, this prototype shows a path toward clinically meaningful mixed reality surgical guidance systems.</p>
-
-            <p>The next evolution of this work would involve headset deployment (HoloLens), markerless tracking, and integration with actual surgical instrument tracking systems. But as a proof of concept for proximity aware AR interaction, it accomplishes exactly what it set out to do: show that we can build systems that not only display anatomy, but actively understand and respond to tool positioning in real time.</p>
-        </section>
+        <!-- ============================================================== -->
+        <h2 class="section">6. Acknowledgments</h2>
+        <p>Marker tracking primitives provided by <strong>Vuforia</strong>. Rendering, gesture handling, and the proximity loop are built on <strong>Unity</strong>. Built independently.</p>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    <script>
-        particlesJS('particles-js', {
-            particles: {
-                number: { value: 80, density: { enable: true, value_area: 800 } },
-                color: { value: '#00b4d8' },
-                shape: { type: 'circle' },
-                opacity: { value: 0.5, random: false },
-                size: { value: 3, random: true },
-                line_linked: {
-                    enable: true,
-                    distance: 150,
-                    color: '#00b4d8',
-                    opacity: 0.4,
-                    width: 1
-                },
-                move: {
-                    enable: true,
-                    speed: 2,
-                    direction: 'none',
-                    random: false,
-                    straight: false,
-                    out_mode: 'out',
-                    bounce: false
-                }
-            },
-            interactivity: {
-                detect_on: 'canvas',
-                events: {
-                    onhover: { enable: true, mode: 'grab' },
-                    onclick: { enable: true, mode: 'push' },
-                    resize: true
-                },
-                modes: {
-                    grab: { distance: 140, line_linked: { opacity: 1 } },
-                    push: { particles_nb: 4 }
-                }
-            },
-            retina_detect: true
-        });
-
-        const cursor = document.createElement('div');
-        cursor.classList.add('cursor');
-        document.body.appendChild(cursor);
-
-        const cursorGlow = document.createElement('div');
-        cursorGlow.classList.add('cursor-glow');
-        document.body.appendChild(cursorGlow);
-
-        document.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-            cursorGlow.style.left = e.clientX + 'px';
-            cursorGlow.style.top = e.clientY + 'px';
-        });
-
-        document.addEventListener('mousedown', () => {
-            cursor.style.transform = 'translate(-50%, -50%) scale(0.8)';
-            cursorGlow.style.transform = 'translate(-50%, -50%) scale(0.8)';
-        });
-
-        document.addEventListener('mouseup', () => {
-            cursor.style.transform = 'translate(-50%, -50%) scale(1)';
-            cursorGlow.style.transform = 'translate(-50%, -50%) scale(1)';
-        });
-
-        const interactiveElements = document.querySelectorAll('a, button, .stat-card, .tech-item');
-        interactiveElements.forEach(element => {
-            element.addEventListener('mouseenter', () => {
-                cursor.classList.add('hover');
-                cursorGlow.classList.add('hover');
-            });
-            element.addEventListener('mouseleave', () => {
-                cursor.classList.remove('hover');
-                cursorGlow.classList.remove('hover');
-            });
-        });
-
-        let lastScrollY = window.scrollY;
-        const backButton = document.querySelector('.back-button');
-
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > lastScrollY && window.scrollY > 100) {
-                backButton.classList.add('hidden');
-            } else {
-                backButton.classList.remove('hidden');
-            }
-            lastScrollY = window.scrollY;
-        });
-    </script>
 </body>
 </html>

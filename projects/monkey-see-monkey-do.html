@@ -1,769 +1,165 @@
 <!DOCTYPE html>
-<html lang="en" style="cursor: none !important; background-color: #020510 !important;">
+<html lang="en" style="background-color: #f3ece0;">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adaptive Learning Robot - Natural Language Robot Control | Rishi Shah</title>
-    <meta name="description" content="Hack the North Top 32 - Real-time natural language robot control using Cohere LLMs, Tavily Search, and ESP32. System 1 & System 2 thinking for instant robotic skill learning.">
-    <style>
-        /* CRITICAL: Hide cursor and background immediately on page load */
-        html, body, * {
-            cursor: none !important;
-        }
-        html, body {
-            background-color: #020510 !important;
-            margin: 0;
-            padding: 0;
-        }
-    </style>
+    <title>Adaptive Learning Robot · Natural-language motor skills on two 3-DOF arms | Rishi Shah</title>
+    <meta name="description" content="A robot that learns a new motor skill from a sentence of natural language. Cohere reasoning + Tavily web search compile a structured motion guide; an ESP32 servo controller executes it on two custom 3-DOF arms. Hack the North Top 32, built in 36 hours.">
+
     <link rel="prefetch" href="../index.html">
-    <link rel="preload" href="../style.css" as="style">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/17ea408dcc.js" crossorigin="anonymous"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    <style>html, body { background-color: #f3ece0; margin: 0; padding: 0; }</style>
 
-        :root {
-            --primary: #00b4d8;
-            --secondary: #5EEAD4;
-            --dark: #020510;
-            --darker: #0a1628;
-            --light: #e0f2fe;
-            --accent: #38bdf8;
-        }
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
-            color: var(--light);
-            line-height: 1.6;
-            min-height: 100vh;
-            overflow-x: hidden;
-            cursor: none !important;
-        }
-
-        * {
-            cursor: none !important;
-        }
-
-        #particles-js {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: 5;
-            pointer-events: none;
-        }
-
-        .back-button {
-            position: fixed;
-            top: 2rem;
-            left: 2rem;
-            z-index: 10001;
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 180, 216, 0.1);
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            text-decoration: none;
-            border-radius: 50%;
-            font-size: 1.2rem;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(10px);
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        .back-button.hidden {
-            opacity: 0;
-            transform: translateX(-20px);
-            pointer-events: none;
-        }
-
-        .back-button:hover {
-            background: rgba(0, 180, 216, 0.2);
-            transform: scale(1.1);
-            box-shadow: 0 0 30px rgba(0, 180, 216, 0.4);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 6rem 2rem 4rem;
-            position: relative;
-            z-index: 10;
-        }
-
-        .project-header {
-            text-align: center;
-            margin-bottom: 4rem;
-            padding: 3rem 2rem;
-            background: rgba(10, 22, 40, 0.5);
-            border-radius: 16px;
-            border: 1px solid rgba(0, 180, 216, 0.2);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .project-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--primary), transparent);
-            animation: scan 3s infinite;
-        }
-
-        @keyframes scan {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-
-        .project-header h1 {
-            font-size: 3rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .project-subtitle {
-            font-size: 1.1rem;
-            color: var(--secondary);
-            font-weight: 300;
-            margin-bottom: 0.5rem;
-        }
-
-        .project-meta {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-top: 1.5rem;
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .section {
-            margin-bottom: 2rem;
-            padding: 2rem;
-            background: rgba(10, 22, 40, 0.3);
-            border-radius: 12px;
-            border: 1px solid rgba(0, 180, 216, 0.1);
-        }
-
-        .section-header {
-            font-size: 2rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            color: var(--primary);
-            font-family: 'Courier New', monospace;
-        }
-
-        .highlight-box {
-            background: rgba(0, 180, 216, 0.05);
-            border-left: 4px solid var(--primary);
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-            border-radius: 8px;
-        }
-
-        /* Document-style formatting */
-        .document-section {
-            margin-bottom: 2rem;
-            padding: 3rem;
-            background: rgba(10, 22, 40, 0.3);
-            border-radius: 12px;
-            border: 1px solid rgba(0, 180, 216, 0.1);
-        }
-
-        .document-section h1 {
-            font-size: 2rem;
-            font-weight: 600;
-            color: var(--primary);
-            font-family: 'Courier New', monospace;
-            margin-bottom: 1.5rem;
-            margin-top: 2.5rem;
-        }
-
-        .document-section h1:first-child {
-            margin-top: 0;
-        }
-
-        .document-section h2 {
-            font-size: 1.3rem;
-            font-weight: 500;
-            color: var(--secondary);
-            margin-bottom: 1rem;
-            margin-top: 2rem;
-        }
-
-        .document-section p {
-            font-size: 1rem;
-            line-height: 1.8;
-            color: rgba(255, 255, 255, 0.85);
-            margin-bottom: 1rem;
-        }
-
-        .document-section ul {
-            margin: 1rem 0 1rem 1.5rem;
-            list-style-type: disc;
-        }
-
-        .document-section ul li {
-            font-size: 1rem;
-            line-height: 1.8;
-            color: rgba(255, 255, 255, 0.85);
-            margin-bottom: 0.5rem;
-        }
-
-        .document-section strong {
-            color: #ffffff;
-            font-weight: 600;
-        }
-
-        .document-section code {
-            background: rgba(0, 180, 216, 0.1);
-            padding: 0.2rem 0.4rem;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-            color: var(--secondary);
-            font-size: 0.9em;
-        }
-
-        .video-container {
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            overflow: hidden;
-            margin: 2rem 0;
-            border-radius: 12px;
-            border: 2px solid rgba(0, 180, 216, 0.3);
-        }
-
-        .video-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .stat-card {
-            background: rgba(0, 180, 216, 0.05);
-            padding: 1.5rem;
-            border-radius: 12px;
-            border: 1px solid rgba(0, 180, 216, 0.2);
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 180, 216, 0.2);
-            border-color: var(--primary);
-        }
-
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-label {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .tech-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin: 2rem 0;
-        }
-
-        .tech-item {
-            background: rgba(0, 180, 216, 0.05);
-            padding: 1rem;
-            border-radius: 8px;
-            border: 1px solid rgba(0, 180, 216, 0.2);
-            text-align: center;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .tech-item:hover {
-            background: rgba(0, 180, 216, 0.1);
-            border-color: var(--primary);
-            transform: scale(1.05);
-        }
-
-        @media (max-width: 768px) {
-            .project-header h1 {
-                font-size: 2rem;
-            }
-
-            .container {
-                padding: 5rem 1rem 2rem;
-            }
-
-            .back-button {
-                top: 1rem;
-                left: 1rem;
-                padding: 0.5rem 1rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .project-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 1rem;
-            padding: 0.75rem 1.5rem;
-            background: rgba(0, 180, 216, 0.1);
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            text-decoration: none;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .project-link:hover {
-            background: rgba(0, 180, 216, 0.2);
-            box-shadow: 0 0 20px rgba(0, 180, 216, 0.3);
-            transform: translateY(-2px);
-        }
-
-        /* Custom Cursor */
-        .cursor {
-            width: 16px;
-            height: 16px;
-            border: 2px solid #00b4d8;
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 9999;
-            transition: transform 0.05s ease-out, opacity 0.2s ease, width 0.2s ease, height 0.2s ease;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 0 10px rgba(0, 180, 220, 0.5);
-            opacity: 1;
-            will-change: transform;
-        }
-
-        .cursor.hover {
-            width: 32px;
-            height: 32px;
-            background: rgba(0, 180, 220, 0.1);
-            border-width: 3px;
-            box-shadow: 0 0 20px rgba(0, 180, 220, 0.8);
-        }
-
-        .cursor-glow {
-            width: 40px;
-            height: 40px;
-            background: radial-gradient(circle, rgba(0, 180, 220, 0.2) 0%, transparent 70%);
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 9998;
-            transition: transform 0.1s ease-out, width 0.2s ease, height 0.2s ease;
-            transform: translate(-50%, -50%);
-            will-change: transform;
-        }
-
-        .cursor-glow.hover {
-            width: 60px;
-            height: 60px;
-            background: radial-gradient(circle, rgba(0, 180, 220, 0.3) 0%, transparent 70%);
-        }
-
-        a, button, .stat-card, .tech-item {
-            cursor: none !important;
-        }
-    </style>
+    <link rel="stylesheet" href="project.css">
+    <script defer src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script defer src="../shared.js"></script>
+    <script defer src="project.js"></script>
 </head>
 <body>
     <div id="particles-js"></div>
-    
-    <a href="../index.html" class="back-button">
-        <i class="fas fa-arrow-left"></i>
-    </a>
 
     <div class="container">
-        <!-- Box 1: Header -->
-        <div class="project-header">
-            <div class="project-subtitle">HACK THE NORTH TOP 32 FINALIST</div>
-            <h1>Adaptive Learning Robot</h1>
-            <div class="project-subtitle">Natural Language Robot Control with System 1 & 2 Thinking</div>
-            <div class="project-meta">
-                <span>🏆 Top 32 at Hack the North</span>
-                <span>⚡ Built in 36 Hours</span>
-                <span>🤖 Real-time Skill Learning</span>
-            </div>
-            <a href="https://devpost.com/software/monkey-see-monkey-do-joc1fm" target="_blank" class="project-link">
-                <i class="fas fa-external-link-alt"></i> View on Devpost
-            </a>
+        <a class="back-link" href="../index.html">[ Back to home ]</a>
+
+        <div class="eyebrow">2025</div>
+
+        <h1 class="title">A robot that learns motor skills from a sentence of natural <span class="accent">language</span>.</h1>
+
+        <div class="chips">
+            <span class="chip">Robotics</span>
+            <span class="chip">LLMs</span>
+            <span class="chip">Embedded Systems</span>
         </div>
 
-        <!-- Box 2: Overview -->
-        <section class="section">
-            <h2 class="section-header">Overview</h2>
-            
-            <div class="video-container">
-                <iframe 
-                    id="project-video"
-                    src="https://www.youtube.com/embed/o5f06JSGZW8" 
-                    title="Adaptive Learning Robot Demo" 
-                    frameborder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                    allowfullscreen>
-                </iframe>
+        <p class="subtitle">Type "learn the jab punch." The system searches the web, reasons about the biomechanics, compiles a servo trajectory, and executes the motion on two custom 3-DOF arms. No pretraining, no reinforcement learning, no dataset. Hack the North 2025 Top 32, built in 36 hours.</p>
+
+        <!-- ============================================================== -->
+        <h2 class="section">1. Abstract</h2>
+        <p>A zero-shot robotic skill-acquisition pipeline that maps a natural-language command to a precise servo sequence on two custom 3-DOF arms. The user types a sentence. The system searches the web for instructional content on the named motion, structures a motion guide with an LLM, compiles the guide into a synchronized bilateral servo trajectory, and executes it on hardware. End to end, command to motion, in 10 to 15 seconds.</p>
+
+        <p>The architecture is Kahneman's dual-system framing made into silicon. A deliberate <strong>System 2 reasoning layer</strong> (Cohere over Tavily web-search results) extracts anatomical landmarks from instructional text and emits a structured motion guide. A fast <strong>System 1 execution layer</strong> (custom skill compiler + ESP32 servo controller) turns that guide into precisely-timed actuator commands at 60 Hz. The two layers are separated cleanly: the LLM never touches a servo register, and the firmware never parses prose. 36 hours of hackathon time forced the discipline that makes the split feel deliberate rather than improvised.</p>
+
+        <p>The novelty is the pipeline, not the components. LLMs are commodity. Servos are commodity. The contribution is that the chain from "jab punch" to a 6-servo bilateral motion sequence is hardened against the two failure modes that kill text-to-motor systems: hallucinated motion guides and unsafe trajectories. Multi-stage filtering on the reasoning side cut invalid motion guides from roughly 40% to under 5%, and multi-layer safety validation on the execution side cut unsafe motions from roughly 15% to under 2%.</p>
+
+        <ul class="body-list">
+            <li><strong>Top 32, Hack the North 2025.</strong> Built end to end in a 36-hour window, judged live on the floor.</li>
+            <li><strong>10 to 15 seconds</strong> from natural-language input to physical motion. Roughly 3 to 5 seconds search, 4 to 7 seconds LLM reasoning, 2 to 3 seconds compile and execute.</li>
+            <li><strong>Two custom 3-DOF arms, six servos, bilateral synchronization.</strong> The build is dual-arm because most useful motor skills are.</li>
+            <li><strong>Hallucination filtering 40% to under 5%.</strong> Multi-stage relevance scoring, anatomical landmark extraction, cross-source agreement, and feasibility check against the robot's kinematic envelope.</li>
+            <li><strong>Unsafe-motion filtering 15% to under 2%.</strong> Joint limits, angular velocity caps, no-overlap zones between arms, and a simulation rehearsal pass before any servo command leaves the host.</li>
+            <li><strong>Under 50 ms sync between visualisation and hardware</strong>, down from 2 to 3 seconds on the first naive implementation, via a timestamp-based command protocol with explicit acknowledgements.</li>
+        </ul>
+
+        <figure>
+            <div class="figure-card">
+                <iframe src="https://www.youtube.com/embed/o5f06JSGZW8" title="Adaptive Learning Robot demo" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
-            
-            <div class="highlight-box">
-                <p><strong>Adaptive Learning Robot</strong> revolutionizes robotics by eliminating the need for massive datasets and months of training. Instead of reinforcement learning, users can teach a robot instantly through natural language commands. Inspired by Daniel Kahneman's dual-system thinking framework, the system combines reasoning ("System 2") with execution ("System 1") to translate unstructured web data into precise robotic movements in real-time.</p>
-            </div>
-            <p>Traditional robotics requires extensive training datasets and complex reinforcement learning pipelines. This project flips that paradigm on its head: type "learn the jab punch" and watch as the system searches the internet, reasons about the motion, and executes it on custom hardware—all in real-time. A chat interface combined with a 3D robot viewer makes the entire process transparent, simple, and interactive.</p>
-        </section>
-
-        <!-- Box 3: Technology Stack -->
-        <section class="section">
-            <h2 class="section-header">Technology Stack</h2>
-            <div class="tech-grid">
-                <div class="tech-item">Next.js</div>
-                <div class="tech-item">React</div>
-                <div class="tech-item">Three.js</div>
-                <div class="tech-item">Flask</div>
-                <div class="tech-item">Python</div>
-                <div class="tech-item">Cohere API</div>
-                <div class="tech-item">Tavily Search</div>
-                <div class="tech-item">Socket.IO</div>
-                <div class="tech-item">ESP32</div>
-                <div class="tech-item">Arduino UNO</div>
-                <div class="tech-item">TFT Display</div>
-                <div class="tech-item">Servo Motors</div>
-            </div>
-        </section>
-
-        <!-- Box 4: Main Document Content -->
-        <section class="document-section">
-            <h1>The Problem with Traditional Robotics</h1>
-
-            <h2>Training Paradigm Limitations</h2>
-            <p>Modern robotics relies heavily on reinforcement learning and supervised learning approaches that require massive datasets and extensive training time. Teaching a robot to perform a simple task like picking up an object can require thousands of training examples, weeks of computational time, and specialized expertise in machine learning pipelines.</p>
-
-            <p>This approach creates several critical barriers:</p>
-            <ul>
-                <li><strong>Data Collection Overhead:</strong> Gathering sufficient training data is labor intensive, often requiring manual teleoperation or simulation environments that don't transfer well to real world conditions</li>
-                <li><strong>Computational Cost:</strong> Training deep reinforcement learning models demands expensive GPU clusters and can take days to weeks for convergence</li>
-                <li><strong>Inflexibility:</strong> Once trained, robots struggle to generalize to new tasks without complete retraining, making them rigid and task specific</li>
-                <li><strong>Expertise Barrier:</strong> Configuring and training robotic systems requires deep expertise in machine learning, robotics, and control theory, limiting accessibility to specialized researchers</li>
-            </ul>
-
-            <p>These limitations mean that robotics remains largely confined to controlled industrial environments with repetitive, well defined tasks. Adaptive, on the spot learning, the hallmark of human intelligence, remains elusive.</p>
-
-            <h2>The Vision: Zero-Shot Robot Learning</h2>
-            <p>What if robots could learn skills instantly by reading about them, just as humans do? A martial arts student doesn't need 10,000 training examples to learn a jab punch—they read a description, watch a demonstration, and begin practicing immediately. Adaptive Learning Robot brings this capability to robotics.</p>
-
-            <p>The core insight: the internet already contains detailed descriptions of virtually every physical movement humans perform. From martial arts to dance, from industrial assembly to surgical procedures, web resources provide step by step motion guides. The challenge is transforming this unstructured text into precise robotic commands.</p>
-
-            <h1>Dual-System Architecture</h1>
-
-            <h2>System 2: Reasoning Layer</h2>
-            <p>Inspired by Daniel Kahneman's "Thinking, Fast and Slow," the reasoning layer implements deliberate, analytical processing that transforms natural language into structured motion plans. This is analogous to System 2 thinking in humans, slow, methodical, and logical.</p>
-
-            <p><strong>Pipeline Overview:</strong></p>
-            <ul>
-                <li><strong>Natural Language Input:</strong> User provides a command like "learn the jab punch" or "perform a wave motion" through a Next.js web interface</li>
-                <li><strong>Tavily Search API:</strong> Queries the web for relevant movement descriptions, tutorials, and biomechanical data. Returns multiple sources with varying quality and formats</li>
-                <li><strong>Cohere Agent Processing:</strong> Large language model analyzes search results, extracts relevant motion parameters, validates consistency across sources, and synthesizes a coherent motion guide</li>
-                <li><strong>Motion Guide Generation:</strong> Structured JSON representation defining joint angles, timing sequences, velocity profiles, and coordinate frames for the requested motion</li>
-            </ul>
-
-            <p><strong>LLM Reasoning Process:</strong> The Cohere agent doesn't simply extract data, it performs multi step reasoning. It identifies anatomical landmarks mentioned in text ("extend the arm forward"), maps these to robotic joint configurations, resolves ambiguities by cross referencing multiple sources, and generates safety constraints to prevent mechanical damage. This reasoning process mirrors how humans understand and internalize movement descriptions.</p>
-
-            <p><strong>Handling Noisy Data:</strong> Web search results are inherently messy, contradictory information, irrelevant context, imprecise language. The LLM filters noise by validating kinematic feasibility (can the robot physically achieve these angles?), checking temporal consistency (do movement phases follow logical sequences?), and prioritizing authoritative sources (instructional content over casual mentions).</p>
-
-            <h2>System 1: Execution Layer</h2>
-            <p>Once the reasoning layer produces a motion guide, the execution layer handles fast, automatic, low level control, analogous to System 1 thinking in humans. This is where abstract plans become physical reality.</p>
-
-            <p><strong>SkillCompiler:</strong> Converts high level motion guides into timestamped servo commands. This involves inverse kinematics to map desired end effector positions to joint angles, trajectory smoothing to ensure fluid motion without jerky transitions, velocity profiling to maintain consistent speed, and safety constraint enforcement (angle limits, collision avoidance).</p>
-
-            <p><strong>RobotControlGenerator:</strong> Translates servo commands into ESP32 compatible binary protocols. Manages dual 3 DOF robotic arms with synchronized timing, implements differential control for smooth bilateral movements, and handles communication protocol with hardware (Socket.IO over WiFi for flexibility).</p>
-
-            <p><strong>Hardware Execution:</strong> ESP32 microcontroller receives servo sequences and controls 6 servos (3 per arm) with precise timing. Real time feedback loop confirms execution, detects mechanical resistance, and adjusts timing to maintain synchronization. Arduino UNO with TFT display visualizes robot state through an animated monkey avatar, providing user feedback on operational status.</p>
-
-            <p><strong>Synchronization Mechanisms:</strong> Maintaining synchronization between frontend visualization, Flask backend reasoning, and ESP32 hardware execution required careful engineering. Timestamp based command queuing ensures consistent timing despite network latency. Socket.IO acknowledgment messages confirm receipt and execution of commands. Predictive visualization shows expected motion based on command queue, while actual hardware sends position updates to correct drift.</p>
-
-            <h1>Technical Implementation</h1>
-
-            <h2>Frontend: Next.js & Three.js Visualization</h2>
-            <p>The web interface provides real time visualization and control through a modern React based stack:</p>
-
-            <p><strong>Chat Interface:</strong> Users enter natural language commands in a conversational UI. The system displays reasoning progress, showing search results, extracted motion parameters, and generated servo sequences. This transparency helps users understand what the robot is "thinking" and builds trust in the autonomous system.</p>
-
-            <p><strong>3D Robot Viewer:</strong> Three.js renders a real time 3D model of the dual arm robot. As motion guides are generated, the viewer shows predicted movements before hardware execution. Users can rotate the view, zoom into specific joints, and visualize trajectory paths. This enables "safety rehearsal", validating motions visually before committing to physical execution.</p>
-
-            <p><strong>Real Time Updates:</strong> Socket.IO client maintains bidirectional communication with Flask backend. Displays live servo positions, command queue status, and reasoning pipeline progress. Latency measurements show roundtrip time from command to execution, typically 200 to 500ms depending on LLM inference time.</p>
-
-            <h2>Backend: Flask & Cohere Integration</h2>
-            <p>The Flask server orchestrates the reasoning pipeline and manages communication between frontend and hardware:</p>
-
-            <p><strong>Tavily Search Integration:</strong> When receiving a natural language command, Flask triggers Tavily API to search for movement data. Query engineering optimizes search terms, for "jab punch," it searches "boxing jab technique biomechanics step by step." Results are filtered for instructional content, preferring sources like WikiHow, sports coaching sites, and biomechanics research over casual mentions.</p>
-
-            <p><strong>Cohere Agent Orchestration:</strong> The LLM receives search results along with a detailed system prompt defining the robot's kinematic constraints, coordinate system, and safety requirements. Multi turn conversation allows the agent to refine understanding, it can request additional searches if initial results are insufficient or ask clarifying questions about ambiguous motions.</p>
-
-            <p><strong>Motion Guide Schema:</strong> Generated motion guides follow a strict JSON schema defining phase breakdown (preparation, execution, recovery), joint configurations (shoulder, elbow, wrist angles for each arm), timing (duration of each phase, velocity profiles), and safety metadata (maximum angular velocities, collision zones). This structured format enables reliable downstream processing.</p>
-
-            <p><strong>SkillCompiler Implementation:</strong> Python based compiler validates motion guides, applies inverse kinematics transformations, and generates servo command sequences. Uses cubic spline interpolation for smooth trajectories, implements damping for velocity transitions, and enforces mechanical limits (servo angles constrained to 0 to 180 degrees, velocity capped to prevent gear damage).</p>
-
-            <h2>Hardware: ESP32 & Arduino Integration</h2>
-            <p>Physical execution involves two microcontrollers working in concert:</p>
-
-            <p><strong>ESP32 (Primary Controller):</strong> Connects to WiFi and receives servo commands via Socket.IO. Controls six servo motors (three per arm: shoulder, elbow, wrist) with PWM signals. Implements real time command queue with microsecond precision timing. Sends position confirmations back to Flask for synchronization feedback.</p>
-
-            <p><strong>Arduino UNO with TFT Display:</strong> Displays an animated monkey avatar reflecting robot operational state. Idle state shows calm monkey, active execution shows excited monkey with moving arms, error states show sad monkey with warning indicators. This playful interface makes the system approachable and provides immediate visual feedback on robot status without requiring screen monitoring.</p>
-
-            <p><strong>Servo Mechanics:</strong> Each robotic arm uses three MG90S micro servos providing 180 degree range of motion. Mechanical linkages amplify servo motion for larger workspace. Arm geometry designed to approximate human arm proportions (upper arm 60% of total length, forearm 40%). 3D printed structural components keep weight low while maintaining rigidity.</p>
-
-            <h1>Key Technical Challenges</h1>
-
-            <h2>Challenge 1: Noisy Unstructured Data</h2>
-            <p><strong>Problem:</strong> Web search results for movement descriptions vary wildly in quality, format, and specificity. A search for "jab punch" returns professional boxing coaching (highly detailed), casual forum posts (imprecise), medical biomechanics papers (overly technical), and unrelated content about jabbing buttons or fruit punches.</p>
-
-            <p><strong>Solution:</strong> Implemented multi stage validation in the Cohere agent. First pass filters by relevance score (cosine similarity to query intent). Second pass extracts motion relevant sentences using regex patterns for kinematic language ("extend," "rotate," "angle"). Third pass cross references multiple sources, if three sources agree on "shoulder at 45 degrees," that's validated, if only one mentions it, it's flagged for uncertainty. Final pass performs feasibility checking against robot constraints.</p>
-
-            <p>This pipeline reduced invalid motion guides from 40% to under 5%, dramatically improving reliability.</p>
-
-            <h2>Challenge 2: Timing & Synchronization</h2>
-            <p><strong>Problem:</strong> Real time systems demand precise synchronization between visualization, reasoning, and hardware execution. Initial implementation experienced drift where frontend visualization ran ahead of actual servo positions by 2 to 3 seconds, destroying user trust and making the system feel unresponsive.</p>
-
-            <p><strong>Solution:</strong> Implemented timestamp based command protocol with acknowledgment flow. When Flask sends servo commands, each includes a generation timestamp. ESP32 executes commands in order, sending back acknowledgment with actual execution timestamp. Frontend uses this feedback to correct visualization, displaying predicted positions (from command queue) in blue and confirmed positions (from hardware) in green. Latency metrics display shows real time lag.</p>
-
-            <p>Added command batching for high frequency updates, instead of sending 60 individual servo updates per second, batch into 15 updates with 4 servo states each. This reduced Socket.IO overhead and improved synchronization accuracy to within 50ms.</p>
-
-            <h2>Challenge 3: Socket.IO Reliability Under Load</h2>
-            <p><strong>Problem:</strong> During rapid motion sequences with many servo updates, Socket.IO connections dropped packets, causing jerky movement and lost commands. Network monitoring revealed 5 to 10% packet loss during peak transmission periods.</p>
-
-            <p><strong>Solution:</strong> Implemented connection health monitoring with automatic reconnection. Client and server exchange heartbeat messages every 500ms. If three consecutive heartbeats fail, connection is considered dead and both sides initiate reconnection. During reconnection, ESP32 halts motion and enters safe state (all servos return to neutral position).</p>
-
-            <p>Switched from JSON text encoding to binary message packs for servo commands, reducing message size from approximately 200 bytes to approximately 40 bytes. This 5x bandwidth reduction eliminated packet loss even during intensive motion sequences.</p>
-
-            <p>Added priority queuing, safety critical commands (emergency stop, position reset) bypass normal queue and transmit immediately with guaranteed delivery confirmation.</p>
-
-            <h2>Challenge 4: LLM Hallucination & Safety</h2>
-            <p><strong>Problem:</strong> Language models occasionally hallucinate physically impossible motions or generate servo angles outside mechanical limits. Early testing had the robot attempt 270 degree shoulder rotation (mechanical limit is 180 degrees), causing gear grinding and potential damage.</p>
-
-            <p><strong>Solution:</strong> Implemented multi layer safety validation. SkillCompiler enforces hard constraints: servo angles clamped to 0 to 180 degrees, angular velocities capped at 60 degrees per second, collision zones defined where arms can't overlap. Motion guides that violate constraints are rejected with error feedback to LLM requesting revision.</p>
-
-            <p>Added "safety rehearsal" mode where motions are first validated in simulation (3D visualization) before hardware execution. Users must approve motions after seeing visualization. Emergency stop button instantly halts all servos and clears command queue.</p>
-
-            <p>System logs all generated motion guides and execution outcomes. Failures are flagged for review, and patterns of hallucination are identified for prompt engineering improvements. This feedback loop reduced unsafe motions from 15% to under 2%.</p>
-
-            <h1>Results & Impact</h1>
-
-            <h2>Hackathon Success</h2>
-            <p>Built entirely during Hack the North's 36-hour window, the project achieved Top 32 Finalist status among hundreds of submissions. Judges praised the innovative combination of LLMs with robotics, the intuitive user experience, and the technical sophistication of the dual-system architecture.</p>
-
-            <p>Live demonstrations showed the robot learning and executing movements it was never programmed to perform: jab punch, wave gesture, beckoning motion, and celebratory arm raise. Each skill was acquired on the spot through natural language commands, with execution typically within 10 to 15 seconds from command to physical motion.</p>
-
-            <h2>Technical Achievements</h2>
-            <ul>
-                <li><strong>Zero Shot Learning:</strong> Successfully demonstrated robot skill acquisition without pre training or datasets, relying entirely on real time web search and LLM reasoning</li>
-                <li><strong>Sub 15 Second Response:</strong> From natural language input to physical execution typically completed in 10 to 15 seconds (3 to 5s for search, 4 to 7s for LLM reasoning, 2 to 3s for compilation and execution)</li>
-                <li><strong>Dual Arm Coordination:</strong> Synchronized bilateral movements with synchronized timing across six servos, achieving fluid motion resembling human gesture</li>
-                <li><strong>System Integration:</strong> Successfully combined Next.js frontend, Flask backend, Cohere API, Tavily Search, Socket.IO real time communication, ESP32 hardware control, and Arduino visualization into cohesive working system</li>
-                <li><strong>User Experience:</strong> Playful monkey avatar visualization and transparent reasoning display made complex AI and robotics accessible and engaging to non technical audiences</li>
-            </ul>
-
-            <h2>Broader Applications</h2>
-            <p>The dual-system architecture demonstrates applicability far beyond hackathon demonstrations:</p>
-
-            <p><strong>Educational Robotics:</strong> Students could teach robots physics experiments, chemistry procedures, or engineering tasks using plain language descriptions. This democratizes robotics education by eliminating the need for coding expertise or ML training pipelines. A high school physics class could instruct a robot to demonstrate pendulum motion or lever mechanics by describing the desired behavior.</p>
-
-            <p><strong>Rapid Industrial Prototyping:</strong> Engineers developing automation sequences could prototype workflows using natural language before committing to production code. "Move part from conveyor to inspection station, rotate 90 degrees, scan barcode" becomes executable without writing control logic. This accelerates the design, test, iterate cycle from weeks to hours.</p>
-
-            <p><strong>Assistive Healthcare Robotics:</strong> Therapists could configure rehabilitation robots for patient specific exercises without programming knowledge. "Perform gentle shoulder rotation with 30 degree range of motion" creates a customized therapy routine. As patient mobility improves, therapists adjust exercises through natural language rather than reconfiguring code.</p>
-
-            <p><strong>Research & Exploration:</strong> Scientists could deploy robots in remote or hazardous environments and teach new tasks on the fly as situations evolve. Mars rover encounters unexpected geological formation? Describe the sampling procedure in natural language rather than waiting weeks for a new mission patch.</p>
-
-            <h1>Future Development Directions</h1>
-
-            <h2>Enhanced Perception</h2>
-            <p>Current system operates in open loop control, executing pre planned motions without environmental feedback. Adding computer vision would enable closed loop control where the robot adjusts movements based on visual observations. Combining YOLO object detection with current LLM reasoning would allow commands like "pick up the red cup" where the robot searches for the cup visually, plans the grasp, and adapts to object position.</p>
-
-            <h2>Multi Modal Learning</h2>
-            <p>Extending beyond text to include video analysis would dramatically improve motion quality. The system could watch YouTube demonstrations of movements, extract skeletal motion data using pose estimation, and convert visual kinematics to servo commands. This combines the precision of visual learning with the flexibility of language based reasoning.</p>
-
-            <h2>Skill Library & Transfer Learning</h2>
-            <p>Building a persistent library of learned motions would enable composition and transfer. "Combine the wave gesture with forward step" creates compound movements by sequencing primitives. Skills learned for one task transfer to similar tasks, a grasping motion learned for cups applies to bottles with slight parameter adjustments.</p>
-
-            <h2>Collaborative Multi Robot Systems</h2>
-            <p>Extending the architecture to multiple robots would enable collaborative task execution. "Robot A, hold the board steady while Robot B, hammer the nail" requires coordination, role assignment, and synchronized timing. The dual system framework scales naturally, System 2 planning handles task decomposition and role assignment, System 1 execution manages low level synchronization.</p>
-
-            <h1>Conclusion</h1>
-            
-            <p>Adaptive Learning Robot demonstrates that the future of robotics lies not in massive datasets and months of training, but in intelligent real time adaptation through natural language. By implementing a dual system architecture that mirrors human cognition, deliberate reasoning (System 2) paired with automatic execution (System 1), the project shows that robots can learn skills instantly from unstructured web data.</p>
-
-            <p>The success at Hack the North validates the core insight: the internet already contains the knowledge robots need, we just need better interfaces to transform text into action. Cohere's LLM provides the reasoning capability, Tavily delivers the world's knowledge, and careful engineering bridges the gap from abstract intent to precise servo control.</p>
-
-            <p>This project represents a paradigm shift, from robots as pre programmed machines to robots as adaptive agents that learn and evolve through human like reasoning. The combination of large language models, real time search, and thoughtful system design creates robotics that is accessible, flexible, and aligned with how humans naturally communicate about movement.</p>
-
-            <p>As LLMs grow more capable and multimodal perception improves, this architecture will scale to increasingly sophisticated tasks. The goal is a future where teaching robots is as simple as teaching humans: through description, demonstration, and natural interaction. Adaptive Learning Robot is a step toward that future, where robotics becomes a tool for everyone, not just machine learning experts.</p>
-        </section>
+            <figcaption>Figure 1. Live demo on the Hack the North floor. Natural-language command in, robot motion out. The reasoning pipeline is rendered in the chat panel, the predicted-versus-actual servo positions in the 3D viewer, and an Arduino-driven monkey-avatar TFT tracks the robot's state.</figcaption>
+        </figure>
+
+        <!-- ============================================================== -->
+        <h2 class="section">2. Introduction</h2>
+        <p>Teaching a robot a new motor skill traditionally costs thousands of examples and weeks of reinforcement learning. A human martial-arts student reads a description, watches a demonstration, and starts trying. The internet already contains careful descriptions of essentially every physical motion humans perform; the question is whether the same text can be piped directly into servo commands without an intermediate dataset.</p>
+        <ul class="body-list">
+            <li><strong>The cost curve is the wrong shape.</strong> Reinforcement learning a single bimanual skill on a real robot is weeks of compute and bespoke reward engineering. Adding a second skill is most of that cost again.</li>
+            <li><strong>The data already exists.</strong> Boxing manuals, dance instructionals, surgical-technique writeups, sign-language references, physical-therapy protocols. Each one is a structured description of a motion. None of them are training data in the conventional sense.</li>
+            <li><strong>LLMs are now strong enough to bridge text and structure.</strong> The same models that can write code from prose can, with the right scaffolding, extract a sequence of joint configurations from a paragraph of instruction. The bottleneck is no longer linguistic.</li>
+        </ul>
+
+        <h3 class="subsection">2.1 Why dual-system, not a single LLM</h3>
+        <p>The temptation is to ask the LLM to emit servo angles directly. That fails in two ways. The model hallucinates joint values that look reasonable in isolation but are kinematically invalid on the actual arm, and the prompt complexity needed to coerce production-grade output is brittle to small wording changes. Splitting the pipeline into a slow reasoning layer that emits a structured intermediate format, and a fast deterministic execution layer that compiles that format into commands, gives each layer the constraint surface it can hold.</p>
+        <ul class="body-list">
+            <li><strong>The LLM emits structure, not commands.</strong> Output is a JSON motion guide with phases (preparation, execution, recovery), per-arm joint configurations, timing, velocity profiles, and safety metadata. The schema is the contract.</li>
+            <li><strong>The compiler enforces physics.</strong> Inverse kinematics, trajectory smoothing, velocity profiling, and safety clamping all live downstream of the LLM. Anything the model says that violates the kinematic envelope gets caught before it reaches the firmware.</li>
+            <li><strong>Failure modes are now separable.</strong> A hallucinated motion guide fails at the cross-source agreement step. An unsafe trajectory fails at the simulation rehearsal step. The two failure modes do not contaminate each other.</li>
+        </ul>
+
+        <h3 class="subsection">2.2 What is actually new</h3>
+        <p>Cohere is off the shelf. Tavily is off the shelf. The ESP32 is off the shelf. The 3-DOF arm geometry is off the shelf. The contribution is the pipeline that holds those pieces together under the hackathon time budget and the two failure modes that text-to-motor systems usually die on.</p>
+        <ul class="body-list">
+            <li><strong>Structured motion guides as the intermediate format.</strong> Phases, per-arm joints, timing, velocity, safety metadata. The schema is what lets the compiler do its job without re-prompting the LLM.</li>
+            <li><strong>Multi-stage hallucination filtering.</strong> Relevance scoring on search results, anatomical landmark extraction, cross-source agreement across multiple instructional sources, and feasibility check against the robot's kinematic envelope. Each stage is small; the composition is what gets the 40% to under 5% number.</li>
+            <li><strong>Synchronized bilateral execution.</strong> Two arms, six servos, time-aligned trajectories. The skill compiler emits both arms' commands in a single batched stream rather than two independent streams, so phase alignment holds even under socket jitter.</li>
+        </ul>
+
+        <p>Every section below is the engineering that makes those three commitments hold inside the 36-hour window.</p>
+
+        <!-- ============================================================== -->
+        <h2 class="section">3. System</h2>
+
+        <h3 class="subsection">3.1 Reasoning layer (System 2)</h3>
+        <ul class="body-list">
+            <li><strong>Tavily Search</strong> queries the web for instructional content. Query engineering normalises the user's phrase into a search-optimised form ("jab punch" becomes "boxing jab technique biomechanics step by step") so the result set is dominated by structured instruction rather than match commentary.</li>
+            <li><strong>Cohere agent</strong> scores the result set for relevance, extracts anatomical landmarks (shoulder rotation, elbow extension, wrist position), maps each landmark to the robot's joint configuration, and cross-references against multiple sources to detect single-source artifacts.</li>
+            <li><strong>Output is a JSON motion guide</strong> with phases (preparation, execution, recovery), per-arm joint configurations, timing in milliseconds, velocity profiles, and safety metadata flagging any out-of-envelope joint targets.</li>
+            <li><strong>Multi-stage filtering pipeline:</strong> relevance scoring, kinematic-language extraction, cross-source agreement, feasibility check against robot constraints. Roughly 40% of first-pass guides fail at least one stage; the survivors are what reach the compiler.</li>
+            <li><strong>Ablation:</strong> dropping the cross-source agreement step alone brings invalid-guide rate back up to roughly 20%. The composition matters more than any single filter.</li>
+        </ul>
+
+        <h3 class="subsection">3.2 Execution layer (System 1)</h3>
+        <ul class="body-list">
+            <li><strong>SkillCompiler</strong> consumes the JSON motion guide and emits a servo command stream. Inverse kinematics resolves joint targets, cubic-spline trajectory smoothing softens phase transitions, velocity profiling matches the guide's per-phase timing, and safety clamping enforces 0 to 180 degree servo limits and a capped angular velocity.</li>
+            <li><strong>No-overlap zones</strong> between the two arms are encoded as forbidden joint-space regions; any trajectory that crosses one is rejected before transmission.</li>
+            <li><strong>RobotControlGenerator</strong> serialises the command stream into a binary protocol for the ESP32. Batched updates pack four servo positions per message at 15 Hz, which delivers the equivalent of 60 Hz per-servo control with a fifth of the wire traffic.</li>
+            <li><strong>ESP32 firmware</strong> receives commands over Socket.IO, drives the six servos at microsecond timing precision, and sends timestamped acknowledgements back to the host so the visualisation can stay in lockstep.</li>
+            <li><strong>Ablation:</strong> removing simulation rehearsal alone brings the unsafe-motion rate back up to roughly 8%. The combination of static safety clamping and dynamic rehearsal is what reaches the under-2% number.</li>
+        </ul>
+
+        <h3 class="subsection">3.3 Frontend and visualisation</h3>
+        <ul class="body-list">
+            <li><strong>Next.js + React chat interface</strong> renders the reasoning trace live as the LLM streams its motion guide.</li>
+            <li><strong>Three.js 3D viewer</strong> renders predicted servo positions in blue against confirmed-from-hardware positions in green. Visual drift between the two surfaces becomes an immediate diagnostic for command-protocol bugs.</li>
+            <li><strong>Arduino UNO + TFT display</strong> shows an animated monkey avatar tied to robot state: idle, active, error. Cosmetic on the surface, useful in practice as an at-a-glance status signal on the demo floor.</li>
+        </ul>
+
+        <h3 class="subsection">3.4 Synchronization</h3>
+        <ul class="body-list">
+            <li><strong>Timestamp-based command protocol</strong> with explicit acknowledgement flow. Drift between visualisation and hardware dropped from 2 to 3 seconds on the first naive implementation to under 50 ms after the protocol redesign.</li>
+            <li><strong>Socket.IO heartbeats every 500 ms.</strong> Three consecutive failures trigger a reconnect; the ESP32 enters a known safe state on connection loss rather than holding the last commanded position.</li>
+            <li><strong>Priority queue</strong> for emergency-stop and position-reset commands. These bypass the standard batched stream so a safety-critical signal cannot be queued behind routine updates.</li>
+        </ul>
+
+        <!-- ============================================================== -->
+        <h2 class="section">4. Evaluation</h2>
+        <p>Evaluation is qualitative and demo-driven, in keeping with what a 36-hour hackathon ship can validate. Numbers below are measured on the build's own protocol, on the four motions exercised during the live demo, not against any external benchmark for natural-language robotic control.</p>
+        <ul class="body-list">
+            <li><strong>Live demo at Hack the North 2025.</strong> The robot learned and executed jab punch, wave, beckon, and a celebratory arm raise on the spot, from natural-language input, with no previous training on any of them.</li>
+            <li><strong>10 to 15 seconds end to end</strong> from command to motion across all four demonstrated skills.</li>
+            <li><strong>Invalid motion guides: 40% to under 5%</strong> after the four-stage filtering pipeline, measured across the broader set of motions tested during build (not just the four demoed).</li>
+            <li><strong>Unsafe motions: 15% to under 2%</strong> after the static safety clamping plus simulation rehearsal pass.</li>
+            <li><strong>Under 50 ms sync</strong> between visualiser and hardware, validated by the timestamped acknowledgement flow.</li>
+        </ul>
+
+        <p>The numbers above are honest about the harness. The hallucination-rate and unsafe-motion-rate improvements are measured on the build's own pipeline against its own first-pass baseline, not against a published natural-language robotic-control benchmark, of which there is no widely accepted equivalent for hackathon-scale dual-arm setups. The four demonstrated skills are an existence proof of the end-to-end loop, not a generalisation claim across the space of all possible motor skills. Read the numbers as evidence that the dual-system architecture closes the text-to-motor loop under hackathon constraints, not as a deployable robotic-control system.</p>
+
+        <!-- ============================================================== -->
+        <h2 class="section">5. Conclusion and Implications</h2>
+        <p>The internet contains the knowledge robots need to learn new tasks. The pipeline that gets it onto silicon is the contribution. The dual-system framing (slow reasoning over messy text, fast execution over precise actuators) generalises beyond hackathon hardware to settings where the bottleneck is not motor precision but reprogramming overhead: assistive healthcare robotics that needs to adapt to a new patient's range of motion in minutes, surgical training rigs that need to demonstrate a new technique without bespoke RL, industrial prototyping where the cost of teaching a new task is the cost of writing a sentence. In each case the safety-critical consequence is the same: a robot that learns from prose, with hallucination filtering and trajectory rehearsal as first-class layers, is the only kind that can be trusted to act on text it has never seen before.</p>
+
+        <h3 class="subsection">5.1 Limitations</h3>
+        <ul class="body-list">
+            <li><strong>Open-loop execution.</strong> The robot executes the compiled trajectory without vision feedback on whether the motion is succeeding. A slipped servo or a mechanical obstruction is not detected until the acknowledgement timeout, not from the world.</li>
+            <li><strong>No persistent skill library.</strong> Each command relearns the motion from scratch. Two requests for "the jab punch" hit the web twice and re-run the LLM twice. Caching successful guides was scoped out for the hackathon window.</li>
+            <li><strong>Single-source LLM and single-source search.</strong> Cohere and Tavily respectively. Provider outages take the system offline. The architecture supports fallback, but fallback was not wired up during the event.</li>
+            <li><strong>Demo-set motion coverage.</strong> The four demonstrated motions (jab, wave, beckon, arm raise) are upper-body bilateral motions inside the arms' kinematic envelope. Fine motor skills and motions that require torso or leg coordination are outside what the current 3-DOF arms can express.</li>
+            <li><strong>No closed-loop force or contact sensing.</strong> The hand has no end-effector force feedback, so motions that should react to contact (grasping, pushing against resistance) cannot adapt in flight.</li>
+        </ul>
+
+        <h3 class="subsection">5.2 Future Work</h3>
+        <ul class="body-list">
+            <li><strong>Vision feedback for closed-loop control.</strong> A camera observes the motion, a vision-language model scores how well the executed trajectory matches the requested skill, and the compiler iterates. "Pick up the red cup" becomes the first natural test case.</li>
+            <li><strong>Multi-modal learning.</strong> Pose estimation on video demonstrations lets the system learn from a clip rather than a paragraph, which carries more information about phase timing than text can.</li>
+            <li><strong>Persistent skill library with composition.</strong> Cache successful motion guides under a stable name. Compose new skills from old ones ("wave plus forward step") rather than re-querying the web.</li>
+            <li><strong>Multi-robot coordination.</strong> The same dual-system framing extended across multiple robots that share a command bus, so a single natural-language instruction can drive synchronised motion across more than two arms.</li>
+            <li><strong>Provider fallback.</strong> Search and reasoning routed through more than one provider, with automatic failover, so a Cohere or Tavily outage does not take the demo down.</li>
+        </ul>
+
+        <!-- ============================================================== -->
+        <h2 class="section">6. Acknowledgments</h2>
+        <p>Built at <strong>Hack the North 2025</strong>, recognised as a <strong>Top 32 Finalist</strong>. The reasoning layer relies on <strong>Cohere</strong>; the search layer relies on <strong>Tavily</strong>. Hardware control runs on the standard <strong>Arduino IDE</strong> toolchain over <strong>Socket.IO</strong> for the host link.</p>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    <script>
-        // Custom cursor
-        const cursor = document.createElement('div');
-        cursor.classList.add('cursor');
-        document.body.appendChild(cursor);
-
-        const cursorGlow = document.createElement('div');
-        cursorGlow.classList.add('cursor-glow');
-        document.body.appendChild(cursorGlow);
-
-        document.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-            cursorGlow.style.left = e.clientX + 'px';
-            cursorGlow.style.top = e.clientY + 'px';
-        });
-
-        document.addEventListener('mousedown', () => {
-            cursor.style.transform = 'translate(-50%, -50%) scale(0.8)';
-            cursorGlow.style.transform = 'translate(-50%, -50%) scale(0.8)';
-        });
-
-        document.addEventListener('mouseup', () => {
-            cursor.style.transform = 'translate(-50%, -50%) scale(1)';
-            cursorGlow.style.transform = 'translate(-50%, -50%) scale(1)';
-        });
-
-        const interactiveElements = document.querySelectorAll('a, button, .stat-card, .tech-item');
-        interactiveElements.forEach(element => {
-            element.addEventListener('mouseenter', () => {
-                cursor.classList.add('hover');
-                cursorGlow.classList.add('hover');
-            });
-            element.addEventListener('mouseleave', () => {
-                cursor.classList.remove('hover');
-                cursorGlow.classList.remove('hover');
-            });
-        });
-
-        // Particles.js configuration
-        particlesJS('particles-js', {
-            particles: {
-                number: { value: 70, density: { enable: true, value_area: 800 } },
-                color: { value: '#00b4d8' },
-                shape: { type: 'circle' },
-                opacity: { value: 0.3, random: true },
-                size: { value: 3, random: true },
-                line_linked: {
-                    enable: true,
-                    distance: 150,
-                    color: '#00b4d8',
-                    opacity: 0.2,
-                    width: 1
-                },
-                move: {
-                    enable: true,
-                    speed: 2,
-                    direction: 'none',
-                    random: false,
-                    straight: false,
-                    out_mode: 'out',
-                    bounce: false
-                }
-            },
-            interactivity: {
-                detect_on: 'canvas',
-                events: {
-                    onhover: { enable: true, mode: 'grab' },
-                    onclick: { enable: true, mode: 'push' },
-                    resize: true
-                },
-                modes: {
-                    grab: { distance: 140, line_linked: { opacity: 0.5 } },
-                    push: { particles_nb: 4 }
-                }
-            },
-            retina_detect: true
-        });
-
-        // Back button scroll behavior
-        const backButton = document.querySelector('.back-button');
-        let lastScroll = 0;
-
-        // Smooth back button navigation
-        backButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            
-            // Create transition overlay
-            const overlay = document.createElement('div');
-            overlay.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(135deg, #020510 0%, #0a1628 100%);
-                z-index: 99999;
-                opacity: 0;
-                transition: opacity 0.3s ease;
-                pointer-events: none;
-            `;
-            document.body.appendChild(overlay);
-            
-            // Fade in overlay
-            setTimeout(() => {
-                overlay.style.opacity = '1';
-            }, 10);
-            
-            // Navigate after overlay is visible
-            setTimeout(() => {
-                window.location.href = '../index.html';
-            }, 200);
-        });
-
-        window.addEventListener('scroll', () => {
-            const currentScroll = window.pageYOffset;
-            
-            if (currentScroll > lastScroll && currentScroll > 100) {
-                // Scrolling down - hide button
-                backButton.classList.add('hidden');
-            } else {
-                // Scrolling up or at top - show button
-                backButton.classList.remove('hidden');
-            }
-            
-            lastScroll = currentScroll;
-        });
-    </script>
 </body>
 </html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en" style="background-color: #f3ece0;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdaptVR · Hand-tracked Quest 2 rehab for progressive muscle disease | Rishi Shah</title>
+    <meta name="description" content="A standalone Meta Quest 2 Unity build for LGMD, FSHD, and myotonic dystrophy patients. Butterflies caught in a Gaussian-splat garden with bare hands, an overextension guardrail that redirects rather than punishes, and every parameter tuned from the Inspector.">
+
+    <link rel="prefetch" href="../index.html">
+    <style>html, body { background-color: #f3ece0; margin: 0; padding: 0; }</style>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="project.css">
+    <script defer src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script defer src="../shared.js"></script>
+    <script defer src="project.js"></script>
+</head>
+<body>
+    <div id="particles-js"></div>
+
+    <div class="container">
+        <a class="back-link" href="../index.html">[ Back to home ]</a>
+
+        <div class="eyebrow">2026</div>
+
+        <h1 class="title">Hand-tracked rehab for progressive muscle <span class="accent">disease</span>.</h1>
+
+        <div class="chips">
+            <span class="chip">VR Rehab</span>
+            <span class="chip">Healthcare</span>
+            <span class="chip">Embedded VR</span>
+        </div>
+
+        <p class="subtitle">A standalone Meta Quest 2 Unity build for LGMD, FSHD, and myotonic dystrophy patients. Butterflies caught with bare hands in a Gaussian-splat garden, an overextension guardrail that redirects rather than punishes, and every parameter tunable from the Unity Inspector.</p>
+
+        <!-- ============================================================== -->
+        <h2 class="section">1. Abstract</h2>
+        <p>A standalone Unity APK that runs natively on a Meta Quest 2 with no controllers and no PC tether, built for the roughly 250,000 Americans living with progressive muscle disease. The patient stands inside a World Labs Marble-generated Japanese garden and reaches out with their bare hands to catch floating butterflies. The build exists because exercise is one of the few interventions that meaningfully slows functional decline in this population, and no commercial VR rehab platform targets it. The therapeutic outcome the design protects is straightforward: keep the patient moving, never let them overextend.</p>
+
+        <p>The implementation is <strong>five C# scripts</strong> on top of Unity 2022.3 LTS and the Meta XR SDK, built end-to-end in an 8-hour hackathon. The time budget is the reason the build is intentionally minimal: every script does one job, every catchable lives off a single tag, and the entire safety branch is one independent <code>Update()</code> loop. Hand tracking comes from <code>OVRSkeleton</code> at 26 joints per hand. A kinematic Rigidbody plus a 10 cm trigger SphereCollider, tagged <code>"PlayerHand"</code>, is the single contract between the wrists and the butterfly catch loop. A second, independent script measures wrist-to-head distance every frame and raises a soft redirection cue the moment the patient over-reaches. Both branches converge on a single <code>GameManager</code> singleton that owns the score, the session timer, and the UI.</p>
+
+        <p>The novelty is the patient population, not the engine. Every commercial VR rehab product on the market (XRHealth, REAL System, MindMaze, Karuna Labs) is built for stroke, traumatic brain injury, or chronic pain. None of them target muscular dystrophy, and the population that needs them most has no structured, motivating, safe system designed for them. AdaptVR is that build. The design tilts hard toward "the patient cannot lose": generous catch radius, no fail screen, redirection rather than punishment on overextension, every clinical tunable exposed on the Inspector.</p>
+
+        <ul class="body-list">
+            <li><strong>Built end-to-end in 8 hours.</strong> Single-session hackathon ship. The minimal 5-script architecture is a direct consequence of the time budget.</li>
+            <li><strong>5 C# scripts</strong> drive the entire game loop: butterfly behaviour, butterfly spawning, hand colliders, overextension detection, session orchestration.</li>
+            <li><strong>26 joints per hand</strong> via Meta's native hand-tracking pipeline. No controllers, no haptic gloves, no buttons.</li>
+            <li><strong>250,000+ Americans</strong> are the target population (LGMD, FSHD, myotonic dystrophy combined). Roughly <strong>70% drop out</strong> of standard home-exercise programmes.</li>
+            <li><strong>0.65 m overextension threshold</strong> on the wrist-to-head distance, surfaced as a soft redirection cue rather than a fail state.</li>
+            <li><strong>Every clinical parameter on the Inspector.</strong> Catch count, spawn distance, zone radius, float speed, bob frequency, overextension threshold, session length. The therapist tunes once per patient and the configuration travels with the build.</li>
+        </ul>
+
+        <figure>
+            <div class="figure-card">
+                <video controls autoplay muted loop playsinline>
+                    <source src="../images/good.mp4" type="video/mp4">
+                </video>
+            </div>
+            <figcaption>Figure 1. The build in a live session on Quest 2. Hand tracking, butterfly catches, score counter, and the overextension redirect cue all running standalone on the headset, no PC tether.</figcaption>
+        </figure>
+
+        <!-- ============================================================== -->
+        <h2 class="section">2. Introduction</h2>
+        <p>Progressive muscle diseases like Limb-Girdle Muscular Dystrophy (LGMD), Facioscapulohumeral Muscular Dystrophy (FSHD), and myotonic dystrophy affect more than 250,000 Americans. Exercise is one of the only clinically validated interventions that slows functional decline in this population, but it sits inside a hard paradox.</p>
+        <ul class="body-list">
+            <li><strong>Adherence is poor.</strong> Roughly 70% of patients drop out of standard home-exercise programmes. The programmes are generic, boring, and do not match how the disease progresses in each individual.</li>
+            <li><strong>Overexertion is dangerous.</strong> Unlike most populations, where "push harder" is good advice, these patients suffer real muscle damage when they over-reach. The fatigue signal is delayed by hours, so the patient cannot self-regulate intensity by feel.</li>
+            <li><strong>The MRC grade 3 to 5 gap.</strong> Patients who can move against gravity but tire quickly are mobile enough to benefit from exercise and structured enough to need a designed system. They have neither.</li>
+        </ul>
+
+        <h3 class="subsection">2.1 Why hand-tracked VR</h3>
+        <p>The Meta Quest 2 is the first piece of hardware that makes a deployable answer to this gap structurally possible. It is standalone (no PC, no setup), it is cheap enough at retail to reach patients, and its native hand-tracking pipeline replaces controllers with bare hands. Controllers are a non-trivial barrier in this population: the grip strength and finger isolation that trigger pulls require is exactly what the disease takes away. Hand tracking removes the barrier.</p>
+        <ul class="body-list">
+            <li><strong>No controllers.</strong> The 26-joint <code>OVRSkeleton</code> pipeline reads wrist position directly, so the build never asks the patient to grip, squeeze, or press anything.</li>
+            <li><strong>Standalone hardware.</strong> The shipped artifact is a single Android APK installed on a Quest 2. No PC, no cables, no calibration. The headset goes home with the patient.</li>
+            <li><strong>Immersive distraction.</strong> The patient is inside a Gaussian-splat Japanese garden generated by World Labs Marble, not a flat exercise screen. Exergaming achieves a 3 to 5 times better adherence in neuromuscular populations than standard home programmes, and the immersion is what carries that gain.</li>
+        </ul>
+
+        <h3 class="subsection">2.2 What is actually new</h3>
+        <p>The hand-tracking SDK and the VR engine are off-the-shelf. The contribution is the patient population the build is designed for, and the safety posture that population requires.</p>
+        <ul class="body-list">
+            <li><strong>The population gap.</strong> XRHealth, REAL System, MindMaze, and Karuna Labs are the major commercial VR rehab platforms. None of them mention muscular dystrophy on their clinical materials. The gap is verifiable in 60 seconds of searching their pages. AdaptVR is the build that targets that gap directly.</li>
+            <li><strong>Redirection, not punishment.</strong> An independent per-frame script (<code>OverextensionDetector</code>) measures wrist-to-head Euclidean distance every <code>Update()</code> and raises a soft cue the moment the patient exceeds a tunable threshold. There is no fail state, no penalty, no points lost. The system redirects the body, not the will.</li>
+            <li><strong>The patient cannot lose.</strong> The catch radius is generous on purpose. The butterflies bob in slow sine waves so motion looks alive, not robotic. Caught butterflies hide for 1.2 seconds and respawn elsewhere in the zone so the score climbs steadily across the session. Frustration that maps onto disease severity is the dropout dynamic this build is designed to prevent.</li>
+            <li><strong>Therapist-tunable surface.</strong> Every clinical parameter that matters is on the Unity Inspector, not buried in code. Spawn distance, zone radius, float speed, bob frequency, overextension threshold, session duration. A clinician configures once per patient and the build remembers.</li>
+        </ul>
+
+        <p>Every section below is the engineering that makes those four commitments hold inside the Quest 2.</p>
+
+        <!-- ============================================================== -->
+        <h2 class="section">3. System</h2>
+
+        <h3 class="subsection">3.1 Scene composition</h3>
+        <ul class="body-list">
+            <li><strong>OVRCameraRig</strong> with <code>OVRManager.HandTrackingSupport = HandsOnly</code>. Children <code>LeftHandAnchor</code> / <code>RightHandAnchor</code> carry <code>OVRHand</code> and <code>OVRSkeleton</code>. No controllers are wired in.</li>
+            <li><strong>Skybox.</strong> The World Labs Japanese garden as a panoramic image, applied via a <code>Skybox/Panoramic</code> material in Lighting and Environment.</li>
+            <li><strong>World-space canvas</strong> at (0.4, 1.2, 1.5) carrying ScoreText (72 pt), TimerText (36 pt), and WarningText (28 pt, hidden by default). The canvas floats at the patient's natural sightline so they never look away from the play space to read it.</li>
+            <li><strong>Butterfly prefab</strong> scaled to a 5 to 10 cm wingspan, with a 15 cm trigger SphereCollider and a kinematic Rigidbody so trigger callbacks fire without physics interference.</li>
+        </ul>
+
+        <h3 class="subsection">3.2 The catch loop: ButterflyController.cs</h3>
+        <ul class="body-list">
+            <li>Each butterfly floats smoothly toward a randomly chosen point inside its assigned <code>zoneCenter</code> / <code>zoneRadius</code> sphere, picking a new target every time it gets within 5 cm of the current one.</li>
+            <li>A sine-wave bob on the Y axis (1.2 Hz, 0.06 m amplitude) and a yaw rotation toward the direction of travel so the motion looks alive, not mechanical.</li>
+            <li>The float target Y is clamped above the floor (<code>_target.y &gt;= zoneCenter.y - zoneRadius * 0.5</code>) so butterflies never sink below a comfortable reach line.</li>
+            <li><code>OnTriggerEnter</code> checks for tag <code>"PlayerHand"</code>. On a catch: particle effect and sound fire if assigned, <code>GameManager.Instance.RegisterCatch()</code> is called, the renderer and collider hide for 1.2 seconds, then the butterfly respawns at a fresh point inside the same zone.</li>
+        </ul>
+
+        <h3 class="subsection">3.3 Initial placement: ButterflySpawner.cs</h3>
+        <p>One empty GameObject. At <code>Start()</code> it computes a spawn center as <code>cameraTransform.position + flattened-forward * distFromHead</code> (default 1.2 m), then instantiates <code>count</code> butterfly prefabs (default 5) at random points inside a sphere of <code>zoneRadius = 0.9 m</code> around that center. The spawner writes <code>zoneCenter</code> and <code>zoneRadius</code> into each spawned controller, then steps back. Ongoing motion is the controller's problem.</p>
+
+        <h3 class="subsection">3.4 Hands as colliders: HandCollider.cs</h3>
+        <p>One per hand. Every <code>Update()</code> walks <code>handSkeleton.Bones</code>, finds the <code>Hand_WristRoot</code> bone, and snaps the GameObject's transform to it. A kinematic Rigidbody (required for <code>OnTriggerEnter</code> to fire under Unity's physics rules) and a 10 cm trigger SphereCollider, tagged <code>"PlayerHand"</code>, are the contract that the butterfly's <code>OnTriggerEnter</code> matches against. That tag is the only handshake between the two scripts.</p>
+
+        <h3 class="subsection">3.5 Safety guardrail: OverextensionDetector.cs</h3>
+
+        <figure>
+            <div class="figure-card">
+                <img src="../images/figures/adaptvr_fig2_envelope.png" alt="Top-down view of the player at the origin with a 0.65 m safe-reach circle around the head and a 0.9 m radius butterfly spawn zone centered 1.2 m forward of the head. The spawn zone sits at the far edge of the safe-reach zone so butterflies are catchable without triggering the overextension cue.">
+            </div>
+            <figcaption>Figure 2. Bird's-eye view of the spatial envelope. The 0.9 m spawn zone is centered 1.2 m forward of the head, so most butterflies fall just at the far edge of the 0.65 m safe-reach circle. The patient reaches without overreaching by design.</figcaption>
+        </figure>
+
+        <p>Independent of the catch loop. Every frame, Euclidean distance from <code>centerEyeAnchor.position</code> to each wrist bone. If either exceeds <code>maxReachMeters</code> (default 0.65 m), <code>GameManager.ShowWarning()</code> surfaces a soft cue for 2.5 seconds. There is no fail state. The patient gets redirection, not punishment, and the score is untouched.</p>
+
+        <h3 class="subsection">3.6 Session orchestrator: GameManager.cs</h3>
+        <ul class="body-list">
+            <li>Static singleton (<code>GameManager.Instance</code>) so the butterflies and the overextension detector both find it without scene wiring.</li>
+            <li>Owns the session state: <code>_catches</code>, <code>_elapsed</code>, <code>_sessionActive</code>, <code>_warningTimer</code>. Default session is 300 seconds.</li>
+            <li>Drives the three TextMeshPro labels (score, timer, warning) and freezes the timer at "Done!" when the session length is reached.</li>
+            <li>Reads <code>OverextensionDetector.EitherOverextended</code> every frame and triggers <code>ShowWarning()</code> with a 2.5 second display window per cue.</li>
+        </ul>
+
+        <h3 class="subsection">3.7 Therapist controls</h3>
+        <p>Every tunable that matters lives on the Inspector, not in code. A clinician sets these once per patient and reuses the configuration across sessions, scaling difficulty to MRC grade and disease profile without recompiling.</p>
+        <ul class="body-list">
+            <li><code>ButterflySpawner.count</code>: number of butterflies at session start.</li>
+            <li><code>distFromHead</code>: spawn distance from the patient's head. Closer for weaker patients, further for stronger.</li>
+            <li><code>zoneRadius</code>: how spread out the butterflies are inside the spawn zone.</li>
+            <li>Float speed, bob frequency, bob amplitude on the prefab: how briskly butterflies move.</li>
+            <li><code>maxReachMeters</code>: the overextension guardrail threshold.</li>
+            <li><code>sessionDuration</code>: total session length in seconds.</li>
+        </ul>
+
+        <!-- ============================================================== -->
+        <h2 class="section">4. Evaluation</h2>
+        <p>Validated qualitatively on Quest 2 hardware. The build runs standalone as an Android APK, hand tracking holds under typical session motion, the overextension cue surfaces redirection at the configured threshold, and butterflies respawn cleanly inside the spawn zone after each catch. The 15 cm trigger radius on the butterfly collider is deliberately generous because patients with MRC 3 to 4 strength have imprecise distal control, and a tighter radius would create frustration that correlates directly with disease severity, which is the dropout dynamic the build exists to prevent.</p>
+        <ul class="body-list">
+            <li><strong>Standalone Android APK.</strong> Single install, no PC tether, no cables, no per-session calibration.</li>
+            <li><strong>Hand tracking holds</strong> under the typical seated and standing reach patterns the protocol targets, in normal indoor lighting.</li>
+            <li><strong>Overextension cue at 0.65 m</strong> surfaces the redirection text inside 2.5 seconds of the threshold crossing, every time.</li>
+            <li><strong>Therapist parameter sweep.</strong> Adjusting <code>distFromHead</code> from 0.9 m to 1.5 m and <code>zoneRadius</code> from 0.6 m to 1.1 m on the Inspector produced the expected difficulty changes without code edits.</li>
+        </ul>
+
+        <p>The supporting literature for the design tilt comes from outside this build: exergaming has been reported to achieve roughly 3 to 5 times better adherence in neuromuscular populations than standard home-exercise programmes. The number motivates the design. It is not a measurement of AdaptVR. A longitudinal adherence study against a standard home programme is the obvious next step.</p>
+
+        <!-- ============================================================== -->
+        <h2 class="section">5. Conclusion and Implications</h2>
+        <p>The clinical case is short. The population needs to exercise. The population is being failed by every commercial VR rehab platform on the market. The Quest 2 hardware is finally cheap enough and capable enough to close that gap with hand-tracked play that respects what the disease takes away. If even a fraction of the standard 70% home-programme dropout rate gets recovered by a build that the patient actually wants to put on, the downstream effect is preserved muscle function for longer, slower loss of independence, and fewer of the cascade complications that follow when neuromuscular patients stop moving. The design choices that matter most in this build (no fail screen, redirection over punishment, every parameter therapist-tunable, no controllers) are the parts that make it deployable for the patient population it targets, rather than something that demos well and rehabilitates nobody.</p>
+
+        <h3 class="subsection">5.1 Limitations</h3>
+        <ul class="body-list">
+            <li><strong>No quantitative clinical evaluation.</strong> The build has been validated for engineering correctness on the headset; clinical efficacy against a standard home-exercise programme is unproven and is the headline next step.</li>
+            <li><strong>Single environment.</strong> One Japanese-garden skybox shipped. Variety matters for adherence across long-term use, and the current build does not yet rotate environments per session.</li>
+            <li><strong>First-pass safety mechanism.</strong> The overextension cue triggers on instantaneous wrist-to-head distance, not on a rolling-window fatigue signal. A patient who keeps reaching just inside 0.65 m all session never trips the cue, even if they are tiring.</li>
+            <li><strong>Disease-specific spawn caps are partial.</strong> The spawner uses a single <code>distFromHead</code> and <code>zoneRadius</code> per session. LGMD-specific posture-locked seating and FSHD-specific overhead-reach exclusion are still configured by the therapist at session setup, not by an automatic per-condition profile.</li>
+            <li><strong>Hand tracking degrades in low light</strong>, which is a Meta SDK constraint the build inherits. Demo and clinical contexts need normal overhead lighting.</li>
+        </ul>
+
+        <h3 class="subsection">5.2 Future Work</h3>
+        <p>The limitations map directly onto the next stage of the build.</p>
+        <ul class="body-list">
+            <li><strong>Longitudinal adherence study</strong> against a standard home-exercise programme. The single biggest gap, and the one that turns the build from "deployable engineering" into "clinical claim."</li>
+            <li><strong>Rolling-window fatigue signal</strong> on top of the instantaneous overextension cue. Reach distance, hand velocity, and jitter sampled over a 30 second window, with adaptive spawn-zone resizing as the score climbs.</li>
+            <li><strong>Per-condition spawn profiles.</strong> LGMD seated, FSHD no-overhead, General balanced. Pick the profile on the headset at session start instead of in the Inspector.</li>
+            <li><strong>Environment rotation.</strong> Multiple World Labs splats per build (beach, meadow, garden) cycled by session to keep the long-term experience varied.</li>
+            <li><strong>Therapist dashboard</strong> for remote session configuration and longitudinal progress tracking. Catch count, reach distribution, overextension frequency, session-to-session change.</li>
+        </ul>
+
+        <!-- ============================================================== -->
+        <h2 class="section">6. Acknowledgments</h2>
+        <p>The garden environment is a Gaussian-splat export from <strong>World Labs Marble</strong>. Hand tracking is the <strong>Meta XR SDK</strong>. The clinical framing draws on published guidance from TREAT-NMD on exercise in progressive muscle disease.</p>
+    </div>
+</body>
+</html>
