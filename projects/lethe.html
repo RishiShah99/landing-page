@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en" style="background-color: #f3ece0;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lethe · A contract-grade verifier and a native Blackwell backward | Rishi Shah</title>
+    <meta name="description" content="A contract-grade verifier for LLM-generated GPU kernels, and the first native Blackwell (tcgen05) training backward for the gated-linear-recurrence family. Twelve adversarial gates audited 2,638 accepted kernels: 62.1% carry a contract violation, 39.5% fail a tolerance-free gate.">
+
+    <link rel="prefetch" href="../index.html">
+    <style>html, body { background-color: #f3ece0; margin: 0; padding: 0; }</style>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="project.css">
+    <script defer src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script defer src="../shared.js"></script>
+    <script defer src="project.js"></script>
+</head>
+<body>
+    <div id="particles-js"></div>
+
+    <div class="container">
+        <a class="back-link" href="../index.html">[ Back to home ]</a>
+
+        <div class="eyebrow">Lethe · 2026</div>
+
+        <h1 class="title">A contract-grade verifier for LLM-generated GPU kernels, and a native <span class="accent">Blackwell</span> backward for the gated-linear-recurrence family.</h1>
+
+        <div class="chips">
+            <span class="chip">Kernel Engineering</span>
+            <span class="chip">Machine Learning</span>
+            <span class="chip">CUDA</span>
+        </div>
+
+        <p class="subtitle">Twelve adversarial gates, aimed in two directions: outward at 2,638 machine-generated kernels a public system had already accepted, and inward at the first native <code>tcgen05</code> training backward for the GDN family. The paper is soon to be uploaded to arXiv and submitted to TMLR.</p>
+
+        <!-- ============================================================== -->
+        <h2 class="section">1. Abstract</h2>
+        <p>Systems that generate GPU kernels with language models report high correctness rates. Those rates come from a single loose test: run the kernel on a few random inputs at one fixed shape and accept it if the output is close to a reference. A kernel can pass that test and still be silently wrong. It can return an ordinary number where the true answer is a NaN or an infinity, produce a different result on each run, break the moment the shape changes, or accumulate in fp16 where the reference keeps an fp32 total. Lethe builds the instrument that checks correctness properly: a <strong>contract-grade verifier</strong> of twelve adversarial gates, each a property a correct kernel must satisfy, several of them <em>tolerance-free</em> so that no choice of threshold can explain a failure away. We aim it in two directions.</p>
+
+        <p>Aimed outward, the verifier audits <strong>2,638 machine-generated kernels</strong> that a public system's own harness had already accepted as correct. It finds <strong>39.5% broken beyond any tolerance argument</strong> and <strong>62.1% carrying at least one violation</strong>. The field's standard test accepts <strong>1,487 kernels the verifier rejects, against only 14 the other way</strong>. The finding is defended four independent ways: a 7/7 positive control, a threshold-calibration sweep, 98.5% agreement with the reference benchmark's own correctness code, and a stratified hand-audit.</p>
+
+        <p>Aimed inward, we test the verifier on a kernel of our own: the <strong>first native Blackwell <code>tcgen05</code> training backward for the gated-linear-recurrence (GDN) family</strong>, including the reverse-state stage the field still runs on a fallback. We establish this kernel's correctness independently of the verifier, against a double-precision oracle, and train five family members through it, so it is a subject whose correctness we have already established. Running it through the battery is then a direct check that the battery is not tuned to flatter its author. The correctness signal behind reported progress in kernel generation is far weaker than the numbers suggest, and a set of tolerance-free contracts would close most of the gap.</p>
+
+        <ul class="body-list">
+            <li><strong>A twelve-gate contract-grade verifier</strong> that operationalizes the Kernel Contracts taxonomy at scale, with tolerance-free gates that need no threshold, thresholded gates whose bounds are derived rather than guessed, and a red team of nineteen deliberately-broken kernels that demonstrates, in both directions, that the referee has teeth.</li>
+            <li><strong>An at-scale rigor-gap audit</strong> of 2,638 accepted kernels: a tolerance-free floor of 39.5% (1,043 kernels), with 62.1% carrying a contract violation. The modal defect, at 34.2%, is a kernel silently replacing a NaN or infinity with an ordinary number.</li>
+            <li><strong>The differential is directional:</strong> the field's standard test accepts 1,487 kernels the battery rejects (958 on a tolerance-free gate), against only 14 in reverse; KernelBench's own correctness code, run at a pinned commit, agrees with our replica of that test on 98.5% of 1,030 pairs.</li>
+            <li><strong>The native backward:</strong> worst relative error 3.29 × 10⁻³ (scalar) and 3.31 × 10⁻³ (channel-wise) against an independent fp64 oracle under a 5 × 10⁻³ bound, bit-for-bit deterministic across runs, and all five family members train through it. It handles correctly the tensor-memory constraint behind the open <a class="inline" href="https://github.com/state-spaces/mamba/issues/904" target="_blank" rel="noopener">#904</a> bug.</li>
+            <li><strong>The first open Triton Mamba-3 MIMO backward we are aware of</strong>, in a six-kernel suite that compiles at every <code>num_warps</code> where the official backward trips #904. Full GPU suite: 1,197 tests green on B200.</li>
+        </ul>
+
+        <figure>
+            <div class="figure-card">
+                <video controls autoplay muted loop playsinline style="max-width: 520px; margin: 0 auto;">
+                    <source src="../images/lethe_film_1x1.mp4" type="video/mp4">
+                </video>
+            </div>
+            <figcaption>Figure 1. The whole project in 74 seconds. The native <code>tcgen05</code> backward, the twelve-gate battery, and the rigor-gap audit, measured on B200 silicon.</figcaption>
+        </figure>
+
+        <!-- ============================================================== -->
+        <h2 class="section">2. Introduction</h2>
+        <p>Generating GPU kernels with large language models has become an active research program, and its benchmarks report that a large fraction of outputs are correct and often faster than a reference. Those reports are only as trustworthy as the correctness signal beneath them, and that signal is almost universally a single test: draw a few random inputs at one fixed shape and accept the kernel if its output is close, in the <code>allclose</code> sense, to a reference (<code>torch.allclose</code> at <code>atol=rtol=10⁻²</code> in the common KernelBench setting). If the acceptance signal is this weak, an unknown share of the reported wins is illusory. This project is about that gap and the instrument that measures it.</p>
+
+        <p>The observation that loose checks accept broken kernels is not new: Sarkar argues the point on a hand-built set of twenty-four kernels but reports no rate on any real accepted corpus, and a separate strand documents <em>performance</em> loopholes, kernels that game the timing harness, in the Sakana and CUDA-L1 systems. The Kernel Contracts taxonomy enumerates correctness classes for GPU kernels; that taxonomy is theirs and we cite it as such. What is ours is the first runnable, at-scale operationalization of it, to the best of our knowledge: a <em>tolerance-free</em> correctness measure that needs no approximate-equality threshold, a quantified audit on thousands of <em>accepted, real</em> kernels, and a certified native artifact the same verifier passes.</p>
+
+        <h3 class="subsection">2.1 One recurrence, five models</h3>
+        <p>The leading sub-quadratic sequence models replace attention's quadratic cost with a fixed-size recurrent state, and they are one family. The models we target use a matrix state <em>S</em> of shape <em>d<sub>k</sub></em> × <em>d<sub>v</sub></em> and the stronger gated DeltaNet (GDN) update. Writing <em>q<sub>t</sub></em>, <em>k<sub>t</sub></em> for queries and keys, <em>v<sub>t</sub></em> for values, and three gates <em>g<sub>t</sub></em> (per-channel log-decay), <em>b<sub>t</sub></em> (erase), and <em>w<sub>t</sub></em> (write):</p>
+
+        <p style="text-align: center; margin: 18px 0;"><em>S<sub>t</sub></em> = (<em>I</em> − <em>k<sub>t</sub></em>(<em>b<sub>t</sub></em> ⊙ <em>k<sub>t</sub></em>)<sup>⊤</sup>) Diag(<em>e</em><sup><em>g<sub>t</sub></em></sup>) <em>S<sub>t−1</sub></em> + <em>k<sub>t</sub></em>(<em>w<sub>t</sub></em> ⊙ <em>v<sub>t</sub></em>)<sup>⊤</sup>, &nbsp;&nbsp; <em>o<sub>t</sub></em> = <em>S<sub>t</sub></em><sup>⊤</sup><em>q<sub>t</sub></em> &nbsp;&nbsp; (1)</p>
+
+        <p>Equation (1) combines channel-wise decay, the delta rule (the model subtracts what <em>S</em> already predicts for a key before writing, so it stores the correction rather than the raw value), a rank-one write, and a read with <em>q<sub>t</sub></em>. It is a superset: fixing its gates recovers the named models, and because roughly 80% of the parameterization is shared, one backward differentiating (1) once produces the training gradients for all five.</p>
+
+        <table class="results">
+            <thead>
+                <tr>
+                    <th>Model</th>
+                    <th>Recurrence <em>S<sub>t</sub></em> = …</th>
+                    <th>Gate setting</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><strong>LA</strong> (linear attention)</td><td class="num"><em>S<sub>t−1</sub></em> + <em>k<sub>t</sub>v<sub>t</sub></em><sup>⊤</sup></td><td class="num">g = b = 0, w = 1</td></tr>
+                <tr><td><strong>GLA</strong> (gated linear attention)</td><td class="num">Diag(<em>e</em><sup><em>g<sub>t</sub></em></sup>) <em>S<sub>t−1</sub></em> + <em>k<sub>t</sub>v<sub>t</sub></em><sup>⊤</sup></td><td class="num">b = 0, w = 1</td></tr>
+                <tr><td><strong>SSD / Mamba-2</strong></td><td class="num"><em>e</em><sup><em>g<sub>t</sub></em></sup> <em>S<sub>t−1</sub></em> + <em>k<sub>t</sub>v<sub>t</sub></em><sup>⊤</sup></td><td class="num">scalar decay g</td></tr>
+                <tr><td><strong>KDA</strong> (Kimi Delta Attention)</td><td class="num">(<em>I</em> − <em>β<sub>t</sub>k<sub>t</sub>k<sub>t</sub></em><sup>⊤</sup>) Diag(<em>e</em><sup><em>g<sub>t</sub></em></sup>) <em>S<sub>t−1</sub></em> + <em>β<sub>t</sub>k<sub>t</sub>v<sub>t</sub></em><sup>⊤</sup></td><td class="num">b = w = β<sub>t</sub></td></tr>
+                <tr><td><strong>GDN</strong> (gated DeltaNet)</td><td class="num">the full recurrence (1)</td><td class="num">per-channel b, w, g</td></tr>
+            </tbody>
+        </table>
+
+        <p>The reductions are checked, not asserted: each member is re-derived independently from its own definition and checked against <em>its own</em> reference, not by setting knobs on the GDN path. Two reductions are exact enough to serve as built-in tests: b = w = β reduces (1) to the KDA equation at machine precision, and b = 0 makes an entire triangular-solve stage vanish (M = 0 ⇒ T = I). The training backward is dominated by two hard stages, a reverse-time inter-chunk state scan and a WY / triangular-inverse vector-Jacobian product, and the reference open-source implementation of both is the Triton <code>flash-linear-attention</code> (<code>fla</code>) library, our speed baseline.</p>
+
+        <h3 class="subsection">2.2 Blackwell, tensor memory, and #904</h3>
+        <p>NVIDIA's Blackwell generation (the B200, architecture <code>sm_100</code>) adds a fifth-generation tensor core, <code>tcgen05</code>, whose matrix-multiply operands reside in a new scarce on-chip space: Tensor Memory (TMEM), governed by a hard 512-column budget per warpgroup. A multi-GEMM kernel must manage TMEM allocation and release lifecycles by hand, and a lifecycle error yields illegal machine code or a deadlock.</p>
+        <ul class="body-list">
+            <li><strong>This constraint is the crux of the open <a class="inline" href="https://github.com/state-spaces/mamba/issues/904" target="_blank" rel="noopener">state-spaces/mamba#904</a> bug:</strong> the official Mamba-3 backward uses the tensor-core matmul (<code>tl.dot</code>), and at the normal performance setting a compiler pass requests 544 TMEM columns against the hardware's 512, so the kernel fails to compile and falls back to a path reported as 38.7× slower on GB200/B200. The tensor-memory half of the failure is addressed by a merged Triton change (PR #9093) not yet shipped in a Mamba release, so a pinned pre-#9093 stack still reproduces it.</li>
+            <li><strong>Both headline contributions engage this constraint.</strong> The verifier's RES-02 gate detects it, and the native backward gets the lifecycle right where the official kernel does not.</li>
+        </ul>
+
+        <h3 class="subsection">2.3 What is new, and what is not claimed</h3>
+        <p>As surveyed: NVIDIA ships an SSD forward but no backward in either of its two stacks; cuLA has a KDA backward that is a hybrid (one native CuTe kernel for the WY stage, but the reverse-state stage still in <code>fla</code> Triton); FlashKDA is forward and inference only; and tilelang has GDN/KDA backward examples with no <code>tcgen05</code>/TMEM in them.</p>
+        <ul class="body-list">
+            <li><strong>Two firsts:</strong> a native Blackwell <code>tcgen05</code>/TMEM <em>training backward</em> for the GDN family, and a native <code>tcgen05</code> <em>reverse-state</em> backward, the stage others still run in <code>fla</code> Triton.</li>
+            <li><strong>Not claimed:</strong> the first native backward kernel for the family (cuLA's WY stage predates ours), the first non-Triton GDN/KDA backward (tilelang exists), or bit-for-bit parity with fp64 (the parity is fp64-tight, not bitwise). The paper states its non-claims as precisely as its claims.</li>
+        </ul>
+
+        <!-- ============================================================== -->
+        <h2 class="section">3. The Verifier and the Rigor-Gap Audit</h2>
+
+        <h3 class="subsection">3.1 The twelve gates</h3>
+        <p>A kernel that passes a single random-input, fixed-shape check can still be wrong on extreme inputs, wrong at a different shape, nondeterministic, secretly low-precision, or wrong about non-finite values. The verifier therefore asks twelve questions, each an adversarial contract graded against a slow high-precision reference. The reference for every operator is a plain high-precision loop that is <em>defined</em> to be ground truth and refuses to execute in reduced precision so that it cannot be misused as a candidate.</p>
+
+        <table class="results">
+            <thead>
+                <tr>
+                    <th>Gate</th>
+                    <th>Property checked</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><strong>CMP-01</strong></td><td>correct on many random <em>and</em> adversarial inputs (zeros, 10⁶, 10⁻⁶, denormals, long L)</td></tr>
+                <tr><td><strong>CMP-02</strong></td><td>the <em>gradients</em> are correct, not only the outputs (autograd versus finite difference)</td></tr>
+                <tr><td><strong>CMP-03</strong></td><td>correct across shapes (batch, length, width), not only the one tested</td></tr>
+                <tr><td><strong>ORD-01</strong></td><td>reordered summation stays within a derived ∝ √N rounding bound</td></tr>
+                <tr><td><strong>ORD-02</strong></td><td>byte-for-byte identical across five repeats, no aliasing of a shared buffer</td></tr>
+                <tr><td><strong>ORD-03</strong></td><td>correct on an input constructed to expose a bad summation order</td></tr>
+                <tr><td><strong>PRC-01</strong></td><td>correct in fp32, fp16, and bf16</td></tr>
+                <tr><td><strong>PRC-02</strong></td><td>fed fp16, still keeps an internal fp32 running total</td></tr>
+                <tr><td><strong>EXC-01</strong></td><td>infinities and NaNs land in exactly the same positions and signs as the reference</td></tr>
+                <tr><td><strong>EXC-02</strong></td><td>flush-to-zero handling of subnormals matches the reference</td></tr>
+                <tr><td><strong>RES-01</strong></td><td>output lives on the same device as the input</td></tr>
+                <tr><td><strong>RES-02</strong></td><td>the compiled kernel fits real hardware limits (registers, shared memory, TMEM budget)</td></tr>
+            </tbody>
+        </table>
+
+        <ul class="body-list">
+            <li><strong>Every tolerance is derived rather than chosen.</strong> ORD-01's bound follows how floating-point error actually accumulates over a reduction, atol ≈ 4ε√N · scale, so a correct kernel passes with wide margin and a wrong one misses by orders of magnitude, and every knob is set at the loosest point that still sides with the candidate.</li>
+            <li><strong>Every verdict depends on the kernel, not on luck:</strong> each gate re-seeds the random number generator from a fixed value before drawing inputs.</li>
+            <li><strong>Red-teamed before it saw foreign code.</strong> The repository ships nineteen deliberately-broken kernels, each embodying one trick: returning its input, caching an answer, accumulating in fp16, behaving nondeterministically, flipping an infinity to a finite value, working at only one shape, or silently moving data to another device. A test asserts that the verifier rejects every one <em>and</em> clears the honest reference. Catching all nineteen while clearing the honest operator is the two-sided check that makes the referee trustworthy before it is ever aimed at foreign code.</li>
+        </ul>
+
+        <h3 class="subsection">3.2 The audit</h3>
+        <p>The verifier ran over Dr. Kernel / KernelGYM (<code>hkust-nlp/drkernel-coldstart-8k</code>, MIT license), a public corpus of 8,920 supervised-fine-tuning trajectories each ending in a Triton kernel, the richest auditable release among the systems we surveyed. Auditing its SSM-adjacent operator classes (matmul, attention, softmax, scan, norm, conv, reduction) yields 3,134 kernels, each run on a B200 (torch 2.12 / triton 3.7) in its own sandboxed subprocess. After excluding toolchain and compile artifacts, <strong>2,638</strong> were accepted as correct by the source system's own harness (<code>final_speedup &gt; 0</code>), a predicate that records their correctness verdict and not merely a successful timing run: in this corpus a kernel is timed, and a speedup written, only once it has passed the harness's own correctness check. This accepted-only set is the headline denominator, the population whose correctness has already been certified.</p>
+        <p>Fairness is enforced in code by eighteen rules, each pinned by its own unit test. Inputs the reference itself cannot run are marked not-applicable and never counted as candidate failures; positions at which candidate and reference agree on a NaN or an infinity are not charged as value mismatches; a candidate is charged only for its own declared compute precision. These rules move every ambiguous case toward the candidate.</p>
+        <ul class="body-list">
+            <li><strong>62.1% carry at least one contract violation.</strong></li>
+            <li><strong>39.5% (1,043 of 2,638) fail a <em>tolerance-free</em> gate:</strong> broken in a way no tolerance argument can excuse. The floor rises to 41.1% once CMP-03 shape rejection is added to it.</li>
+            <li><strong>The modal defect is EXC-01, non-finite non-propagation, at 34.2%:</strong> a kernel silently returning an ordinary number where the reference returns a NaN or an infinity, the failure mode that converts a training-time error into silent data corruption.</li>
+            <li><strong>The finding is robust to aggressive re-slicing:</strong> the 62.1% survives stripping the entire matmul class, the worst case for the TF32 tolerance argument, at 61.9%, and survives an all-contested-channels strip at 60.6%.</li>
+        </ul>
+        <p>The tolerance-free floor is the right lens because it sidesteps any debate over thresholds: a kernel that returns a finite value where the reference returns a NaN, or a different answer on each run, or a wrong shape, is wrong under any tolerance. The floor is the conservative claim, and the 62.1% is the wider, tolerance-dependent superset above it.</p>
+
+        <h3 class="subsection">3.3 Four independent defenses</h3>
+        <p>The obvious objection is that this checker is simply stricter than everyone else's, so foreign kernels fail by construction. The paper answers it four ways, each falsifiable on its own.</p>
+        <ul class="body-list">
+            <li><strong>(1) Positive control, 7/7.</strong> Our own six Mamba-3 Triton kernels and the native GDN backward run through the <em>same</em> battery, and all seven pass every applicable gate, clean on every tolerance-free channel. One of the seven is independent by construction: the verifier's tolerance model was calibrated against the six Triton kernels, whereas the native GDN backward played no part in calibration, so it is a control the thresholds were never fitted to. The control is not a formality: it caught a genuine gap in our own code, C5 (<code>fused_block_forward</code>) inferring its channel dimension from the input tensor without checking it against the convolution-weight channels, fixed with a one-line channel-mismatch guard (commit <code>7f46226</code>), after which the control reads 7/7. A checker tuned to flatter its author would not have flagged the author's own kernel.</li>
+            <li><strong>(2) Threshold calibration.</strong> For each band-gate on a known-correct operator, a perturbation of known magnitude locates the exact pass-to-fail trip point, bracketed between the honest noise floor (the error a correct kernel emits) and the real-error onset (the error a wrong kernel emits). Every band-gate shows clean separation, and the one thin margin is disclosed rather than hidden: ORD-03 sits only 1.2× below its real-error onset because it is the deliberately-relaxed gate, and its coverage is carried by CMP-01 and ORD-01.</li>
+            <li><strong>(3) The benchmark's own harness agrees, 98.5%.</strong> To close the objection that our replica of the standard check is not faithful to it, we ran KernelBench's <em>own</em> correctness code at the pinned commit <code>48642c5c</code> on the accepted pairs and joined <em>their</em> verdict against our reimplementation. Agreement is 98.5% over 1,030 pairs (844 pass/pass, 171 fail/fail, 15 disagreements). Of the 15 disagreements, 7 are our replica being <em>stricter</em>, which cannot inflate the finding, and 8 are seed-borderline flips in the loose paper-era <code>allclose</code>. The two patches we needed were scoped to loading, not checking, so the correctness logic under test is byte-for-byte theirs. The standard by which we judge is therefore not ours alone.</li>
+            <li><strong>(4) Stratified hand-audit.</strong> 31 disputed cases from the load-bearing cell (accepted by the benchmark, rejected by us) were hand-traced and classified from the gate semantics and the failure signature: 16 genuinely broken (the tolerance-free core), 8 real but tolerance-dependent, and 7 reclassified as out of scope and dropped from the strict floor. That the audit discards 7 of the 31 rather than confirming all of them is evidence it does not rubber-stamp its own conclusion. Representative rows a reader can spot-check: id 179, a scan off by 1.1 × 10²² on plain random input that the fixed-shape <code>allclose</code> accepted; id 518, a 36× "speedup" from a candidate whose output is unparseable; and id 123, a softmax correct at native shape but wrong by 0.30 at four times the sequence length.</li>
+        </ul>
+        <p>The convergence of four independent and separately falsifiable defenses is the reason the finding should be believed.</p>
+
+        <h3 class="subsection">3.4 The differential</h3>
+        <p>Running the same accepted kernels through KernelBench's standard paper-era check (<code>allclose</code> at <code>atol=rtol=10⁻²</code>, five random-input trials, fixed shapes) produces the following contingency table. The benchmark accepts <strong>93.7%</strong> (2,472 of 2,638) of these kernels.</p>
+
+        <table class="results">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Ours: PASS</th>
+                    <th>Ours: FAIL</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>KernelBench: PASS</strong></td>
+                    <td class="num">985</td>
+                    <td class="num"><strong>1,487</strong> (958 tolerance-free)</td>
+                </tr>
+                <tr>
+                    <td><strong>KernelBench: FAIL</strong></td>
+                    <td class="num">14</td>
+                    <td class="num">152</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>The load-bearing cell, external PASS and our FAIL, holds 1,487 kernels (56.4% of the accepted set), 958 of them on a tolerance-free gate. The reverse cell is only 14 (0.5%), so our battery is not simply a stricter <code>allclose</code> that flags everything: the two checks disagree almost entirely in one direction, which is the signature of a systematic blind spot in the acceptance signal, not of two checks calibrated to different strictness. Under KernelBench's <em>hardened</em> per-dtype variant (fp32 tolerance 10⁻⁴) the accept rate falls to 84.6%, but 1,263 kernels still pass their check and fail ours, so the finding survives the tightened check. The standard test certifies nearly 1,500 broken kernels as correct.</p>
+
+        <h3 class="subsection">3.5 Robustness: a second stack and a second corpus</h3>
+        <ul class="body-list">
+            <li><strong>A different software stack:</strong> a 300-kernel re-audit on torch 2.11.0+cu128, against the audit's 2.12, returns 68.6% on the same B200 silicon; it runs above the 62.1% headline only because the smaller sample over-weights the high-rate reduction class. The pre-registered kill criterion was a re-audit rate below 5%; the observed rate clears it by more than thirteen times.</li>
+            <li><strong>A second corpus, native CUDA:</strong> the Sakana AI CUDA Engineer archive (213 kernels), graded by the system's own <code>Correct</code> boolean. Its raw 100% fail rate is precision-dominated, because the kernels are fp32-only by design, so it is not reported as a headline figure. The environment-robust residual is 20.2% (43 of 213), driven by CMP-03 shape rigidity (37), EXC-02 subnormal handling (9), ORD-02 nondeterminism (4), and CMP-01 value (1). The same rigor gap recurring in native CUDA along a complementary and weaker axis of precision and shape rigidity, rather than a second 62%.</li>
+        </ul>
+        <p>Together the cross-stack reconfirmation and the second corpus show that the effect is neither toolchain-bound nor Triton-specific.</p>
+
+        <!-- ============================================================== -->
+        <h2 class="section">4. The Native <code>tcgen05</code> Backward</h2>
+        <p>The second contribution is a piece of systems software that the verifier and a double-precision oracle jointly certify: a hand-written native Blackwell <code>tcgen05</code> tensor-memory training backward for the gated-linear-recurrence family.</p>
+
+        <h3 class="subsection">4.1 The two hard kernels</h3>
+        <p>The scan is sequential; the GPU wants parallelism. The standard resolution is chunking: split the sequence into chunks of 64 steps, do the parallelizable work inside all chunks at once, then run a short sequential carry between chunks. The backward runs this in reverse, and two stages are genuinely hard.</p>
+        <ul class="body-list">
+            <li><strong>K#1, the reverse inter-chunk state scan.</strong> A reverse-time walk accumulating the state gradient dS (shape <em>d<sub>k</sub></em> × <em>d<sub>v</sub></em>, fp32) backward across chunks, with a rank-one correction at each step from the delta rule. This is the sequential, carried stage, and it is the exact piece open libraries still run on a Triton fallback. Making it native <code>tcgen05</code> with the dS accumulator resident in TMEM across the whole loop is the sharpest single element of the contribution.</li>
+            <li><strong>K#2, the WY / triangular-inverse VJP.</strong> Inside each chunk the delta rule requires a small triangular solve T = (I + M)⁻¹, and its vector-Jacobian product is the numerically nastiest piece. The forward already computed T, so the backward reuses it as two triangular matrix multiplies and never re-inverts.</li>
+        </ul>
+        <p>Everything else in the backward is genuine work, but it is supporting glue. The design keeps K#1 and K#2 as native kernels while the glue is torch, and the glue is progressively fused in.</p>
+
+        <h3 class="subsection">4.2 Clearing the tensor-memory constraint</h3>
+        <p>The first attempt to run two or more matrix multiplies in one kernel produced illegal machine code or a deadlock, the same failure class behind #904. The root cause, established by reading NVIDIA's own <code>mamba2_ssd.py</code> in the same pinned toolchain, was a lifecycle error: the kernel reserved the full 512-column TMEM budget and released it per matrix multiply, which the hardware forbids. NVIDIA's kernel instead runs four <code>tcgen05</code> MMAs, including the cross-chunk recurrence, with a <em>single</em> reservation, fixed per-accumulator column offsets, and <em>one</em> release at the end. Porting that lifecycle, offset-partitioned accumulators with alloc-once and relinquish-once, cleared the blocker. What it unblocked is the contribution itself: the native reverse-state scan and WY-VJP for the GDN family, hand-written on the (128, 64, 128) <code>tcgen05</code> tile with TMA data movement and async pipelines, the backward stages that open implementations otherwise keep in <code>fla</code> Triton.</p>
+
+        <h3 class="subsection">4.3 Verification and the oracle chain</h3>
+        <p>Correctness is anchored by a layered ground-truth ladder, each rung checked against the one below: a token-serial fp64 oracle, a chunkwise reference, an fp64 torch assembly of the K#1/K#2 references with glue, and finally the <code>tcgen05</code> kernels on the B200. Applied to the native backward, the ladder gives the following.</p>
+        <ul class="body-list">
+            <li><strong>Double-precision spec pins</strong> on the reverse-state-scan tile and the WY-VJP tile: about 7 × 10⁻¹⁶ against the closed-form spec, machine-exact.</li>
+            <li><strong>The full assembled backward against an independent fp64 oracle:</strong> worst relative error 3.29 × 10⁻³ (scalar) and 3.31 × 10⁻³ (channel-wise), both under the 5 × 10⁻³ acceptance bound, and bit-for-bit deterministic across runs. One configuration sits outside that bound and is reported rather than hidden: the widest d_v = 128 save-forward arm reaches 5.21 × 10⁻³, a 4% overrun that is a property of the assembled pipeline arm and not of the kernel, which measures 5.5 × 10⁻⁴ against the same oracle.</li>
+            <li><strong>It trains.</strong> The native backward runs real 300-step training loops with zero numerical blow-ups, once a masked-exp2 fix corrected an exponent overflow that had produced a NaN. Every family member trains through the native path with the reference fallback disabled: the four reductions (LA, GLA, SSD, KDA), with LA run at L = 64 over 4000 steps, and the full GDN recurrence, which the backward differentiates directly. Fresh-input graph replay is bit-exact against eager execution.</li>
+            <li><strong>Positive control.</strong> The native backward passes the full twelve-gate battery, clean on every tolerance-free channel.</li>
+        </ul>
+
+        <h3 class="subsection">4.4 Speed, stated plainly</h3>
+        <p>The native GDN backward is <em>slower</em> than the <code>fla</code> Triton library, by roughly 8× at L = 512 rising to about 78× at L = 2048, and the paper does not claim parity. The gap is structural: <code>fla</code> sits near a 0.9 ms latency floor because it reuses the delta-rule inverse saved in the forward pass, while the reverse-state scan is inherently sequential and most of the runtime is spent in the surrounding fp32 glue rather than in the tensor-core kernels. The speedups reported are over our <em>own</em> earlier pipeline, not <code>fla</code>: a channel-wise fusion campaign cut the captured backward <strong>2.75×</strong> (52.9 to 19.2 ms), and a tensor-memory tiling optimization cut the d_v = 128 save-forward variant <strong>2.98×</strong> (24.50 to 8.23 ms). The contribution is that the kernel is native, general across the family, and verified; speed is future work.</p>
+
+        <h3 class="subsection">4.5 The bridge: the audit's failure modes are the gates that judged our kernel</h3>
+        <p>The verifier's two uses, the outward audit and the inward acceptance gate, are joined not only by shared code but by shared data. The defects that most often sink foreign kernels are, gate for gate, detected by the same gates that caught real errors in our own kernel during development.</p>
+        <ul class="body-list">
+            <li><strong>EXC-01, the modal foreign defect (34.2%).</strong> Foreign kernels silently swallow non-finites; our kernel generated non-finite values twice during development (the exponent overflow above, and a drifted <code>A_log</code> parametrization that made the state decay exceed one and blow up over long sequences) and <em>propagated</em> them, and it was precisely that propagation which made the errors visible at step 250 and during training. Non-finite propagation is not merely a gate to pass; it is the property that makes a kernel's own failures catchable. A kernel that had silently substituted a finite value, the foreign failure mode, would have hidden the same bugs from us.</li>
+            <li><strong>CMP-03, shape breakage (18.1% of applicable foreign kernels).</strong> The same gate surfaced the channel-inference defect in our own fused-block forward. We fixed the kernel rather than reclassified the verdict, which is the concrete form of the fairness argument.</li>
+            <li><strong>RES-02, the #904 hardware class.</strong> The tensor-memory lifecycle error the native backward had to clear is the exact constraint this gate exists to detect.</li>
+        </ul>
+        <p>Two further gates, PRC-02 (fp32 accumulation) and ORD-02 (determinism), our kernel passes by construction rather than by catching a bug: the reverse-state gradient dS is fp32-resident in TMEM across the whole loop, and the backward is bit-for-bit deterministic across runs. The paper marks them pass-by-design, because a positive control that passed only by design would be weaker evidence than one that caught something; the substantive alignments are the first three. A checker that flattered its author would neither have caught the author's own bugs nor shared a failure surface with the corpus it indicts. The defects the verifier found in our own work are what make the defects it found in everyone else's worth believing.</p>
+
+        <!-- ============================================================== -->
+        <h2 class="section">5. Supporting Results</h2>
+        <p>Around the two headlines sit five supporting results, each reported with the number behind it.</p>
+        <ul class="body-list">
+            <li><strong>Six contract-verified Mamba-3 Triton kernels</strong> (forward chunked scan, backward selective scan, MIMO backward, complex / RoPE scan, and the fused block forward and backward), hand-written with no <code>tl.dot</code> anywhere. Because they never touch the broken compiler pass, they compile and run at <code>num_warps</code> 2/4/8 on Blackwell, where the official kernel loses every <code>num_warps</code> ≥ 4 configuration to the TMEM budget: an availability advantage, categorical and independent of any latency ratio. They were verified against hand-derived references <em>first</em>, so they are the known-correct kernels against which the verifier's tolerance model was calibrated before it was ever aimed at foreign code. The MIMO backward is the first open Triton Mamba-3 MIMO backward we are aware of. All six pass every applicable gate on B200, and the full GPU test suite passes at <strong>1,197 tests</strong>.</li>
+            <li><strong>A faithful reproduction of #904</strong> on our own B200 (torch 2.12 / triton 3.7): a batch-2 / L = 2048 run and a batch-4 / L = 4096 run both trip <code>Required: 544, Hardware limit: 512</code> together with an out-of-resource error, forcing the slow fallback. We reproduced the bug, our kernels survive it, and RES-02 detects it. This is the failure class that motivates both the six Triton kernels and the native backward.</li>
+            <li><strong>A 1.1B-parameter applied demonstration:</strong> a Mamba-3 SISO model (d_model = 4096, 32 layers, d_state = 64, fp32) trained end-to-end as a 12-lead physiological-signal classifier on the public PTB-XL dataset, data-parallel across eight Blackwell GPUs with the forward pass running through our fused kernel. It reaches <strong>0.880 macro-AUC</strong> from random initialization with zero NaN (0.820 at step 500, then 0.859, 0.871, and a peak of 0.880 at step 2000). This is a demonstration that the stack trains a real model, not a domain result: 0.880 sits below the published state of the art for the dataset, which is a matter of training recipe (no pretraining, a mean-pool head, fp32-only, a fixed learning rate, and the SISO rather than MIMO block), not kernel correctness.</li>
+            <li><strong>Reinforcement learning: an autotuner win and a discovery negative.</strong> A from-scratch GRPO loop whose reward ladder pays a speed bonus only after every contract passes (no compile 0.0, fails the gates 0.1, passes all gates 1.0 plus a bounded speed bonus), so a fast-but-wrong kernel can never out-score a correct one. Config-RL beats the shipped default by <strong>1.167×</strong> at long sequences and selects the right shape-to-mode boundary, but this is autotuning, not discovery: the shape-gated selector we already ship captures the same optimum deterministically (2.174× geomean over the old serial default), so config-RL's standing contribution is that RL rediscovers a hand-derivable heuristic. Edit-RL, where the policy emits source edits graded through the full untrusted battery, is a negative result: over 320 attempts, 208 (65%) of edits did not apply because the model could not reproduce exact source lines; 52 applied and passed every gate but ran no faster; 37 applied but broke correctness and were caught by the gates; 19 failed at execution; and 4 failed inside the sandbox for reasons not attributable to the edit. The maximum speedup was 0.183× (roughly 5× slower) and no edit beat the baseline. The verifier rejected every incorrect edit. Source generation is the weakest action space for pointing a policy at this problem, and the result is credible <em>because</em> of how strictly it was judged.</li>
+            <li><strong>Speed baselines and killed levers.</strong> The Triton kernels' speed is recorded against three baselines, kept strictly separate so a ratio is never ambiguous. Against the #904-crippled official Mamba-3 backward we are about 4× slower (0.22 to 0.36×), the structural cost of avoiding <code>tl.dot</code> to survive #904; the real win over that baseline is <em>availability</em> rather than latency. Against healthy Mamba-1 SSD CUDA we range from slower to near-parity on the forward (0.21 to 1.04×, beating it only at the largest shape) and are slower on the backward (0.13 to 0.75×). Against our own earlier default, a shape-gated selector is 2.174× faster (geomean), internal autotuning, not a claim of external speed. Separately, four optimizations were built or probed and measured to give no benefit, and each is recorded with its mechanism so that it is not attempted again.</li>
+        </ul>
+
+        <!-- ============================================================== -->
+        <h2 class="section">6. Conclusion and Implications</h2>
+        <p>Every reported result in GPU-kernel generation rests on a claim of correctness, and that claim rests on a test too weak to carry it. Lethe builds the instrument that tests it properly and aims it in two directions. Outward: 62.1% of an accepted corpus carries a contract violation, and 39.5% is broken in a way no tolerance argument can excuse. Inward: the first native Blackwell <code>tcgen05</code> training backward for the GDN family, including the reverse-state stage the field still runs on a fallback, whose correctness was established independently of the verifier, machine-exact on the core tiles and 3.3 × 10⁻³ end to end, so its passing is a genuine positive control rather than a self-assessment. One instrument, two directions, and the same standard in both. The correctness behind the field's reported progress is far weaker than its numbers suggest, and the same twelve contracts that expose the gap are enough to begin closing it.</p>
+        <p>The practical implication is that acceptance criteria for kernel-generation benchmarks understate the correctness gap, and that a small set of tolerance-free contracts (non-finite propagation, determinism, shape polymorphism) would close most of it at modest cost; the paper suggests such contracts as a benchmark standard. On the systems side, the structural speed gap points to a specific lever (a <code>tl.dot</code> path on a post-#9093 Triton, and reducing the surrounding fp32 glue) rather than a general redesign.</p>
+        <p><strong>The paper, "A Contract-Grade Verifier for LLM-Generated GPU Kernels, and a Native Blackwell Backward for the Gated-Linear-Recurrence Family," is soon to be uploaded to arXiv and submitted to TMLR.</strong> All quantitative claims are backed by committed artifacts under a fixed software environment; single-row reproduction of any audited kernel requires only the public verifier and the public MIT-licensed corpus.</p>
+
+        <h3 class="subsection">6.1 Threats to validity, as the paper states them</h3>
+        <ul class="body-list">
+            <li><strong>Corpus dependence.</strong> The headline rests on one primary corpus, mitigated by the cross-stack reconfirmation (68.6% on torch 2.11) and the second, native-CUDA corpus (20.2% residual), though the effect is weaker on CUDA.</li>
+            <li><strong>Gate coverage.</strong> On a forward-only corpus two of twelve gates are idle (CMP-02 has no autograd graph to check, RES-02 no compile-time metadata to read), so the audit rests on ten and effectively seven load-bearing gates; both idle gates are exercised by the positive control.</li>
+            <li><strong>Reference correctness.</strong> The audit is only as good as its references, which is why the red team of nineteen cheats and the positive control on known-good kernels both run, and why the references refuse reduced precision.</li>
+            <li><strong>Native-kernel envelope.</strong> The <code>tcgen05</code> kernels are verified on a narrow shape envelope (d_k = 128, chunk = 64, d_v ∈ {64, 128}), at a loose fp16 tolerance, on a single GPU generation, and their correctness claim is scoped to that envelope and not asserted beyond it.</li>
+            <li><strong>Kernel-accelerated, not fully native.</strong> Stage-B, the normalization gradient, packing, and masks remain in torch and are progressively fused in. The one accuracy exception, the d_v = 128 save-forward arm at 5.21 × 10⁻³, is reported and scoped.</li>
+        </ul>
+
+        <h3 class="subsection">6.2 What's next</h3>
+        <ul class="body-list">
+            <li><strong>The arXiv upload and the TMLR review cycle.</strong></li>
+            <li><strong>The named speed levers:</strong> a <code>tl.dot</code> path on a post-#9093 Triton and reducing the surrounding fp32 glue, rather than a general redesign.</li>
+            <li><strong>Tolerance-free contracts as a benchmark standard</strong>, extended to further public corpora with the same four-way defense.</li>
+        </ul>
+
+        <!-- ============================================================== -->
+        <h2 class="section">7. Acknowledgments</h2>
+        <p>Thanks to <strong>Rishav Shrestha</strong> for GPU access. The verifier operationalizes the Kernel Contracts taxonomy (<a class="inline" href="https://arxiv.org/abs/2604.22032" target="_blank" rel="noopener">arXiv:2604.22032</a>), cited as the source, not our invention. KernelBench (<a class="inline" href="https://arxiv.org/abs/2502.10517" target="_blank" rel="noopener">arXiv:2502.10517</a>) is the acceptance signal the audit measures against, and the audited corpus is Dr. Kernel / KernelGYM (<a class="inline" href="https://arxiv.org/abs/2602.05885" target="_blank" rel="noopener">arXiv:2602.05885</a>, MIT license). The speed baseline is the <a class="inline" href="https://github.com/fla-org/flash-linear-attention" target="_blank" rel="noopener">flash-linear-attention</a> library, the TMEM lifecycle follows NVIDIA's <code>mamba2_ssd.py</code> example, and the tensor-memory bug the work engages is tracked at <a class="inline" href="https://github.com/state-spaces/mamba/issues/904" target="_blank" rel="noopener">state-spaces/mamba#904</a>.</p>
+    </div>
+</body>
+</html>

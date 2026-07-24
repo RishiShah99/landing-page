@@ -14,20 +14,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rishi Shah</title>
-    <meta name="description" content="Rishi Shah develops machine learning for the next generation of healthcare. Wrote a C++17 PyTorch in 5,500 lines and ran it on a $4 chip to predict hypoglycemia 60 minutes early. Surgical-vision AI at 95% tool-segmentation accuracy. Hand-tracked VR rehab for progressive muscle disease.">
+    <meta name="description" content="Rishi Shah develops machine learning systems. Wrote the first native Blackwell training backward for the gated-linear-recurrence family and a 12-gate verifier that falsified 62.1% of LLM-generated GPU kernels a published system accepted. Also: a C++17 PyTorch in 5,500 lines predicting hypoglycemia 60 minutes early, and surgical-vision AI at 95% tool-segmentation accuracy.">
 
     <!-- Open Graph / LinkedIn Preview -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://shahrishi.com/">
     <meta property="og:title" content="Rishi Shah">
-    <meta property="og:description" content="Built a C++17 PyTorch in 5,500 lines, then ran it on a $4 chip to predict hypoglycemia 60 minutes early. Also: surgical-vision AI at 95% tool-segmentation accuracy, hand-tracked VR rehab for progressive muscle disease, and architecture-driven adversarial robustness.">
+    <meta property="og:description" content="Wrote the first native Blackwell training backward for the gated-linear-recurrence family, and a 12-gate verifier that falsified 62.1% of LLM-generated GPU kernels a published system accepted. Also: a C++17 PyTorch in 5,500 lines on a $4 chip, and surgical-vision AI at 95% tool-segmentation accuracy.">
     <meta property="og:image" content="https://shahrishi.com/images/user.jpg">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://shahrishi.com/">
     <meta name="twitter:title" content="Rishi Shah">
-    <meta name="twitter:description" content="Built a C++17 PyTorch in 5,500 lines, then ran it on a $4 chip to predict hypoglycemia 60 minutes early. Also: surgical-vision AI at 95% tool-segmentation accuracy, hand-tracked VR rehab for progressive muscle disease, and architecture-driven adversarial robustness.">
+    <meta name="twitter:description" content="Wrote the first native Blackwell training backward for the gated-linear-recurrence family, and a 12-gate verifier that falsified 62.1% of LLM-generated GPU kernels a published system accepted. Also: a C++17 PyTorch in 5,500 lines on a $4 chip, and surgical-vision AI at 95% tool-segmentation accuracy.">
     <meta name="twitter:image" content="https://shahrishi.com/images/user.jpg">
 
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23f3ece0'/><text x='50' y='72' font-family='Georgia,serif' font-size='72' font-weight='700' fill='%231d1a16' text-anchor='middle'>R</text></svg>">
@@ -56,7 +56,7 @@
             <div class="header-content-compact">
                 <div class="header-info">
                     <h1>Rishi <span class="accent">Shah</span></h1>
-                    <p class="subtitle">Developing machine learning algorithms for the next generation of healthcare.</p>
+                    <p class="subtitle">Developing machine learning systems.</p>
                     <div class="contact-links">
                         <a href="https://github.com/RishiShah99"><i class="fa-brands fa-github"></i></a>
                         <a href="https://www.linkedin.com/in/rishi-shah-7915a7309/"><i class="fa-brands fa-linkedin"></i></a>
@@ -80,10 +80,10 @@
                 <h2 class="section-title">About</h2>
                 <ul class="about-points">
                     <li>Schulich Leader Scholar at McMaster University, one of Canada's top 50 entrepreneurial engineers that was awarded $120,000.</li>
+                    <li>Developed the first native Blackwell (tcgen05) training backward for the gated-linear-recurrence family (Mamba-2, GLA, KDA, Gated DeltaNet) and built a 12-gate contract verifier that audited 2,638 LLM-generated GPU kernels, falsifying 62.1% of them.</li>
                     <li>Built a novel linear-attention sequence model from scratch in 5,500 lines of pure C++17, trained it on real clinical data to predict hypoglycemia 60 minutes ahead, and proved its kernel runs bit-identically on a $4 chip.</li>
                     <li>Engineered a biologically inspired recurrent vision model that outperformed MIT's CORNet-S in adversarial robustness across MNIST, CIFAR, and ImageNet100.</li>
                     <li>Worked with Synaptive Medical and surgeons to develop a surgical-vision system trained on live operating-room data, achieving 95% tool segmentation accuracy for real-time surgical guidance.</li>
-                    <li>Founded Hack49 Global, a worldwide hackathon with over 1,000 participants from 40+ countries, securing $19,000+ in sponsorships.</li>
                 </ul>
             </div>
         </div>
@@ -94,9 +94,23 @@
         <div class="container">
             <h2 class="section-title">Projects</h2>
             <div class="work-grid-2col">
+                <div class="work" onclick="window.location.href='projects/lethe.html'">
+                    <img src="images/project-12.jpg" alt="Lethe" fetchpriority="high" decoding="async">
+                    <div class="work-content">
+                        <div class="work-year">2026</div>
+                        <h3>Lethe</h3>
+                        <div class="chips">
+                            <span class="chip">Kernel Engineering</span>
+                            <span class="chip">Machine Learning</span>
+                            <span class="chip">CUDA</span>
+                        </div>
+                        <p>First hand-written native Blackwell (tcgen05) training backward for the gated-linear-recurrence family (Mamba-2, GLA, KDA, Gated DeltaNet), verified against an fp64 oracle and bit-for-bit deterministic. Includes a 12-gate contract verifier that audited 2,638 LLM-generated kernels a public system had accepted and falsified 62.1% of them, plus the first open Triton Mamba-3 MIMO backward.</p>
+                    </div>
+                </div>
                 <div class="work" onclick="window.location.href='projects/cgm-on-chip.html'">
                     <img src="images/project-10.jpg" alt="CGM-on-Chip" fetchpriority="high" decoding="async">
                     <div class="work-content">
+                        <div class="work-year">2026</div>
                         <h3>CGM-on-Chip</h3>
                         <div class="chips">
                             <span class="chip">Machine Learning</span>
@@ -109,6 +123,7 @@
                 <div class="work" onclick="window.location.href='projects/from-pixels-to-precision.html'">
                     <img src="images/project-1.png" alt="From Pixels to Precision" fetchpriority="high" decoding="async">
                     <div class="work-content">
+                        <div class="work-year">2023</div>
                         <h3>From Pixels to Precision</h3>
                         <div class="chips">
                             <span class="chip">Surgical Vision</span>
@@ -121,6 +136,7 @@
                 <div class="work" onclick="window.location.href='projects/adversarial-robustness.html'">
                     <img src="images/project-2.png" alt="Adversarial Robustness" loading="lazy" decoding="async">
                     <div class="work-content">
+                        <div class="work-year">2025</div>
                         <h3>Adversarial Robustness Research</h3>
                         <div class="chips">
                             <span class="chip">ML Research</span>
@@ -133,6 +149,7 @@
                 <div class="work" onclick="window.location.href='projects/sentinel.html'">
                     <img src="images/project-8.png" alt="Sentinel" loading="lazy" decoding="async">
                     <div class="work-content">
+                        <div class="work-year">2025</div>
                         <h3>Sentinel</h3>
                         <div class="chips">
                             <span class="chip">Developer Tools</span>
@@ -145,6 +162,7 @@
                 <div class="work" onclick="window.location.href='projects/adaptvr.html'">
                     <img src="images/project-11.jpg" alt="AdaptVR" loading="lazy" decoding="async">
                     <div class="work-content">
+                        <div class="work-year">2026</div>
                         <h3>AdaptVR</h3>
                         <div class="chips">
                             <span class="chip">VR Rehab</span>
@@ -157,6 +175,7 @@
                 <div class="work" onclick="window.location.href='projects/monkey-see-monkey-do.html'">
                     <img src="images/project-7.jpg" alt="Adaptive Learning Robot" loading="lazy" decoding="async">
                     <div class="work-content">
+                        <div class="work-year">2025</div>
                         <h3>Adaptive Learning Robot</h3>
                         <div class="chips">
                             <span class="chip">Robotics</span>
@@ -169,6 +188,7 @@
                 <div class="work" onclick="window.location.href='projects/zephyr-ai.html'">
                     <img src="images/project-5.png" alt="Zephyr" loading="lazy" decoding="async">
                     <div class="work-content">
+                        <div class="work-year">2024</div>
                         <h3>Zephyr AI Assistant</h3>
                         <div class="chips">
                             <span class="chip">Personal AI</span>
@@ -181,6 +201,7 @@
                 <div class="work" onclick="window.location.href='projects/dermai.html'">
                     <img src="images/project-6.jpg" alt="DermAI" loading="lazy" decoding="async">
                     <div class="work-content">
+                        <div class="work-year">2024</div>
                         <h3>DermAI Medical Assistant</h3>
                         <div class="chips">
                             <span class="chip">Medical AI</span>
@@ -193,6 +214,7 @@
                 <div class="work" onclick="window.location.href='projects/surgical-tool-ar.html'">
                     <img src="images/project-9.png" alt="SurgicalToolAR" loading="lazy" decoding="async">
                     <div class="work-content">
+                        <div class="work-year">2024</div>
                         <h3>SurgicalToolAR</h3>
                         <div class="chips">
                             <span class="chip">Mixed Reality</span>
@@ -205,6 +227,7 @@
                 <div class="work" onclick="window.location.href='projects/gesture-arm.html'">
                     <img src="images/project-3.png" alt="Gesture Controlled Robotic Arm" loading="lazy" decoding="async">
                     <div class="work-content">
+                        <div class="work-year">2024</div>
                         <h3>Gesture Controlled Robotic Arm</h3>
                         <div class="chips">
                             <span class="chip">Computer Vision</span>
@@ -222,7 +245,7 @@
     </div>
 
     <script>
-        // Project card click handlers — wires inline onclick into the cream fade transition.
+        // Project card click handlers: wires inline onclick into the cream fade transition.
         // Particles, transition helper, and bfcache cleanup live in shared.js.
         document.querySelectorAll('.work').forEach(workElement => {
             const originalOnclick = workElement.getAttribute('onclick');
