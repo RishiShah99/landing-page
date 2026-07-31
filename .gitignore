@@ -7,6 +7,15 @@
 # Thumbnail working dir
 images/.thumb_candidates/
 
+# Internal and working documents. This site is public: anything committed
+# under images/ is served at shahrishi.com. Deny by default, allow explicitly.
+# The E3A handover document in particular must never be published.
+images/*.md
+images/*.pdf
+images/*.docx
+!images/Rishi_Shah_Resume.pdf
+!images/Shah_ContractGradeVerifierForGPUKernels_2026.pdf
+
 # OS junk
 .DS_Store
 Thumbs.db
