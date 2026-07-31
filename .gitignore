@@ -16,6 +16,10 @@ images/*.docx
 !images/Rishi_Shah_Resume.pdf
 !images/Shah_ContractGradeVerifierForGPUKernels_2026.pdf
 
+# MedSprint working files, not published
+images/MedSprint*
+images/com.DefaultCompany.Medsprint*
+
 # OS junk
 .DS_Store
 Thumbs.db
