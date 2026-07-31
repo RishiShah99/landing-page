@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sentinel · Hardware-aware static analysis for Arduino and ESP32 | Rishi Shah</title>
-    <meta name="description" content="A VS Code extension and custom Language Server that catches RAM overruns, pin conflicts, strapping-pin boot failures, and bus errors in Arduino and ESP32 code as you type. Solo build, shipped in a few hours at Hack Western 12, Best Developer Tool. 800+ combined installs across the VS Code Marketplace and Open VSX.">
+    <meta name="description" content="A VS Code extension and custom Language Server that catches RAM overruns, pin conflicts, strapping-pin boot failures, and bus errors in Arduino and ESP32 code as you type. Solo build, shipped in a few hours at Hack Western 12, Best Developer Tool. 1K+ combined installs across the VS Code Marketplace and Open VSX.">
 
     <link rel="prefetch" href="../index.html">
     <style>html, body { background-color: #f3ece0; margin: 0; padding: 0; }</style>
@@ -36,7 +36,7 @@
 
         <p class="subtitle">A VS Code extension and custom Language Server Protocol that catches RAM overruns, pin conflicts, strapping-pin boot failures, and bus configuration errors in Arduino and ESP32 code as you type, not after the flash. Built solo in a few hours at Hack Western 12, where it won Best Developer Tool.</p>
 
-        <p class="subtitle" style="margin-top: 1em;">Install from the <a class="inline" href="https://marketplace.visualstudio.com/items?itemName=RishiShah.sentinel-arduino" target="_blank" rel="noopener">VS Code Marketplace</a> or <a class="inline" href="https://open-vsx.org/extension/RishiShah/sentinel-arduino" target="_blank" rel="noopener">Open VSX</a> &middot; 800+ combined installs.</p>
+        <p class="subtitle" style="margin-top: 1em;">Install from the <a class="inline" href="https://marketplace.visualstudio.com/items?itemName=RishiShah.sentinel-arduino" target="_blank" rel="noopener">VS Code Marketplace</a> or <a class="inline" href="https://open-vsx.org/extension/RishiShah/sentinel-arduino" target="_blank" rel="noopener">Open VSX</a> &middot; 1K+ combined installs.</p>
 
         <!-- ============================================================== -->
         <h2 class="section">1. Abstract</h2>
@@ -48,7 +48,7 @@
 
         <ul class="body-list">
             <li><strong>Best Developer Tool, Hack Western 12.</strong> External validation that the gap is felt by the people who would benefit most from closing it.</li>
-            <li><strong>800+ combined installs</strong> across the VS Code Marketplace and Open VSX, as a solo-maintained extension. Adoption past the demo audience.</li>
+            <li><strong>1K+ combined installs</strong> across the VS Code Marketplace and Open VSX, as a solo-maintained extension. Adoption past the demo audience.</li>
             <li><strong>Custom Node.js Language Server</strong> built end-to-end in a single hackathon session. AST parser for <code>.ino</code> + <code>.cpp</code>, hardware state machine, rule engine, LSP diagnostic surface.</li>
             <li><strong>Per-board hardware models</strong> for ATmega328P, ATmega2560, ESP32, and ESP8266. Pin maps, peripheral assignments, strapping pin behaviour at reset.</li>
             <li><strong>RAM and Flash estimates</strong> rendered live in the editor against per-board budgets. Within roughly 3% of compiled output on the calibration sketch suite.</li>
@@ -131,14 +131,14 @@
             <li><strong>Memory estimate accuracy:</strong> within roughly 3% of compiled-output RAM and Flash on the calibration sketches across the four supported boards. The estimate degrades on sketches that use heavy dynamic allocation (the <code>String</code> class on AVR, dynamic <code>WiFiClient</code> pools on ESP32) because those costs only materialise at runtime.</li>
             <li><strong>Diagnostic latency:</strong> 47 ms average from keystroke to inline diagnostic on sketches under 2000 lines. P95 under 100 ms on the same set.</li>
             <li><strong>Rule coverage:</strong> 50+ active rules across memory, GPIO assignment, strapping pins, and the three buses. New rules average tens of lines of code each, which is what makes the count plausible inside a hackathon window.</li>
-            <li><strong>Adoption:</strong> 800+ combined installs across the VS Code Marketplace and Open VSX as a solo-maintained extension, post-event. The download path past the Hack Western audience is what makes the project something other than a demo.</li>
+            <li><strong>Adoption:</strong> 1K+ combined installs across the VS Code Marketplace and Open VSX as a solo-maintained extension, post-event. The download path past the Hack Western audience is what makes the project something other than a demo.</li>
         </ul>
 
         <p>These numbers are honest about the harness. The 3% memory estimate holds on the sketches the analyzer was calibrated against and degrades outside that distribution. The 50+ rule count is correct as a count, not as a claim that every rule is equally hardened: hackathon-grade rules and shipped-product-grade rules look the same in the rule engine, and a few are closer to the former. The 200+ device autocomplete database is mostly assembled from public datasheets rather than original research. Read the numbers as evidence of the editor-loop direction, not as a benchmark against PC-Lint or Clang-Tidy.</p>
 
         <!-- ============================================================== -->
         <h2 class="section">5. Conclusion and Implications</h2>
-        <p>The state of embedded tooling is a productivity tax that limits who can build hardware. By moving diagnostics from after compile to inside the editor, Sentinel makes firmware development feel like high-level software development: fast iteration, instant safety rails, fewer trips to the oscilloscope. The safety-critical consequence is that the strapping-pin and pin-conflict failures that today surface as field-deployment bugs, bricked devices, or boot-loop incidents in industrial and medical embedded systems can surface as squiggles in the editor instead. Best Developer Tool at Hack Western 12 was the external validation that the gap is felt by the people who would benefit most from closing it; the 800+ installs since then are the quieter, more durable signal.</p>
+        <p>The state of embedded tooling is a productivity tax that limits who can build hardware. By moving diagnostics from after compile to inside the editor, Sentinel makes firmware development feel like high-level software development: fast iteration, instant safety rails, fewer trips to the oscilloscope. The safety-critical consequence is that the strapping-pin and pin-conflict failures that today surface as field-deployment bugs, bricked devices, or boot-loop incidents in industrial and medical embedded systems can surface as squiggles in the editor instead. Best Developer Tool at Hack Western 12 was the external validation that the gap is felt by the people who would benefit most from closing it; the 1K+ installs since then are the quieter, more durable signal.</p>
 
         <h3 class="subsection">5.1 Limitations</h3>
         <ul class="body-list">
