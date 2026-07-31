@@ -82,6 +82,7 @@
                 <ul class="about-points">
                     <li>Schulich Leader Scholar at McMaster University, one of Canada's top 50 entrepreneurial engineers that was awarded $120,000.</li>
                     <li>Developed the first native Blackwell (tcgen05) training backward for the gated-linear-recurrence family (Mamba-2, GLA, KDA, Gated DeltaNet) and built a 12-gate contract verifier that audited 2,638 LLM-generated GPU kernels, falsifying 62.1% of them.</li>
+                    <li>Architected and shipped a labor-prediction model that beats the clinical state of the art by 3x, calling term delivery within 3 days instead of 11 and halving preterm error, live on real patients.</li>
                     <li>Built a novel linear-attention sequence model from scratch in 5,500 lines of pure C++17, trained it on real clinical data to predict hypoglycemia 60 minutes ahead, and proved its kernel runs bit-identically on a $4 chip.</li>
                     <li>Engineered a biologically inspired recurrent vision model that outperformed MIT's CORNet-S in adversarial robustness across MNIST, CIFAR, and ImageNet100.</li>
                     <li>Worked with Synaptive Medical and surgeons to develop a surgical-vision system trained on live operating-room data, achieving 95% tool segmentation accuracy for real-time surgical guidance.</li>
@@ -90,10 +91,16 @@
         </div>
     </div>
 
-    <!-- Portfolio Section -->
+    <!-- Portfolio Section: Projects / Papers / Work Experience -->
     <div id="portfolio">
         <div class="container">
-            <h2 class="section-title">Projects</h2>
+            <div class="section-tabs" role="tablist" aria-label="Portfolio sections">
+                <button class="tab active" data-tab="projects" role="tab" aria-selected="true">Projects</button>
+                <button class="tab" data-tab="papers" role="tab" aria-selected="false">Papers</button>
+                <button class="tab" data-tab="experience" role="tab" aria-selected="false">Work Experience</button>
+            </div>
+
+            <div id="panel-projects" class="tab-panel active" role="tabpanel">
             <div class="work-grid-2col">
                 <div class="work" onclick="window.location.href='projects/lethe.html'">
                     <img src="images/project-12.jpg" alt="Lethe" fetchpriority="high" decoding="async">
@@ -157,7 +164,7 @@
                             <span class="chip">Embedded Systems</span>
                             <span class="chip">Language Server</span>
                         </div>
-                        <p>First hardware-aware static analyzer for embedded systems performing RAM/Flash estimation, pin-mapping, and 50+ validations before compilation. Built a custom Language Server Protocol integration with VS Code for real-time hardware-intelligent error detection.</p>
+                        <p>First hardware-aware static analyzer for embedded systems performing RAM/Flash estimation, pin-mapping, and 50+ validations before compilation. Built a custom Language Server Protocol integration with VS Code for real-time hardware-intelligent error detection. Won Best Developer Tool at Hack Western 12; 1K+ installs across the VS Code Marketplace and Open VSX.</p>
                     </div>
                 </div>
                 <div class="work" onclick="window.location.href='projects/adaptvr.html'">
@@ -239,6 +246,66 @@
                     </div>
                 </div>
             </div>
+            </div>
+
+            <div id="panel-papers" class="tab-panel" role="tabpanel">
+            <div class="paper-list">
+                <div class="paper">
+                    <div class="paper-year">2026 &middot; Preprint</div>
+                    <h3 class="paper-title"><a href="images/Shah_ContractGradeVerifierForGPUKernels_2026.pdf" target="_blank" rel="noopener">A Contract-Grade Verifier for LLM-Generated GPU Kernels, and a Native Blackwell Backward for the Gated-Linear-Recurrence Family</a></h3>
+                    <p class="paper-meta">Rishi Shah, Rishav Shrestha &middot; DOI <a href="https://doi.org/10.5281/zenodo.21563213" target="_blank" rel="noopener">10.5281/zenodo.21563213</a></p>
+                    <p class="paper-abstract">Twelve adversarial gates that check GPU-kernel correctness properly, several of them tolerance-free. Aimed outward, the verifier audited 2,638 LLM-generated kernels a public system had already accepted and found 62.1% carrying a contract violation; aimed inward, it certified the first native Blackwell (tcgen05) training backward for the gated-linear-recurrence family.</p>
+                    <div class="paper-links">
+                        <a href="images/Shah_ContractGradeVerifierForGPUKernels_2026.pdf" target="_blank" rel="noopener">PDF</a>
+                        <a href="https://doi.org/10.5281/zenodo.21563213" target="_blank" rel="noopener">DOI</a>
+                        <a href="projects/lethe.html">Project Page</a>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <div id="panel-experience" class="tab-panel" role="tabpanel">
+                <div class="timeline">
+                    <div class="timeline-entry current">
+                        <div class="timeline-date">May 2026 &ndash; Aug 2026<span class="loc">Shenzhen, China</span></div>
+                        <div class="timeline-body">
+                            <h3 class="timeline-role">Machine Learning Engineer</h3>
+                            <div class="timeline-org">E3A Healthcare</div>
+                            <p>Owned the supervised layer and set the architecture direction of a longitudinal model that reads at-home fetal monitoring and returns a full posterior over days until delivery. The model predicts term delivery to within 3 days against 11 days for the clinical state of the art, and halves the obstetric calendar's error on preterm cases. </p>
+                        <ul class="timeline-points">
+                            <li>Authored the first design of the cohort mixture-of-experts and its learned gate, and originated the sub-agent architecture now on the model's roadmap.</li>
+                            <li>Built the reasoning layer and the coupled-likelihood objective behind the preterm win, 2.02 days better with the same sign on all ten seeds.</li>
+                            <li>Wrote the evaluation methodology the project now runs on, and put GPU compute in every engineer's hands by automating multi-region GPU cluster provisioning on GCP.</li>
+                        </ul>
+                        </div>
+                    </div>
+                    <div class="timeline-entry">
+                        <div class="timeline-date">Oct 2025 &ndash; Apr 2026<span class="loc">Hamilton, ON</span></div>
+                        <div class="timeline-body">
+                            <h3 class="timeline-role">Research Engineer</h3>
+                            <div class="timeline-org">McMaster Automotive Resource Centre (MARC)</div>
+                            <p>Cut battery voltage-model error 84% (12.82 mV to 2.03 mV RMSE) with a physics + LSTM hybrid, then carried it through ONNX to MATLAB and Simulink with machine-precision parity. Co-authoring a paper on agentic-AI-accelerated state-of-charge estimation built on a from-scratch EKF and SVSF.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-entry">
+                        <div class="timeline-date">Apr 2024 &ndash; Aug 2025<span class="loc">London, ON</span></div>
+                        <div class="timeline-body">
+                            <h3 class="timeline-role">Machine Learning Researcher</h3>
+                            <div class="timeline-org">Western University, Vision &amp; Robotics Lab</div>
+                            <p>Designed a biologically inspired recurrent vision model that reached 97.82% adversarial accuracy on MNIST without a single adversarial training example, outperforming MIT's CORNet-S by 12 points across MNIST, CIFAR-100, and ImageNet100.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-entry">
+                        <div class="timeline-date">Nov 2022 &ndash; May 2024<span class="loc">London, ON</span></div>
+                        <div class="timeline-body">
+                            <h3 class="timeline-role">Student Researcher, Medical Imaging</h3>
+                            <div class="timeline-org">Robarts Research Institute</div>
+                            <p>Partnered with Synaptive Medical on surgical-vision AI: a U-Net at 95% DICE and sub-0.12 s per frame on live operating-room footage, plus a marker-based AR guidance prototype. Bronze Medal at the Canada-Wide Science Fair.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="copyright">
                 <p>Copyright &copy; 2026 Rishi Shah. All rights reserved.</p>
             </div>
@@ -256,6 +323,23 @@
                 workElement.addEventListener('click', () => window.navigateToProject(url));
             }
         });
+
+        // Portfolio tabs: Projects / Papers / Work Experience.
+        // Hash deep-links (#projects, #papers, #experience) select the tab on load.
+        const tabs = document.querySelectorAll('.section-tabs .tab');
+        const panels = document.querySelectorAll('.tab-panel');
+        function activateTab(name, updateHash) {
+            tabs.forEach(t => {
+                const on = t.dataset.tab === name;
+                t.classList.toggle('active', on);
+                t.setAttribute('aria-selected', on);
+            });
+            panels.forEach(p => p.classList.toggle('active', p.id === 'panel-' + name));
+            if (updateHash) history.replaceState(null, '', '#' + name);
+        }
+        tabs.forEach(t => t.addEventListener('click', () => activateTab(t.dataset.tab, true)));
+        const initialTab = location.hash.slice(1);
+        if (['projects', 'papers', 'experience'].includes(initialTab)) activateTab(initialTab, false);
     </script>
 </body>
 </html>
