@@ -36,6 +36,15 @@
 
         <p class="subtitle">Twelve adversarial gates, aimed in two directions: outward at 2,638 machine-generated kernels a public system had already accepted, and inward at the first native <code>tcgen05</code> training backward for the GDN family. The full paper, which covers all of this in far greater detail, is published at <a class="inline" href="https://doi.org/10.5281/zenodo.21563213" target="_blank" rel="noopener">doi.org/10.5281/zenodo.21563213</a>.</p>
 
+        <figure>
+            <div class="figure-card">
+                <video controls autoplay muted loop playsinline style="max-width: 520px; margin: 0 auto;">
+                    <source src="../images/lethe_film_1x1.mp4" type="video/mp4">
+                </video>
+            </div>
+            <figcaption>Figure 1. The whole project in 74 seconds. The native <code>tcgen05</code> backward, the twelve-gate battery, and the rigor-gap audit, measured on B200 silicon.</figcaption>
+        </figure>
+
         <!-- ============================================================== -->
         <h2 class="section">1. Abstract</h2>
         <p>Systems that generate GPU kernels with language models report high correctness rates. Those rates come from a single loose test: run the kernel on a few random inputs at one fixed shape and accept it if the output is close to a reference. A kernel can pass that test and still be silently wrong. It can return an ordinary number where the true answer is a NaN or an infinity, produce a different result on each run, break the moment the shape changes, or accumulate in fp16 where the reference keeps an fp32 total. Lethe builds the instrument that checks correctness properly: a <strong>contract-grade verifier</strong> of twelve adversarial gates, each a property a correct kernel must satisfy, several of them <em>tolerance-free</em> so that no choice of threshold can explain a failure away. We aim it in two directions.</p>
@@ -51,15 +60,6 @@
             <li><strong>The native backward:</strong> worst relative error 3.29 × 10⁻³ (scalar) and 3.31 × 10⁻³ (channel-wise) against an independent fp64 oracle under a 5 × 10⁻³ bound, bit-for-bit deterministic across runs, and all five family members train through it. It handles correctly the tensor-memory constraint behind the open <a class="inline" href="https://github.com/state-spaces/mamba/issues/904" target="_blank" rel="noopener">#904</a> bug.</li>
             <li><strong>The first open Triton Mamba-3 MIMO backward we are aware of</strong>, in a six-kernel suite that compiles at every <code>num_warps</code> where the official backward trips #904. Full GPU suite: 1,197 tests green on B200.</li>
         </ul>
-
-        <figure>
-            <div class="figure-card">
-                <video controls autoplay muted loop playsinline style="max-width: 520px; margin: 0 auto;">
-                    <source src="../images/lethe_film_1x1.mp4" type="video/mp4">
-                </video>
-            </div>
-            <figcaption>Figure 1. The whole project in 74 seconds. The native <code>tcgen05</code> backward, the twelve-gate battery, and the rigor-gap audit, measured on B200 silicon.</figcaption>
-        </figure>
 
         <!-- ============================================================== -->
         <h2 class="section">2. Introduction</h2>
