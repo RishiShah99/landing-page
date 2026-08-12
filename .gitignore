@@ -15,6 +15,7 @@ images/*.pdf
 images/*.docx
 !images/Rishi_Shah_Resume.pdf
 !images/Shah_ContractGradeVerifierForGPUKernels_2026.pdf
+!images/Shah_RolloutDecodedReconstruction_2026.pdf
 
 # MedSprint working files, not published
 images/MedSprint*

@@ -115,6 +115,19 @@
                         <p>First hand-written native Blackwell (tcgen05) training backward for the gated-linear-recurrence family (Mamba-2, GLA, KDA, Gated DeltaNet), verified against an fp64 oracle and bit-for-bit deterministic. Includes a 12-gate contract verifier that audited 2,638 LLM-generated kernels a public system had accepted and falsified 62.1% of them, plus the first open Triton Mamba-3 MIMO backward.</p>
                     </div>
                 </div>
+                <div class="work" onclick="window.location.href='projects/rdr.html'">
+                    <img src="images/project-13.jpg" alt="RDR" fetchpriority="high" decoding="async">
+                    <div class="work-content">
+                        <div class="work-year">2026</div>
+                        <h3>RDR</h3>
+                        <div class="chips">
+                            <span class="chip">World Models</span>
+                            <span class="chip">Machine Learning</span>
+                            <span class="chip">Model-Based Control</span>
+                        </div>
+                        <p>A one-term training objective for latent world models that free-runs the model during training, decodes every rollout latent, and penalizes it against ground truth. Adds zero parameters and changes no architecture, so setting its weight to zero recovers the standard objective exactly and every result is a one-flag A/B. Nearly doubles valid prediction time on chaotic Kuramoto&ndash;Sivashinsky at an identical 193,568 parameters, 10 of 10 preregistered configurations, with the margin growing as the latent widens.</p>
+                    </div>
+                </div>
                 <div class="work" onclick="window.location.href='projects/cgm-on-chip.html'">
                     <img src="images/project-10.jpg" alt="CGM-on-Chip" fetchpriority="high" decoding="async">
                     <div class="work-content">
@@ -250,6 +263,17 @@
 
             <div id="panel-papers" class="tab-panel" role="tabpanel">
             <div class="paper-list">
+                <div class="paper">
+                    <div class="paper-year">2026 &middot; Preprint</div>
+                    <h3 class="paper-title"><a href="images/Shah_RolloutDecodedReconstruction_2026.pdf" target="_blank" rel="noopener">Rollout-Decoded Reconstruction for Latent World Models</a></h3>
+                    <p class="paper-meta">Rishi Shah, Rishav Shrestha &middot; DOI <a href="https://doi.org/10.5281/zenodo.21894547" target="_blank" rel="noopener">10.5281/zenodo.21894547</a></p>
+                    <p class="paper-abstract">A latent world model's decoder is trained on states anchored to observations and deployed on the model's own free-running rollout. RDR is one loss term that closes the gap: free-run during training, decode every rollout latent, penalize the error against ground truth. It adds no parameters, so every comparison is a one-flag A/B. On chaotic Kuramoto&ndash;Sivashinsky it raises valid prediction time from 3.87 to 6.97 time units at an identical 193,568 parameters, winning 10 of 10 preregistered configurations.</p>
+                    <div class="paper-links">
+                        <a href="images/Shah_RolloutDecodedReconstruction_2026.pdf" target="_blank" rel="noopener">PDF</a>
+                        <a href="https://doi.org/10.5281/zenodo.21894547" target="_blank" rel="noopener">DOI</a>
+                        <a href="projects/rdr.html">Project Page</a>
+                    </div>
+                </div>
                 <div class="paper">
                     <div class="paper-year">2026 &middot; Preprint</div>
                     <h3 class="paper-title"><a href="images/Shah_ContractGradeVerifierForGPUKernels_2026.pdf" target="_blank" rel="noopener">A Contract-Grade Verifier for LLM-Generated GPU Kernels, and a Native Blackwell Backward for the Gated-Linear-Recurrence Family</a></h3>

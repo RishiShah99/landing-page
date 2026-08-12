@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en" style="background-color: #f3ece0;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RDR · Rollout-Decoded Reconstruction for latent world models | Rishi Shah</title>
+    <meta name="description" content="A single loss term that free-runs a latent world model during training, decodes every rollout latent, and penalizes reconstruction error against ground truth. On the chaotic Kuramoto–Sivashinsky equation it raises valid prediction time from 3.87 to 6.97 time units, a 1.80× improvement at an identical 193,568 parameters, winning 10 of 10 preregistered configurations.">
+
+    <link rel="prefetch" href="../index.html">
+    <style>html, body { background-color: #f3ece0; margin: 0; padding: 0; }</style>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="project.css">
+    <script defer src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script defer src="../shared.js"></script>
+    <script defer src="project.js"></script>
+</head>
+<body>
+    <div id="particles-js"></div>
+
+    <div class="container">
+        <a class="back-link" href="../index.html">[ Back to home ]</a>
+
+        <div class="eyebrow">RDR · 2026</div>
+
+        <h1 class="title">Rollout-Decoded Reconstruction for <span class="accent">latent world models</span>.</h1>
+
+        <div class="chips">
+            <span class="chip">World Models</span>
+            <span class="chip">Machine Learning</span>
+            <span class="chip">Model-Based Control</span>
+        </div>
+
+        <p class="subtitle">A latent world model's decoder is trained on states anchored to observations and deployed on the model's own free-running rollout. RDR is one loss term that trains it where it is deployed: free-run during training, decode every rollout latent, penalize the error against ground truth. It adds no parameters and changes no architecture, so every comparison is a one-flag A/B. The full paper, which covers all of this in far greater detail, is published at <a class="inline" href="https://doi.org/10.5281/zenodo.21894547" target="_blank" rel="noopener">doi.org/10.5281/zenodo.21894547</a>.</p>
+
+        <figure>
+            <div class="figure-card">
+                <video controls autoplay muted loop playsinline style="max-width: 520px; margin: 0 auto;">
+                    <source src="../images/rdr_film_1x1.mp4" type="video/mp4">
+                </video>
+            </div>
+            <figcaption>Figure 1. The whole project in 85 seconds. The decoder's blind spot, the free-running rollout on Kuramoto–Sivashinsky, the scaling with latent width, and the two control results.</figcaption>
+        </figure>
+
+        <!-- ============================================================== -->
+        <h2 class="section">1. Abstract</h2>
+        <p>Latent world models learn three components: an encoder that maps observations to a compact state, a transition that advances the state, and a decoder that maps states back to observation space. The standard training objective supervises the decoder on <em>posterior</em> latents, states computed while observations are available, and on predictions one teacher-forced step from them. Multi-step training signals, where present, act in latent space only. At deployment the model free-runs. The transition iterates on its own outputs, and the decoder is applied to latents that have drifted for tens or hundreds of steps without being conditioned on an observation. The decoder's training distribution and its deployment distribution therefore diverge exactly where long-horizon behavior is decided.</p>
+
+        <p>The gap is named but unmeasured. PlaNet identified the direct fix, observation overshooting, which decodes the multi-step rollout latents, and set it aside as too expensive in image domains, so what it is worth was never established; the Dreamer line trains its decoder on posterior latents only and never decodes an imagined state as a training loss. The gap has stood open in every latent world model since. <strong>Rollout-Decoded Reconstruction (RDR)</strong> closes it directly. During training the model is rolled free-running from an encoded initial state, exactly as evaluation will roll it; every rollout latent is decoded; and the reconstruction error against ground truth is penalized. The term adds no parameters, changes no architecture, and reduces to the standard objective when its weight λ is zero, so every comparison is a controlled A/B at fixed data, seeds, budget, and parameter count, differing in one flag.</p>
+
+        <p>On the chaotic Kuramoto–Sivashinsky equation, a standard long-horizon benchmark with exact ground truth, RDR raises valid prediction time from 3.87 ± 0.23 to 6.97 ± 0.42 time units: a <strong>1.80× improvement at an identical 193,568 parameters</strong>, confirmed on fresh seeds and at both evaluation horizons, with the direction holding in <strong>10 of 10 preregistered configurations</strong> at ratios of 1.71 to 2.50×. The effect is attributable to the decoder's training distribution rather than to capacity, and it grows with latent width while the standard objective anti-scales. In model-based control, ensembles of RDR world models reach useful behavior in fewer optimizer steps and are robust to a planner–training rollout mismatch that costs the standard objective more return in 4 of 4 measured rows. Both results come from the same single term. RDR is an objective rather than an architecture: it composes with any world model that retains a decoder.</p>
+
+        <ul class="body-list">
+            <li><strong>One loss term, zero new parameters.</strong> RDR free-runs the model during training, decodes every rollout latent, and penalizes reconstruction against ground truth. Setting λ = 0 recovers the standard objective exactly, which makes every result in the paper a one-flag A/B rather than a comparison between two systems.</li>
+            <li><strong>Nearly a doubling of valid prediction time on a chaotic PDE:</strong> 3.87 ± 0.23 to 6.97 ± 0.42 time units at an identical 193,568 trainable parameters, 3.77 to 6.90 on the long horizon from the same checkpoints, and 10 of 10 preregistered configurations in the same direction at 1.71 to 2.50×.</li>
+            <li><strong>The effect is supervision, not capacity.</strong> A split-decoder variant that spends +25.7% more parameters on the same objective (243,296 against 193,568) performs <em>worse</em> than the shared decoder in 7 of 10 configurations on both horizons, including the winner and its fresh-seed confirmation.</li>
+            <li><strong>It converts capacity into horizon where the standard objective anti-scales.</strong> Across a four-point latent bracket the posterior-only arm's valid prediction time <em>falls</em> as the latent widens, 3.00 to 2.27 time units, while the RDR arm rises; the per-rung ratio grows from 1.41× at latent 16 to 2.50× at latent 48, and all 36 per-seed paired ratios exceed 1.</li>
+            <li><strong>In control, two properties, each established by a matched control:</strong> 20 of 20 paired episodes won at every reduced-data rung on both tasks, which a step-matched ladder localizes to optimizer steps rather than data volume; and robustness to a planner that rolls the model differently than training did, where the posterior arm gains more from being put back in step in 4 of 4 rows.</li>
+        </ul>
+
+        <!-- ============================================================== -->
+        <h2 class="section">2. Introduction</h2>
+        <p>Every latent world model in current use trains a decoder and then deploys it somewhere else. Training supervises the decoder on states computed while observations are available, plus predictions one teacher-forced step from them. Inference free-runs: the transition iterates on its own output, and by the time long-horizon behavior is decided the decoder is reading latents hundreds of steps from the last observation it saw. Multi-step training signals do exist in this lineage, but they act in latent space, so the decoder itself is never exposed to a multi-step rollout latent. The distribution the decoder is fit on and the distribution it is used on are different, and the difference is unmeasured.</p>
+
+        <h3 class="subsection">2.1 The gap, and why it stayed open</h3>
+        <ul class="body-list">
+            <li><strong>PlaNet named the fix and dropped it.</strong> Observation overshooting decodes the multi-step rollout latents, which is the direct remedy; it was set aside as too expensive in image domains, so its value was never established.</li>
+            <li><strong>The Dreamer line never revisited it.</strong> Encoder, latent transition, and decoder train jointly with the decoder supervised on posterior latents; latent overshooting in PlaNet and KL balancing in its successors keep the multi-step signal in latent space, and no imagined state is decoded as a training loss.</li>
+            <li><strong>Decoder-free models remove the component rather than fix it.</strong> TD-MPC2 replaces reconstruction with value prediction and MuDreamer deletes the reconstruction loss from Dreamer; this is the one family RDR does not reach, having removed the component it trains. Wherever a decoder is retained, it can be trained into a substantially better long-horizon instrument at zero parameter cost.</li>
+            <li><strong>The exposure-bias literature addresses the input, not the decoder.</strong> Scheduled sampling and professor forcing operate on model-generated inputs; the pushforward trick and solver-in-the-loop unroll observation-space PDE surrogates, which have no latent space and hence no decoder subject to the mismatch; Self Forcing, Diffusion Forcing, and Next Forcing train on their own rollouts in pixel space, without an encoder, latent, decoder triplet.</li>
+        </ul>
+
+        <h3 class="subsection">2.2 What is new, and what is not claimed</h3>
+        <p>Two concurrent 2026 preprints are the closest work. NeuroWorld decodes a frozen dynamics model's rollout latents with a separately trained subject decoder for fMRI prediction; Koopman Dreamer includes an open-loop observation-prediction term among several auxiliaries around a spectrally constrained transition. Neither isolates the decoder's training distribution as the object of study. From the reduced-order modeling side, Rollout-LaSDI reaches the same construction for latent space dynamics identification, but its latent evolution is a per-parameter linear system fit by regression rather than a learned nonlinear transition applied recursively to its own output, its system is a smooth viscous PDE rather than a chaotic one, it reports no action-conditioned or control result, and it holds the latent width fixed, so the capacity behavior has no counterpart there.</p>
+        <ul class="body-list">
+            <li><strong>What is new:</strong> rollout-decoded training carried into world models and measured, on a chaotic system, at fixed parameters, data, seeds, and budget, with the capacity and the scaling behavior separated out.</li>
+            <li><strong>Not claimed:</strong> that RDR competes with the architectural work in this area. Symmetry reduction, discrete latents, KL balancing, and latent overshooting all leave a decoder in place and leave its training distribution unchanged, so RDR applies on top of each. Any world model with an encoder, a transition, and a decoder can adopt it by adding one term and setting one weight.</li>
+            <li><strong>Every quantitative claim is archived.</strong> The numbers trace to evaluation artifacts produced under a fixed, preregistered protocol, and the figures are rendered by a script that re-asserts each quoted number against those artifacts and fails the build on drift.</li>
+        </ul>
+
+        <!-- ============================================================== -->
+        <h2 class="section">3. The RDR Objective</h2>
+
+        <h3 class="subsection">3.1 Model and base objective</h3>
+        <p>The model is a deliberately plain instance of the encoder, transition, decoder triplet, so that the objective is the only thing under test. An MLP encoder <em>E<sub>φ</sub></em> maps a field snapshot <em>u<sub>t</sub></em> ∈ ℝ<sup>64</sup> to a latent <em>z<sub>t</sub></em> ∈ ℝ<sup><em>d</em></sup> through two hidden layers of 256 with GELU. A state-space predictor <em>f<sub>θ</sub></em>, a four-layer S5 stack with state size 64, advances the latent one step. A decoder <em>D<sub>ψ</sub></em>, an MLP with one hidden layer of 512, maps latents back to field space. A target encoder <em>Ē</em>, the exponential moving average of <em>E<sub>φ</sub></em> with decay 0.999, provides latent regression targets, written <em>z̄<sub>t</sub></em> = <em>Ē</em>(<em>u<sub>t</sub></em>) and called <em>posterior</em> by analogy with RSSM practice.</p>
+
+        <p>Four standard terms train the triplet. Writing sg for the stop-gradient and <em>ẑ<sub>t+k</sub></em> for the free-running rollout, with gradients flowing through the whole chain:</p>
+
+        <table class="results">
+            <thead>
+                <tr>
+                    <th>Term</th>
+                    <th>What it supervises</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><strong>L<sub>TF</sub></strong></td><td>teacher-forced one-step latent prediction</td></tr>
+                <tr><td><strong>L<sub>R</sub></strong></td><td>multi-step latent rollout consistency, in latent space only</td></tr>
+                <tr><td><strong>L<sub>OBS</sub></strong></td><td>decode the teacher-forced prediction</td></tr>
+                <tr><td><strong>L<sub>recon</sub></strong></td><td>reconstruction anchor on the online encoder</td></tr>
+            </tbody>
+        </table>
+
+        <p>In all four terms the decoder is supervised only on posterior latents or on predictions one teacher-forced step from them. No term exposes it to a multi-step rollout latent. That is the gap.</p>
+
+        <h3 class="subsection">3.2 The RDR term</h3>
+        <p>RDR decodes the same free-running rollout that L<sub>R</sub> constrains, and that evaluation will score, against the ground-truth fields:</p>
+
+        <p style="text-align: center; margin: 18px 0;"><em>L</em><sub>RDR</sub> = (1 / <em>K</em>) Σ<sub><em>k</em>=1</sub><sup><em>K</em></sup> ‖ <em>D<sub>ψ</sub></em>(<em>ẑ<sub>t+k</sub></em>) − <em>u<sub>t+k</sub></em> ‖², &nbsp;&nbsp; <em>L</em> = <em>L</em><sub>TF</sub> + <em>α<sub>e</sub></em> <em>L</em><sub>R</sub> + <em>L</em><sub>OBS</sub> + <em>L</em><sub>recon</sub> + λ <em>L</em><sub>RDR</sub> &nbsp;&nbsp; (1)</p>
+
+        <ul class="body-list">
+            <li><strong>The gradient reaches all three components.</strong> It hits the decoder directly and, through the rollout chain, the predictor and the encoder, so all three are shaped by the trajectory the model will actually produce.</li>
+            <li><strong>The curriculum is standard.</strong> <em>α<sub>e</sub></em> ramps linearly from 0 to 1 between epochs 2 and 5, the rollout branch and with it the RDR term opens after the two warm-up epochs, and the rollout is pure free-running throughout.</li>
+            <li><strong>λ = 0 is the baseline, exactly.</strong> That arm is called <em>posterior-only</em>. The operating weight is λ = 0.3, and the result is flat across λ ∈ {0.1, 0.3, 0.6, 1.0}.</li>
+        </ul>
+
+        <h3 class="subsection">3.3 A split-decoder variant</h3>
+        <p>A single decoder serves two roles under RDR, sharp on-manifold reconstruction and robust off-manifold rollout decoding, and these could in principle conflict. A variant therefore gives the rollout term its own decode head of identical shape, +25.7% total parameters, under two evaluation policies: the sharp head everywhere (variant B), or a ramp from the sharp to the rollout head across the horizon (variant C). Variant C was fixed by preregistration as the primary arm before any result existed. Section 4.3 shows that at the operating point the split spends parameters without improving on the shared decoder, and that its usefulness depends on latent size.</p>
+
+        <!-- ============================================================== -->
+        <h2 class="section">4. Forecasting on a Chaotic PDE</h2>
+
+        <h3 class="subsection">4.1 Setup</h3>
+        <p>Kuramoto–Sivashinsky is integrated on <em>L</em> = 22 with 64 grid points by ETDRK4 at d<em>t</em> = 0.1, discarding a 2000-step transient, generating 512 training, 64 validation, and 64 test trajectories of 256 snapshots each from disjoint seeds. Training draws one fixed 160-snapshot window per trajectory and unrolls the rollout losses over <em>K</em> = 128 steps, at batch size 32, Adam at 3 × 10⁻⁴, three seeds per arm. The headline configuration is latent 32, decoder width 512, λ = 0.3, 320 epochs.</p>
+        <p>Evaluation free-runs each model from the first snapshot of every held-out trajectory through the same rollout path used in training, decodes, and scores normalized RMSE against the climatological standard deviation of the scored window. Valid prediction time (VPT) is the time of the first crossing of 0.5, in time units (tu). The canonical horizon is 200 steps (20 tu); the long horizon is 1300 steps (130 tu) on separately generated, dealiased records. For this domain one Lyapunov time is 23.26 tu.</p>
+
+        <h3 class="subsection">4.2 Main result</h3>
+        <ul class="body-list">
+            <li><strong>At fresh seeds never used during selection,</strong> the posterior-only arm reaches 3.87 ± 0.23 tu and the RDR arm 6.97 ± 0.42 tu: a <strong>1.80× improvement at an identical 193,568 trainable parameters</strong>, both counts measured from the checkpoints with the EMA target encoder excluded identically.</li>
+            <li><strong>It is not a short-horizon artifact.</strong> The same checkpoints score 3.77 against 6.90 tu on the long horizon.</li>
+            <li><strong>Ten preregistered rows, ten wins.</strong> Across nine distinct configurations plus the winner's fresh-seed rerun, RDR wins 10 of 10 at capacity-matched ratios between 1.71× and 2.50×.</li>
+            <li><strong>The preregistered gate was locked before any sweep number existed.</strong> It required the preregistered primary arm (variant C) to exceed 5.77 tu, the observation-space baseline measured at an earlier training budget. It does: 6.47 ± 0.40 tu at fresh seeds, with every seed above the bar (6.4 / 6.9 / 6.1). The selection-seed value of 6.90 ± 0.50 is reported only under that label, and the bar itself reproduces at 5.80 ± 0.44 on re-measurement, a 0.03 tu match.</li>
+            <li><strong>Training length is the one lever that keeps paying.</strong> The primary arm moves from 5.27 to 6.37 to 6.90 tu across 160, 240, and 320 epochs at selection seeds, still unsaturated at the longest budget tested. Longer training is left to future work.</li>
+        </ul>
+
+        <h3 class="subsection">4.3 Ablations: decoder sharing and the loss weight</h3>
+        <ul class="body-list">
+            <li><strong>Zero added parameters, full effect.</strong> The headline arm is the shared-decoder form of RDR: one decoder supervised on both posterior and rollout latents. It matches the posterior-only arm's parameter count exactly and is the strongest arm.</li>
+            <li><strong>Added capacity does not reproduce the effect.</strong> The split-decoder variant (243,296 parameters against 193,568) performs worse than the shared decoder in 7 of 10 configurations on both horizons, including the winner and its fresh-seed confirmation, 6.47 against 6.97. The supervision, rather than the capacity, carries the effect. Because preregistration fixed variant C as the primary arm before these numbers existed, and variant C is the lower of the two RDR arms, the headline gate is decided by the conservative choice; the primary arm's own ratio of 1.67× is capacity-confounded and is reported as such.</li>
+            <li><strong>The split is latent-size dependent.</strong> At latent 128 with a linear decoder the head split is decisive: VPT 0.43 without it, 0.90 with it, under the sharp-head evaluation. At latent 32 with a 512-wide decoder the ordering reverses. When the latent is wide and the decoder thin, one head cannot be simultaneously sharp on-manifold and robust off-manifold; with a stronger decoder at moderate latent size, one head absorbs both roles and the split only spends parameters.</li>
+            <li><strong>The term has one hyperparameter and is insensitive to it.</strong> The sweep over λ (0.1, 0.6, 1.0 against the default 0.3) keeps the capacity-matched ratio between 2.0× and 2.3×. Every tested weight roughly doubles VPT.</li>
+        </ul>
+
+        <h3 class="subsection">4.4 Scaling with latent width</h3>
+        <p>Re-scoring earlier checkpoints under the final protocol completes a four-point latent bracket at one recipe (decoder 512, 160 epochs, λ = 0.3, three paired seeds per rung).</p>
+
+        <table class="results">
+            <thead>
+                <tr>
+                    <th>Latent</th>
+                    <th>Posterior-only (tu)</th>
+                    <th>+ RDR, shared decoder (tu)</th>
+                    <th>Ratio</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><strong>16</strong></td><td class="num">3.00 ± 0.36</td><td class="num">4.20 ± 0.27</td><td class="num">1.41 ± 0.10</td></tr>
+                <tr><td><strong>24</strong></td><td class="num">2.77 ± 0.06</td><td class="num">4.73 ± 0.15</td><td class="num">1.71 ± 0.09</td></tr>
+                <tr><td><strong>32</strong></td><td class="num">2.60 ± 0.27</td><td class="num">5.90 ± 0.46</td><td class="num">2.30 ± 0.43</td></tr>
+                <tr><td><strong>48</strong></td><td class="num">2.27 ± 0.06</td><td class="num">5.67 ± 0.55</td><td class="num">2.50 ± 0.22</td></tr>
+            </tbody>
+        </table>
+
+        <ul class="body-list">
+            <li><strong>The posterior objective anti-scales; RDR converts capacity into horizon.</strong> As the latent grows from 16 to 48 the posterior-only arm's VPT <em>falls</em> at every rung, in 3 of 3 seeds at every step. This is the mechanism restated: a wider latent has more directions the decoder never sees under posterior-only training, free-running rollouts wander into exactly those directions, and RDR trains the decoder there. RDR wins at every rung and in every seed; all 36 per-seed paired ratios exceed 1, with a minimum of 1.32 on the shared arm.</li>
+            <li><strong>The strength is calibrated, not asserted.</strong> The 16-to-24 and 24-to-32 steps hold in 3 of 3 paired seeds and the endpoints are cleanly separated; the top step is noisy, holding in 2 of 3 seeds and reversing under leave-one-seed-out. At the rung level the observed ordering attains the smallest cluster-permutation <em>p</em> available, 2/24 ≈ 0.083, and the per-seed Spearman correlation of 0.907 over 12 points is disclosed as overstating certainty if quoted alone, so it is not relied on.</li>
+            <li><strong>Three facts accompany the bracket rather than being buried.</strong> Predictor width covaries with latent size by construction, so the axis is model latent width rather than a pure bottleneck size; the posterior arm falls below the persistence baseline of 2.40 tu at latent 48 in 3 of 3 seeds, so part of the top-rung ratio growth is baseline collapse rather than RDR gain; and VPT is quantized at 0.1 tu, so the smallest reported seed spreads are quantization-limited. The bracket is descriptive, at selection seeds, post hoc, with no preregistered gate.</li>
+            <li><strong>Where the edge is weakest is stated.</strong> The rung nearest the system's inertial manifold, dimension near 8 for <em>L</em> = 22 Kuramoto–Sivashinsky, is where RDR's edge is smallest, and the edge grows away from it. Latent ≈ 8 was not run, and behavior below 16 is untested.</li>
+        </ul>
+
+        <!-- ============================================================== -->
+        <h2 class="section">5. Control Experiments</h2>
+        <p>The objective is carried to two classic control tasks, pendulum swing-up and a cartpole swing-up variant, with action-conditioned world models. Ensembles of ten models per arm drive a cross-entropy-method MPC planner with 128 sampled action sequences per step and no disagreement bonus, scored over 20 paired episodes with identical episode seeds. Two properties are established, each by a matched control.</p>
+
+        <h3 class="subsection">5.1 Step-efficiency</h3>
+        <ul class="body-list">
+            <li><strong>With training epochs held fixed as the dataset shrinks to 50/25/10%, RDR wins 20 of 20 paired episodes at every reduced rung on both tasks,</strong> with pendulum mean-return margins of +745, +1072, and +396.</li>
+            <li><strong>That protocol confounds two things, so it is paired with a second ladder.</strong> Fixed epochs give the reduced rungs proportionally fewer optimizer steps, 480/240/60 against the full-data 960, varying data volume and optimization length together. Matching optimizer steps at every rung, both arms train fully at every rung, the posterior arm at 25% exceeds its own full-data score, and the margins narrow to +3/+13/−18.</li>
+            <li><strong>The pair locates the benefit precisely:</strong> RDR reaches useful control in fewer optimizer steps, and given equal steps, reduced data limits neither arm. The advantage is one of optimization rather than of data volume.</li>
+        </ul>
+
+        <h3 class="subsection">5.2 Robustness to planner–training rollout mismatch</h3>
+        <p>A deployed planner may roll the world model with an implementation that differs from the one used in training; a common variant re-initializes the recurrent state at each planning step rather than carrying it. Both arms are evaluated under the stateful rollout, which matches training, and under the per-step-reset variant, on both tasks and both seed sets.</p>
+
+        <table class="results">
+            <thead>
+                <tr>
+                    <th>Row</th>
+                    <th>Posterior gain</th>
+                    <th>RDR gain</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>pendulum, seeds 0&ndash;19</td><td class="num">+9.04</td><td class="num">+1.82</td></tr>
+                <tr><td>pendulum, seeds 100&ndash;119</td><td class="num">+18.12</td><td class="num">+3.59</td></tr>
+                <tr><td>cartpole, seeds 0&ndash;19</td><td class="num">+17.08</td><td class="num">+12.80</td></tr>
+                <tr><td>cartpole, seeds 100&ndash;119</td><td class="num">+12.71</td><td class="num">+10.64</td></tr>
+            </tbody>
+        </table>
+
+        <p>Moving from the per-step-reset to the stateful planner improves both arms in all four measured rows, and the posterior arm gains more in every row. The asymmetry follows from the objective: RDR trains its decoder on free-running rollouts and is largely indifferent to the planner's rollout function, while the posterior-only decoder, trained exclusively on encoder posteriors and teacher-forced latents, absorbs the mismatch as lost return. <strong>RDR is robust to planner–training rollout mismatch</strong>, an implementation class that is easy to ship and that the standard objective silently converts into lost return. Under the stateful planner the arms perform equivalently, margins of +0.61 and +1.24 on the primary rows, which bounds the property: RDR insulates against mismatch rather than planning better under matched conditions.</p>
+
+        <h3 class="subsection">5.3 Scope of the oracle comparison</h3>
+        <p>Under the stateful planner, ensemble MPC over the learned world models matches planning with the true dynamics at the same search budget: on pendulum the RDR ensemble returns −177.45 against the oracle planner's −183.67, and on cartpole 158.57 against 151.01. The posterior-only ensemble shares the property (−178.06 and 157.33 on the same rows). This is a statement about ensembles of learned models, quoted as scope for the control experiments, and not an RDR result.</p>
+
+        <!-- ============================================================== -->
+        <h2 class="section">6. Scope</h2>
+
+        <h3 class="subsection">6.1 Comparison to observation-space prediction</h3>
+        <p>A fair reading of the main result requires the strongest non-latent control. An observation-space pushforward predictor, trained on its own unrolled outputs at the winner's budget, reaches 7.00 ± 0.26 tu.</p>
+
+        <table class="results">
+            <thead>
+                <tr>
+                    <th>Model</th>
+                    <th>Params</th>
+                    <th>VPT canonical (tu)</th>
+                    <th>VPT long (tu)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>latent + RDR, shared decoder <strong>(headline)</strong></td><td class="num">193,568</td><td class="num"><strong>6.97 ± 0.42</strong></td><td class="num">6.90 ± 0.44</td></tr>
+                <tr><td>latent + RDR, split head (preregistered primary)</td><td class="num">243,296</td><td class="num">6.47 ± 0.40</td><td class="num">6.40 ± 0.40</td></tr>
+                <tr><td>observation-space pushforward</td><td class="num">230,464</td><td class="num">7.00 ± 0.26</td><td class="num">6.90 ± 0.26</td></tr>
+                <tr><td>latent, posterior-only</td><td class="num">193,568</td><td class="num">3.87 ± 0.23</td><td class="num">3.77 ± 0.23</td></tr>
+            </tbody>
+        </table>
+
+        <p>That is parity with the capacity-matched RDR arm, with every gap far inside one seed-level standard deviation, and ahead of the preregistered primary arm. Both model classes scale with training at nearly the same rate, the latent stack from 5.27 to 6.90 against observation-space from 5.80 to 7.00 over the same budget change, which is why the 5.77 bar, measured at the smaller budget, is not the matched comparison. On a fully observed, 64-dimensional system, the latent bottleneck buys nothing over a direct observation-space predictor at matched budget.</p>
+        <p><strong>This result bounds the bottleneck rather than the objective.</strong> The RDR contrast is within-latent throughout, and every arm in the table carries a latent, so the class comparison leaves it unaffected. What it does establish is what this system can and cannot demonstrate: a 64-dimensional fully observed field is small enough to predict directly, so the architecture RDR improves is not the one a practitioner would choose here. The settings that force a latent, partial observability, pixel observations, or a planner that requires a compact state, are also the settings in which an observation-space predictor is unavailable. Measuring the effect in one of those is the natural next experiment.</p>
+
+        <h3 class="subsection">6.2 Limitations, as the paper states them</h3>
+        <ul class="body-list">
+            <li><strong>One system, three seeds, a quantized metric.</strong> The forecasting claim rests on one dynamical system at one domain size, three seeds per cell, and a metric quantized at 0.1 tu. The uniform 10-of-10 direction and the fresh-seed confirmation mitigate this but do not remove it.</li>
+            <li><strong>Selection touched the test split.</strong> Configuration selection during the sweep compared results on the test split. Validation-split re-ranking selects the same winner with rank agreement ρ = 0.979, and the headline is in any case reported at fresh seeds never used in selection.</li>
+            <li><strong>The control results are two low-dimensional classic tasks.</strong></li>
+            <li><strong>The case for the latent stack is not made on this system.</strong> RDR is measured within-latent throughout, and the settings that make a latent necessary are left to future work.</li>
+        </ul>
+
+        <!-- ============================================================== -->
+        <h2 class="section">7. Conclusion and Implications</h2>
+        <p>A latent world model's decoder is deployed on the model's own free-running rollout and trained, almost universally, on something else. Rollout-Decoded Reconstruction closes that gap with one loss term and no new parameters. On a chaotic PDE it nearly doubles valid prediction time at an identical parameter count, in 10 of 10 preregistered configurations, with an advantage that grows as the latent widens while the standard objective anti-scales. In control it yields step-efficiency and robustness to rollout mismatch, each established by a matched control. On a fully observed low-dimensional system an observation-space predictor reaches parity at matched budget, which marks where a latent bottleneck earns its place and leaves the within-latent effect standing.</p>
+        <p>The architectures this reaches are already in use. Every model in the Dreamer lineage trains its decoder on posterior latents and free-runs it at inference, and adopting RDR in any of them means adding one term and choosing one weight; on the system measured here that is worth almost a doubling of usable horizon. The scaling behavior indicates where it repays most: over the range measured, the wider the latent, the more the standard objective leaves on the table, and deployed world models run latents far wider than any rung tested here. Measuring the effect where a latent is required, under partial observability, pixel observations, or planning over compact states, is the direct next step.</p>
+        <p><strong>The paper, "Rollout-Decoded Reconstruction for Latent World Models," is published at <a class="inline" href="https://doi.org/10.5281/zenodo.21894547" target="_blank" rel="noopener">doi.org/10.5281/zenodo.21894547</a>.</strong> All training ran on short-lived cloud GPU instances for roughly $155; every evaluation and figure runs on a laptop CPU from the archived checkpoints, and the figure script re-asserts each quoted number against those artifacts and fails the build on drift.</p>
+
+        <!-- ============================================================== -->
+        <h2 class="section">8. References and Prior Work</h2>
+        <p><strong>The world-model lineage.</strong> The gap RDR closes was named in <a class="inline" href="https://arxiv.org/abs/1811.04551" target="_blank" rel="noopener">PlaNet</a> and left open across the Dreamer line (<a class="inline" href="https://arxiv.org/abs/1912.01603" target="_blank" rel="noopener">Dreamer</a>, <a class="inline" href="https://arxiv.org/abs/2010.02193" target="_blank" rel="noopener">DreamerV2</a>, <a class="inline" href="https://arxiv.org/abs/2301.04104" target="_blank" rel="noopener">DreamerV3</a>). The decoder-free models RDR does not reach are <a class="inline" href="https://arxiv.org/abs/2310.16828" target="_blank" rel="noopener">TD-MPC2</a> and <a class="inline" href="https://arxiv.org/abs/2405.15083" target="_blank" rel="noopener">MuDreamer</a>.</p>
+        <p><strong>Training on model-generated outputs.</strong> <a class="inline" href="https://arxiv.org/abs/1506.03099" target="_blank" rel="noopener">Scheduled sampling</a> and <a class="inline" href="https://arxiv.org/abs/1610.09038" target="_blank" rel="noopener">professor forcing</a> address the input; the <a class="inline" href="https://arxiv.org/abs/2202.03376" target="_blank" rel="noopener">pushforward trick</a> and <a class="inline" href="https://arxiv.org/abs/2007.00016" target="_blank" rel="noopener">solver-in-the-loop</a> unroll observation-space PDE surrogates; <a class="inline" href="https://arxiv.org/abs/2506.08009" target="_blank" rel="noopener">Self Forcing</a>, <a class="inline" href="https://arxiv.org/abs/2407.01392" target="_blank" rel="noopener">Diffusion Forcing</a>, and <a class="inline" href="https://arxiv.org/abs/2606.11187" target="_blank" rel="noopener">Next Forcing</a> train on their own rollouts in pixel space. The closest concurrent work is <a class="inline" href="https://arxiv.org/abs/2608.01773" target="_blank" rel="noopener">NeuroWorld</a> and <a class="inline" href="https://arxiv.org/abs/2607.19719" target="_blank" rel="noopener">Koopman Dreamer</a>, and the same construction is reached from reduced-order modeling by <a class="inline" href="https://arxiv.org/abs/2509.08191" target="_blank" rel="noopener">Rollout-LaSDI</a>.</p>
+        <p><strong>The domain and its conventions.</strong> The predictor is an <a class="inline" href="https://arxiv.org/abs/2208.04933" target="_blank" rel="noopener">S5</a> stack; the planner is cross-entropy-method MPC (<a class="inline" href="https://arxiv.org/abs/1805.12114" target="_blank" rel="noopener">PETS</a>, <a class="inline" href="https://arxiv.org/abs/2008.06389" target="_blank" rel="noopener">Pinneri et al.</a>). Horizons are calibrated in Lyapunov times using the literature value for <a class="inline" href="https://arxiv.org/abs/1902.09651" target="_blank" rel="noopener">Kuramoto–Sivashinsky</a>, and the strongest published latent-space results on this domain, which use symmetry reduction and are orthogonal to the training objective studied here, are <a class="inline" href="https://arxiv.org/abs/2001.04263" target="_blank" rel="noopener">Linot and Graham</a>.</p>
+    </div>
+</body>
+</html>
