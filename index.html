@@ -43,13 +43,9 @@
 
     <link rel="stylesheet" href="style.css">
     <script defer src="https://kit.fontawesome.com/17ea408dcc.js" crossorigin="anonymous"></script>
-    <script defer src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script defer src="shared.js"></script>
 </head>
 <body>
-    <!-- Particles Background -->
-    <div id="particles-js"></div>
-
     <!-- Header Section -->
     <div id="header">
         <div class="container">
@@ -342,7 +338,7 @@
 
     <script>
         // Project card click handlers: wires inline onclick into the cream fade transition.
-        // Particles, transition helper, and bfcache cleanup live in shared.js.
+        // Transition helper and bfcache cleanup live in shared.js.
         document.querySelectorAll('.work').forEach(workElement => {
             const originalOnclick = workElement.getAttribute('onclick');
             if (originalOnclick) {

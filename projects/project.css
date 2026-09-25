@@ -76,14 +76,6 @@ body {
 ::-webkit-scrollbar-thumb { background: var(--rule-strong); border-radius: 5px; border: 2px solid var(--paper); }
 ::-webkit-scrollbar-thumb:hover { background: var(--ink-faint); }
 
-/* Particles layer sits behind content */
-#particles-js {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-}
-
 /* ============================================
    PAGE WRAP
    ============================================ */

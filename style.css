@@ -26,9 +26,6 @@
     --tag-bg:       rgba(0, 180, 216, 0.14);
     --tag-ink:      #006a85;
 
-    /* Particle layer */
-    --particle:     rgba(29, 26, 22, 0.45);
-
     /* Fonts */
     --font-serif:   'EB Garamond', Georgia, 'Times New Roman', serif;
     --font-sans:    'Inter Tight', system-ui, -apple-system, sans-serif;
@@ -76,14 +73,6 @@ body {
 ::-webkit-scrollbar-track { background: var(--paper); }
 ::-webkit-scrollbar-thumb { background: var(--rule-strong); border-radius: 5px; border: 2px solid var(--paper); }
 ::-webkit-scrollbar-thumb:hover { background: var(--ink-faint); }
-
-/* Particles layer sits behind content */
-#particles-js {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-}
 
 .container {
     max-width: var(--col-max);

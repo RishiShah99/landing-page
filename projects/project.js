@@ -1,7 +1,7 @@
 /* ============================================
    CREAM PAPER — project page JS
    Owns: back-link click wiring.
-   Shared runtime (particles, fade transition, bfcache)
+   Shared runtime (fade transition, bfcache)
    lives in /shared.js, loaded before this file.
    ============================================ */
 
