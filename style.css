@@ -318,27 +318,6 @@ body {
 
 .work-year .flag { color: var(--accent); }
 
-.work-content .chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    margin-bottom: 12px;
-}
-
-.work-content .chip {
-    font-family: var(--font-sans);
-    font-size: 9.5px;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    padding: 2px 8px;
-    border-radius: 999px;
-    background: var(--paper-sunk);
-    color: var(--ink-muted);
-    line-height: 1.5;
-    white-space: nowrap;
-}
-
 .work-content p {
     font-family: var(--font-serif);
     font-size: 17.5px;
