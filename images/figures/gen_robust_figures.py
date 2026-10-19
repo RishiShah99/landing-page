@@ -12,8 +12,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-PAPER = "#f3ece0"
-CARD = "#f9f3e6"
+PAPER = "#f0efeb"
+CARD = "#ffffff"
 INK = "#1d1a16"
 GOLD = "#b18639"
 SAGE_BG = "#d8e4d4"

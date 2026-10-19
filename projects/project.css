@@ -1,15 +1,16 @@
 /* ============================================
-   CREAM PAPER — project page
-   Locked 2026-05-31. See memory: project_cream_paper_typography,
+   PAPER — project page
+   Typography locked 2026-05-31; background neutral #f0efeb since
+   2026-10-19. See memory: project_cream_paper_typography,
    feedback_project_page_structure.
    Paper reading column: 880px. Strip all chrome.
    ============================================ */
 
 :root {
     /* Backgrounds */
-    --paper:        #f3ece0;
-    --paper-card:   #f9f3e6;
-    --paper-sunk:   #ece4d4;
+    --paper:        #f0efeb;
+    --paper-card:   #ffffff;
+    --paper-sunk:   #e6e4de;
 
     /* Ink */
     --ink:          #1d1a16;
@@ -17,8 +18,8 @@
     --ink-faint:    #8e857a;
 
     /* Lines */
-    --rule:         #d6cdb9;
-    --rule-strong:  #b8ad96;
+    --rule:         #dddad2;
+    --rule-strong:  #c8c4bb;
 
     /* Accent — warm gold */
     --accent:       #b18639;

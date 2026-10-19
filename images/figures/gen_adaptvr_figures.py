@@ -10,14 +10,14 @@ import matplotlib.pyplot as plt
 from matplotlib import rcParams
 from matplotlib.patches import Circle
 
-PAPER       = "#f3ece0"
-PAPER_CARD  = "#f9f3e6"
-PAPER_SUNK  = "#ece4d4"
+PAPER       = "#f0efeb"
+PAPER_CARD  = "#ffffff"
+PAPER_SUNK  = "#e6e4de"
 INK         = "#1d1a16"
 INK_MUTED   = "#6b6359"
 INK_FAINT   = "#8e857a"
-RULE        = "#d6cdb9"
-RULE_STRONG = "#b8ad96"
+RULE        = "#dddad2"
+RULE_STRONG = "#c8c4bb"
 ACCENT      = "#b18639"
 ACCENT_SOFT = "#e3c98a"
 SAGE_BG     = "#d8e4d4"
