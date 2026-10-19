@@ -96,7 +96,7 @@ body {
 
 .header-content-compact {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 64px;
     padding: 32px 0 24px;
@@ -164,10 +164,11 @@ body {
     background: var(--paper-card);
 }
 
+/* Circle portrait, sized to the text block so the hero stays compact */
 .header-image-compact {
-    flex: 0 0 300px;
-    width: 300px;
-    height: 300px;
+    flex: 0 0 180px;
+    width: 180px;
+    height: 180px;
     overflow: hidden;
     border-radius: 50%;
     background: var(--paper-sunk);
@@ -639,15 +640,11 @@ body {
 
     #header { padding-top: 32px; }
     .header-content-compact {
-        flex-direction: column-reverse;
-        align-items: flex-start;
-        gap: 28px;
+        gap: 24px;
         padding: 16px 0 24px;
     }
-    .header-info { width: 100%; }
     .header-info .subtitle { font-size: 19px; }
-    .header-image-compact { flex: 0 0 auto; width: 220px; height: 220px; }
-    .header-image-compact img { object-position: center 28%; }
+    .header-image-compact { flex: 0 0 104px; width: 104px; height: 104px; }
     .contact-links { gap: 18px; }
 
     #about { padding: 48px 0 24px; }
@@ -675,7 +672,9 @@ body {
 
 @media (max-width: 480px) {
     :root { --text-title: 40px; }
+    .header-content-compact { gap: 16px; }
     .header-info .subtitle { font-size: 17px; }
+    .header-image-compact { flex: 0 0 80px; width: 80px; height: 80px; }
     .work img { height: 180px; }
 }
 
