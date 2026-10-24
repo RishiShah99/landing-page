@@ -11,9 +11,10 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="project.css">
+    <link rel="stylesheet" href="../base.css?v=20261024b">
+    <link rel="stylesheet" href="project.css?v=20261024b">
     <script defer src="../shared.js"></script>
     <script defer src="project.js"></script>
 </head>
@@ -23,123 +24,108 @@
 
         <div class="eyebrow">2024</div>
 
-        <h1 class="title">Dermatological <span class="accent">triage</span> with cited medical evidence.</h1>
+        <h1 class="title">Dermatological triage with cited medical evidence.</h1>
 
-        <div class="chips">
-            <span class="chip">Medical AI</span>
-            <span class="chip">Healthcare</span>
-            <span class="chip">RAG</span>
-        </div>
 
         <p class="subtitle">A DenseNet121 classifier trained on 19,000+ DermNet images across 23 skin conditions, paired with a retrieval-augmented chatbot whose every answer cites a real medical source. Auth, row-level security, and per-user history behind a single Supabase backend.</p>
 
         <!-- ============================================================== -->
         <h2 class="section">1. Abstract</h2>
-        <p>A dermatological triage layer that pairs an image classifier with a retrieval-augmented chatbot, sitting behind a Supabase-backed user account with auth, row-level security, and persistent conversation history. The point is concrete: in regions where dermatologist access is limited, the difference between a survival event and a routine appointment is often the speed of getting in front of a clinician at all. A phone-accessible system that returns an evidence-grounded opinion on whether a skin condition warrants urgent attention shortens that distance without pretending to replace the appointment.</p>
+        <p>A dermatological triage layer that pairs an image classifier with a retrieval-augmented chatbot, behind a Supabase-backed account with auth, row-level security, and persistent conversation history. Where dermatologist access is limited, how fast a patient reaches a clinician often separates a survival event from a routine appointment. An evidence-grounded opinion, on a phone, on whether a skin condition warrants urgent attention shortens that distance without pretending to replace the appointment.</p>
 
-        <p>The classifier is a <strong>DenseNet121</strong> backbone (Huang et al., 2017), picked because dense connections give efficient gradient flow and feature reuse, which matters on the parameter budget appropriate for medical images. Trained on the <strong>DermNet dataset</strong>, roughly 19,000 dermatoscopic images across 23 categories spanning malignant (melanoma, basal-cell carcinoma, squamous-cell carcinoma), precancerous (actinic keratosis), and benign conditions, with class-weighted loss to penalise errors on rare malignant categories more heavily. The chatbot is a retrieval-augmented generation pipeline: a query embedded with OpenAI <code>text-embedding-3-small</code> (1536-d), top-5 chunks pulled from a pgvector HNSW index over a corpus of dermatology textbooks and clinical guidelines, generation handed to Gemini 2.0 Flash with a system prompt that requires every answer to cite specific retrieved chunks or to refuse.</p>
+        <p>The classifier is a <strong>DenseNet121</strong> backbone (Huang et al., 2017), picked because dense connections give efficient gradient flow and feature reuse on a parameter budget suited to medical images. It trains on the <strong>DermNet dataset</strong>, roughly 19,000 dermatoscopic images across 23 categories, with class-weighted loss that penalises errors on rare malignant categories more heavily. The chatbot embeds each query with OpenAI <code>text-embedding-3-small</code> (1536-d), pulls the top-5 chunks from a pgvector HNSW index over dermatology textbooks and clinical guidelines, and hands generation to Gemini 2.0 Flash under a system prompt that requires every answer to cite specific retrieved chunks or refuse.</p>
 
-        <p>The novelty is the integration, not any of the parts. DenseNet121 is off-the-shelf. DermNet is public. RAG is a standard architecture. What is new is the product shape: a classifier that surfaces a calibrated prediction with a "see a clinician" fallback below 60% confidence, a chatbot whose every answer is grounded in a cited source by construction so the system cannot hallucinate clinical advice, and per-user persistent history that makes both the prediction and the follow-up reusable across sessions, all behind a real auth surface. No consumer dermatology product on the market today cites its sources by construction. This is the build that targets that gap directly.</p>
+        <p>The novelty is the integration, not the parts. DenseNet121 is off-the-shelf, DermNet is public, RAG is standard. What is new is the product shape: a classifier with a "see a clinician" fallback below 60% confidence, a chatbot grounded in a cited source by construction so it cannot hallucinate clinical advice, and per-user history that makes both reusable across sessions, all behind a real auth surface. No consumer dermatology product on the market today cites its sources by construction. This build targets that gap.</p>
 
         <ul class="body-list">
             <li><strong>19,000+ dermatoscopic images across 23 condition categories</strong> in training, spanning malignant, precancerous, and benign skin conditions.</li>
-            <li><strong>Citation-by-construction.</strong> The chatbot's system prompt enforces a cited chunk in every answer. Responses without a cited source are regenerated; refusal is the fallback when context is insufficient.</li>
-            <li><strong>Sub-50 ms vector retrieval</strong> over a pgvector HNSW index. First-token chat latency under 1 s via the Vercel AI SDK streaming pipeline.</li>
-            <li><strong>Calibrated "see a clinician" fallback</strong> below 60% top-1 confidence, so ambiguous predictions surface as low-confidence rather than as a confidently-wrong label.</li>
-            <li><strong>Supabase Auth and row-level security.</strong> Every user only sees their own classifications and conversations. Signed image URLs expire after 24 hours.</li>
+            <li><strong>Citation-by-construction.</strong> Every answer must carry a cited chunk. Uncited responses are regenerated; refusal is the fallback when context is insufficient.</li>
+            <li><strong>Sub-50 ms vector retrieval</strong> over a pgvector HNSW index. First-token chat latency under 1 s via Vercel AI SDK streaming.</li>
+            <li><strong>Calibrated "see a clinician" fallback</strong> below 60% top-1 confidence, so ambiguous predictions surface as low-confidence, not as a confidently-wrong label.</li>
+            <li><strong>Supabase Auth and row-level security.</strong> Users see only their own classifications and conversations. Signed image URLs expire after 24 hours.</li>
         </ul>
 
         <!-- ============================================================== -->
         <h2 class="section">2. Introduction</h2>
-        <p>In low-access regions a missed melanoma is a survival event, and the bottleneck is rarely diagnostic accuracy in the clinic. It is the time it takes for a patient to reach a clinic at all. A phone-accessible triage layer that gives an evidence-based opinion on whether a lesion warrants urgent attention is a concrete way to shorten that distance without pretending to replace clinical evaluation.</p>
+        <p>In low-access regions a missed melanoma is a survival event, and the bottleneck is rarely diagnostic accuracy in the clinic. It is the time it takes a patient to reach a clinic at all.</p>
         <ul class="body-list">
-            <li><strong>The path-to-clinic is the bottleneck.</strong> Once a patient is in front of a dermatologist, accuracy is high. The friction is everything before that point: deciding whether the lesion warrants the appointment in the first place.</li>
-            <li><strong>Black-box labels are not actionable.</strong> A "this is melanoma" output with no explanation does not help a non-clinician weigh whether to seek care, or what to say at intake if they do.</li>
-            <li><strong>Hallucinated medical advice is a real failure mode.</strong> Off-the-shelf LLMs will confidently produce plausible-but-wrong clinical statements, and a triage tool that anyone might trust cannot afford that.</li>
+            <li><strong>The path-to-clinic is the bottleneck.</strong> In front of a dermatologist, accuracy is high. The friction is deciding whether the lesion warrants the appointment in the first place.</li>
+            <li><strong>Black-box labels are not actionable.</strong> "This is melanoma" with no explanation does not help a non-clinician decide whether to seek care, or what to say at intake.</li>
+            <li><strong>Hallucinated medical advice is a real failure mode.</strong> Off-the-shelf LLMs confidently produce plausible-but-wrong clinical statements. A triage tool anyone might trust cannot afford that.</li>
         </ul>
 
         <h3 class="subsection">2.1 Why a classifier and a RAG chatbot, not either alone</h3>
-        <p>A classifier alone produces a label and a probability. That is necessary but not sufficient for triage: the patient still has to decide whether the label warrants a clinic visit. A chatbot alone produces explanations but, without grounding, cannot reliably distinguish a benign mole from one that needs urgent attention. The integration is what makes the system useful: the classifier provides a calibrated starting point, the chatbot translates it into language a patient can act on, and the grounding requirement guarantees the translation is anchored in cited medical sources.</p>
+        <p>A classifier alone gives a label and a probability, leaving the patient to judge whether it warrants a visit. An ungrounded chatbot cannot reliably tell a benign mole from one that needs urgent attention. Together, the classifier sets a calibrated starting point, the chatbot turns it into language a patient can act on, and grounding anchors that language in cited medical sources.</p>
         <ul class="body-list">
-            <li><strong>DenseNet121.</strong> Dense connections compound the gradient signal across blocks and let features from early layers propagate into late ones without retraining them. The accuracy-per-parameter is favourable on small medical datasets, which matters because 19,000 images is small by ImageNet standards but representative for dermatoscopic capture.</li>
-            <li><strong>RAG over an authoritative corpus.</strong> The chatbot's generation is constrained to retrieved chunks from dermatology textbooks and clinical guidelines, so it cannot answer from generic training-data priors. The prompt template requires a citation slot, which forces the model either to attribute or to refuse.</li>
-            <li><strong>Authenticated persistence.</strong> Both the prediction and the chat history sit behind Supabase Auth with row-level security. A patient can return to the same conversation across devices, and a clinician can be granted temporary read access through a signed URL rather than a screenshot.</li>
+            <li><strong>DenseNet121.</strong> Dense connections carry early-layer features into late layers without retraining them, giving favourable accuracy-per-parameter on small medical datasets. 19,000 images is small by ImageNet standards but representative for dermatoscopic capture.</li>
+            <li><strong>RAG over an authoritative corpus.</strong> Generation is constrained to retrieved chunks from dermatology textbooks and clinical guidelines, not generic training-data priors. A required citation slot forces the model to attribute or refuse.</li>
+            <li><strong>Authenticated persistence.</strong> Predictions and chat history sit behind Supabase Auth with row-level security. A clinician can be granted temporary read access through a signed URL rather than a screenshot.</li>
         </ul>
 
         <h3 class="subsection">2.2 What is actually new</h3>
-        <p>The classifier architecture, the embedding model, the vector store, and the LLM are all existing infrastructure. The contribution is the way they compose into a triage product.</p>
+        <p>The classifier architecture, embedding model, vector store, and LLM are existing infrastructure. The contribution is how they compose into a triage product.</p>
         <ul class="body-list">
-            <li><strong>Citation-by-construction.</strong> The chatbot's system prompt enforces a citation slot in every answer. A response without a cited retrieved chunk is regenerated under stricter grounding instructions. The point is structural: hallucinated medical advice cannot leave the system, because the response template will not accept one.</li>
-            <li><strong>Calibrated "I don't know."</strong> Predictions below 60% top-1 confidence surface as "see a clinician" rather than as a low-probability label. Failure is redirection, not a confidently-wrong answer. The patient is steered toward professional evaluation in exactly the cases where the system is least sure.</li>
-            <li><strong>Per-user persistent context.</strong> Supabase Auth, row-level security, and signed image URLs let the same user return to a previous classification and continue the conversation about it across devices. This is what turns a one-shot classifier into a longitudinal triage layer.</li>
+            <li><strong>Citation-by-construction.</strong> Hallucinated medical advice cannot leave the system, because the response template will not accept one.</li>
+            <li><strong>Calibrated "I don't know."</strong> Failure is redirection, not a confidently-wrong answer. The patient is steered to professional evaluation exactly where the system is least sure.</li>
+            <li><strong>Per-user persistent context.</strong> A user returns to a previous classification and continues the conversation across devices, turning a one-shot classifier into a longitudinal triage layer.</li>
         </ul>
 
-        <p>Every section below is the engineering that makes those three commitments hold inside a single deployed product.</p>
+        <p>Everything below makes those three commitments hold inside one deployed product.</p>
 
         <!-- ============================================================== -->
         <h2 class="section">3. System</h2>
 
         <h3 class="subsection">3.1 Image classification</h3>
         <ul class="body-list">
-            <li><strong>DenseNet121 backbone.</strong> Dense connections give efficient gradient flow and feature reuse, which is the part of the architecture that compensates for a small training set.</li>
+            <li><strong>DenseNet121 backbone.</strong> Its feature reuse compensates for a small training set.</li>
             <li><strong>DermNet, 19,000+ dermatoscopic images, 23 categories</strong> spanning malignant (melanoma, basal-cell carcinoma, squamous-cell carcinoma), precancerous (actinic keratosis), and benign conditions.</li>
-            <li><strong>Augmentation:</strong> rotation, horizontal and vertical flips, color jitter, Gaussian noise. Addresses both class imbalance and capture-condition variability across patient phones.</li>
-            <li><strong>Class-weighted cross-entropy</strong> penalises errors on rare malignant categories more heavily than on common benign ones, on the principle that a missed melanoma costs more than a missed benign mole.</li>
-            <li><strong>Top-3 with calibrated confidence.</strong> The output is the full probability distribution, not just the argmax. The top-3 labels and their probabilities are shown to the user. Predictions below 60% top-1 confidence surface a "see a clinician" prompt instead of a label.</li>
-            <li><strong>FP16 quantization</strong> at deployment time, roughly 50% memory reduction with negligible accuracy impact, which keeps inference responsive on the Flask host.</li>
+            <li><strong>Augmentation:</strong> rotation, horizontal and vertical flips, color jitter, Gaussian noise. Addresses class imbalance and capture variability across patient phones.</li>
+            <li><strong>Class-weighted cross-entropy</strong> penalises errors on rare malignant categories more than on common benign ones. A missed melanoma costs more than a missed benign mole.</li>
+            <li><strong>Top-3 with calibrated confidence.</strong> The model outputs the full probability distribution; the user sees the top-3 labels and their probabilities. Below 60% top-1 confidence, a "see a clinician" prompt replaces the label.</li>
+            <li><strong>FP16 quantization</strong> at deployment keeps inference responsive on the Flask host.</li>
         </ul>
 
         <h3 class="subsection">3.2 Retrieval-augmented generation</h3>
-        <p>The chatbot constrains generation to retrieved sources so it can answer follow-up questions about a prediction without inventing clinical facts.</p>
+        <p>Generation is constrained to retrieved sources, so the chatbot answers follow-up questions about a prediction without inventing clinical facts.</p>
         <ul class="body-list">
-            <li><strong>Ingestion.</strong> Dermatology textbooks and clinical guidelines chunked into 500 to 1000-token segments with overlapping windows, then embedded with OpenAI <code>text-embedding-3-small</code> (1536-d).</li>
-            <li><strong>Storage.</strong> Supabase Postgres with the <code>pgvector</code> extension. HNSW index for sub-50 ms approximate-nearest-neighbour similarity search. Per-chunk metadata tags carry source authority and recency for filtered retrieval.</li>
-            <li><strong>Retrieval.</strong> The user's query is embedded into the same 1536-d space and the top-5 chunks are ranked by cosine similarity, weighted with source-authority metadata so a textbook chunk outranks a forum post at equal cosine.</li>
-            <li><strong>Generation.</strong> Gemini 2.0 Flash receives the prediction context, the retrieved chunks, and a system prompt that instructs it to answer <em>only</em> from the retrieved chunks, to cite specific sources by chunk identifier, and to refuse when the context is insufficient. A response without a citation is regenerated under stricter grounding instructions.</li>
+            <li><strong>Ingestion.</strong> Dermatology textbooks and clinical guidelines chunked into 500 to 1000-token overlapping segments, embedded with OpenAI <code>text-embedding-3-small</code> (1536-d).</li>
+            <li><strong>Storage.</strong> Supabase Postgres with the <code>pgvector</code> extension and an HNSW index for approximate-nearest-neighbour search. Per-chunk metadata carries source authority and recency for filtered retrieval.</li>
+            <li><strong>Retrieval.</strong> The query is embedded into the same 1536-d space; the top-5 chunks are ranked by cosine similarity weighted with source authority, so a textbook chunk outranks a forum post at equal cosine.</li>
+            <li><strong>Generation.</strong> Gemini 2.0 Flash receives the prediction context, the retrieved chunks, and a system prompt: answer <em>only</em> from those chunks, cite sources by chunk identifier, refuse when context is insufficient. Uncited responses are regenerated under stricter grounding instructions.</li>
         </ul>
 
         <h3 class="subsection">3.3 Stack</h3>
         <ul class="body-list">
-            <li><strong>Frontend.</strong> Next.js 15 App Router with React server components, Tailwind, and shadcn/ui. Drag-and-drop image upload, streaming chat UI, and markdown-rendered responses with inline citation badges.</li>
-            <li><strong>Backend.</strong> Flask serves the PyTorch classifier on <code>/predict</code> (port 5001). Next.js API routes own the RAG orchestration on <code>/api/chat</code> and the database I/O. The classifier and the chatbot are independent services that meet at the Next.js layer.</li>
-            <li><strong>Auth and storage.</strong> Supabase Auth with OAuth (Google and GitHub) and HTTP-only session cookies. Row-level security on every table so users can only read their own classifications and conversations. Uploaded images go to Supabase Storage with signed URLs that expire after 24 hours.</li>
-            <li><strong>Streaming.</strong> The Vercel AI SDK pipes Gemini's token-by-token output back to the client so first-token latency stays under 1 s even on long answers.</li>
+            <li><strong>Frontend.</strong> Next.js 15 App Router with React server components, Tailwind, and shadcn/ui. Drag-and-drop upload, streaming chat, and markdown responses with inline citation badges.</li>
+            <li><strong>Backend.</strong> Flask serves the PyTorch classifier on <code>/predict</code> (port 5001). Next.js API routes own RAG orchestration on <code>/api/chat</code> and the database I/O. The two independent services meet at the Next.js layer.</li>
+            <li><strong>Auth and storage.</strong> Supabase Auth with OAuth (Google and GitHub) and HTTP-only session cookies. Row-level security on every table. Uploaded images live in Supabase Storage behind signed URLs that expire after 24 hours.</li>
+            <li><strong>Streaming.</strong> The Vercel AI SDK pipes Gemini's output to the client token by token.</li>
         </ul>
 
         <!-- ============================================================== -->
         <h2 class="section">4. Evaluation</h2>
-        <p>Validated for engineering correctness on held-out DermNet images and on the deployed product surface. The classifier produces calibrated probabilities, the retrieval pipeline returns relevant chunks under typical query load, and the citation enforcement path correctly regenerates responses that fail the grounding check.</p>
+        <p>Validated for engineering correctness on held-out DermNet images and on the deployed product surface.</p>
         <ul class="body-list">
             <li><strong>Sub-50 ms vector retrieval</strong> on the pgvector HNSW index across the ingested corpus.</li>
             <li><strong>First-token chat latency under 1 s</strong> via Vercel AI SDK streaming, even on responses that consume the full top-5 retrieved context.</li>
             <li><strong>FP16 quantization</strong> reduces classifier memory roughly 50% with negligible accuracy impact on the held-out DermNet split.</li>
-            <li><strong>Calibrated uncertainty</strong> surfaces ambiguous cases as low-confidence "see a clinician" prompts rather than as overconfident top-1 labels. The 60% threshold is configurable and was picked to err on the side of routing borderline cases to clinical care.</li>
-            <li><strong>Citation enforcement validated</strong> by inspecting model outputs across a representative query set: uncited responses are caught by the response template and regenerated under stricter grounding, and insufficient-context queries surface as refusals rather than as fabricated answers.</li>
+            <li><strong>Calibrated uncertainty</strong> routes ambiguous cases to "see a clinician" instead of overconfident top-1 labels. The 60% threshold is configurable, picked to err toward routing borderline cases to clinical care.</li>
+            <li><strong>Citation enforcement validated</strong> on a representative query set. Uncited responses are caught and regenerated; insufficient-context queries surface as refusals, not fabricated answers.</li>
         </ul>
 
-        <p>The accuracy numbers here come from held-out DermNet images, single split, single seed. They are not a leaderboard claim against published dermatology AI benchmarks (those are scored on different datasets with different label conventions), and they are not a clinical-grade diagnostic claim. This is a triage layer that helps a patient decide whether to seek care, not a tool that decides what they have. The contribution this page is making is the integration and the citation discipline, not the classifier accuracy on a public dataset.</p>
+        <p>The accuracy numbers come from held-out DermNet images, single split, single seed. They are not a leaderboard claim against published dermatology AI benchmarks (different datasets, different label conventions), and not a clinical-grade diagnostic claim. This triage layer helps a patient decide whether to seek care, not what they have.</p>
 
         <!-- ============================================================== -->
         <h2 class="section">5. Conclusion and Implications</h2>
-        <p>A dermatological triage layer that pairs a calibrated classifier with citation-grounded follow-up is a concrete step toward earlier dermatologist intake in populations that cannot easily reach one. If even a fraction of the path-to-clinic friction is recovered by a phone-accessible product that returns an evidence-grounded opinion with cited sources, the downstream effect is faster intake on time-critical conditions like melanoma, fewer late-stage diagnoses, and lower triage burden on under-resourced dermatology services. The design choices that matter most in this build (citation-by-construction, calibrated "see a clinician" fallback, per-user persistent history) are the parts that make it deployable as a real triage layer rather than something that demos well and helps nobody.</p>
+        <p>Pairing a calibrated classifier with citation-grounded follow-up is a concrete step toward earlier dermatologist intake for populations that cannot easily reach one. Recovering even a fraction of the path-to-clinic friction means faster intake on time-critical conditions like melanoma, fewer late-stage diagnoses, and lower triage burden on under-resourced dermatology services. Citation-by-construction, the calibrated fallback, and per-user history make this a deployable triage layer, not something that demos well and helps nobody.</p>
 
-        <h3 class="subsection">5.1 Limitations</h3>
+        <h3 class="subsection">5.1 Limitations and future work</h3>
         <ul class="body-list">
-            <li><strong>Training-set bias toward lighter Fitzpatrick skin types.</strong> A documented equity issue in dermatology AI. Closing it requires more representative training data, not just augmentation.</li>
-            <li><strong>Smartphone capture is not dermoscopy.</strong> Phone cameras lack the magnification and polarised lighting that clinical dermoscopes provide. Clinical-grade triage will require dedicated attachments and a model retrained on dermoscope-grade input.</li>
-            <li><strong>Educational and pre-clinical, not regulated.</strong> The system is positioned as a triage layer that helps a patient decide whether to seek care. It is not a regulated diagnostic device and does not replace dermatologist evaluation.</li>
-            <li><strong>Citation quality is bounded by the ingested corpus.</strong> Out-of-corpus conditions surface as refusals, which is correct behaviour but does not help the patient resolve their question.</li>
-            <li><strong>No quantitative clinical evaluation.</strong> The build has been validated for engineering correctness on the held-out split and on the deployed surface; clinical efficacy against a standard dermatology intake protocol is unproven and is the headline next step.</li>
-        </ul>
-
-        <h3 class="subsection">5.2 Future Work</h3>
-        <p>The limitations map directly onto the next stage of the build.</p>
-        <ul class="body-list">
-            <li><strong>Longitudinal lesion tracking.</strong> Register the same lesion across uploads and surface change-over-time as a separate signal from the per-image prediction. Lesion evolution is one of the highest-signal inputs a clinician asks about.</li>
-            <li><strong>Dermoscopy attachment support</strong> and a dermoscopy-trained model variant, to bring the input regime closer to clinical-grade capture.</li>
-            <li><strong>Multilingual chatbot</strong> for global accessibility, especially in the regions where dermatologist access is most constrained and where English is not the patient's first language.</li>
-            <li><strong>Multi-clinic data partnerships</strong> for representative Fitzpatrick coverage in the training set, directly addressing the equity gap.</li>
-            <li><strong>Clinician handoff path.</strong> Surface a signed-URL read view of a user's classification and conversation to a clinician on request, turning the triage layer into a referral-ready intake document.</li>
+            <li><strong>Training-set bias toward lighter Fitzpatrick skin types.</strong> A documented equity issue in dermatology AI that augmentation cannot close. Multi-clinic data partnerships for representative coverage can.</li>
+            <li><strong>Smartphone capture is not dermoscopy.</strong> Phones lack the magnification and polarised lighting of clinical dermoscopes. Next: dermoscopy attachment support and a dermoscopy-trained model variant.</li>
+            <li><strong>Educational and pre-clinical, not regulated.</strong> Engineering correctness is validated; clinical efficacy against a standard dermatology intake protocol is unproven and is the headline next step.</li>
+            <li><strong>Citation quality is bounded by the corpus.</strong> Out-of-corpus conditions surface as refusals: correct behaviour, but no help resolving the patient's question.</li>
+            <li><strong>Next features.</strong> Longitudinal lesion tracking, a multilingual chatbot, and a signed-URL clinician handoff that makes the triage layer a referral-ready intake document.</li>
         </ul>
     </div>
 </body>

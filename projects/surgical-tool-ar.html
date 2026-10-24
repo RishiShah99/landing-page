@@ -11,9 +11,10 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="project.css">
+    <link rel="stylesheet" href="../base.css?v=20261024b">
+    <link rel="stylesheet" href="project.css?v=20261024b">
     <script defer src="../shared.js"></script>
     <script defer src="project.js"></script>
 </head>
@@ -23,30 +24,25 @@
 
         <div class="eyebrow">2024</div>
 
-        <h1 class="title">Proximity-aware AR for surgical <span class="accent">training</span>.</h1>
+        <h1 class="title">Proximity-aware AR for surgical training.</h1>
 
-        <div class="chips">
-            <span class="chip">Mixed Reality</span>
-            <span class="chip">Healthcare</span>
-            <span class="chip">Surgical Vision</span>
-        </div>
 
         <p class="subtitle">Most AR medical demos stop at "here's a brain floating on a marker." This one tracks a simulated probe against that brain in real time, computes tool-to-tissue distance, and raises safety warnings on a tablet HUD.</p>
 
         <!-- ============================================================== -->
         <h2 class="section">1. Abstract</h2>
-        <p>A marker-based AR prototype built in Unity with Vuforia tracking, deployed as an Android tablet APK. A 3D brain model is anchored to a printed base marker; a physical pen with fiducial fins is tracked as a surrogate surgical probe. The system computes live tip-to-anatomy distance, classifies it into <strong>SAFE / CAUTION / DANGER</strong> zones with hysteresis, and surfaces both the numeric reading and the zone state in a high-contrast HUD. The point is concrete: surgical-AR training tools that go past visualization into spatial awareness give the trainee feedback about <em>where the tool is, relative to what matters</em>, which is the part of operative judgement the trainee actually has to build before the first patient.</p>
+        <p>A marker-based AR prototype built in Unity with Vuforia tracking, deployed as an Android tablet APK. A 3D brain model is anchored to a printed base marker; a pen with fiducial fins stands in for a surgical probe. The system computes live tip-to-anatomy distance, classifies it into <strong>SAFE / CAUTION / DANGER</strong> zones with hysteresis, and shows both on a high-contrast HUD. That tells the trainee <em>where the tool is, relative to what matters</em>: the operative judgement they have to build before the first patient.</p>
 
-        <p>Tracking is <strong>Vuforia</strong> image targets at 6-DOF. The brain anatomy sits on a printed BrainTarget; the pen carries two redundant markers (FrontTarget and BackTarget) so a temporarily occluded face never breaks the track. Distance is computed with <code>Collider.ClosestPoint()</code> against capsule and sphere colliders approximating the brain. Fast enough for live feedback at frame rate, and accurate enough to distinguish the safety bands the training scenario cares about. Hysteresis on the zone transitions prevents the HUD from flickering between bands when the tip hovers near a threshold.</p>
+        <p>Tracking is <strong>Vuforia</strong> image targets at 6-DOF, with two redundant markers on the pen so a temporarily occluded face never breaks the track. <code>Collider.ClosestPoint()</code> against capsule and sphere colliders approximating the brain computes distance fast enough for frame-rate feedback and accurately enough to separate the training scenario's safety bands.</p>
 
-        <p>The novelty is the loop, not the rendering. Every commercial surgical-AR demo on the market stops at "here is the anatomy floating on a marker." Few of them close the loop into spatial reasoning about the tool, and none of the consumer-grade ones do it on a $400 Android tablet with paper-printed image targets. This is the build that closes that loop on commodity hardware: live visualization, plus per-frame distance, plus a classified safety state, plus a HUD that surfaces both for a trainee under variable lighting.</p>
+        <p>The novelty is the loop, not the rendering. Every commercial surgical-AR demo on the market stops at "here is the anatomy floating on a marker." Few close the loop into spatial reasoning about the tool, and none of the consumer-grade ones do it on a $400 Android tablet with paper-printed image targets. This build closes that loop on commodity hardware.</p>
 
         <ul class="body-list">
-            <li><strong>6-DOF pose tracking on three image targets:</strong> one BrainTarget for anatomy, FrontTarget and BackTarget for tool redundancy. Marker loss on one face of the tool does not break the track.</li>
+            <li><strong>6-DOF pose tracking on three image targets:</strong> BrainTarget for anatomy, FrontTarget and BackTarget for tool redundancy.</li>
             <li><strong>Real-time mm-scale distance</strong> via <code>Collider.ClosestPoint()</code> against capsule and sphere colliders on the brain. Frame-rate-stable on commodity Android.</li>
-            <li><strong>Hysteresis on zone transitions</strong> prevents flickering between SAFE, CAUTION, and DANGER states when the tip hovers near a threshold.</li>
-            <li><strong>Multi-touch gesture controls:</strong> pinch-to-scale, drag-to-rotate, lock, and measurement-mode toggle. Trainee-facing, not researcher-facing.</li>
-            <li><strong>Self-contained Android tablet APK.</strong> No headset, no operating-room infrastructure, no PC tether. Single install reaches a trainee at a desk.</li>
+            <li><strong>Hysteresis on zone transitions</strong> prevents flicker between SAFE, CAUTION, and DANGER when the tip hovers near a threshold.</li>
+            <li><strong>Multi-touch gesture controls:</strong> pinch-to-scale, drag-to-rotate, lock, and measurement-mode toggle.</li>
+            <li><strong>Self-contained Android tablet APK.</strong> No headset, no operating-room infrastructure, no PC tether.</li>
         </ul>
 
         <figure>
@@ -55,109 +51,98 @@
                     <source src="../images/SurgicalToolAR.mp4" type="video/mp4">
                 </video>
             </div>
-            <figcaption>Figure 1. Tablet AR view. As the pen approaches the tracked brain model, the HUD updates the distance in millimetres and the zone indicator transitions through SAFE, CAUTION, and DANGER.</figcaption>
+            <figcaption>Figure 1. Tablet AR view. As the pen approaches the tracked brain model, the HUD distance updates in millimetres and the zone indicator steps through SAFE, CAUTION, and DANGER.</figcaption>
         </figure>
 
         <!-- ============================================================== -->
         <h2 class="section">2. Introduction</h2>
-        <p>AR for surgical visualization has a ceiling. A 3D model floating on a fiducial is visually striking but clinically inert. What surgical training actually needs is <em>interaction awareness</em>: where the tool is, how close it is to the structure that matters, and whether the trainee is on the right side of a threshold. Until the demo can answer those three questions in real time, it remains a presentation prop rather than a training tool.</p>
+        <p>AR for surgical visualization has a ceiling. Training needs <em>interaction awareness</em>: where the tool is, how close it is to the structure that matters, and which side of a threshold the trainee is on. Until a demo answers those in real time, it is a presentation prop.</p>
         <ul class="body-list">
-            <li><strong>Visualization without interaction is inert.</strong> Rendering anatomy on a marker shows what is there. It does not tell the trainee what to do.</li>
-            <li><strong>The trainee is building spatial judgement.</strong> The part of operative skill that takes the longest to develop is millimetre-scale awareness of the tip relative to the anatomy. That is what a training surface has to teach.</li>
-            <li><strong>Commodity hardware unlocks reach.</strong> An Android tablet with paper-printed image targets reaches more trainees in more places than a HoloLens, a wet lab, or an OR rotation can.</li>
+            <li><strong>Visualization without interaction is inert.</strong> A 3D model on a fiducial is visually striking, but it shows what is there, not what to do.</li>
+            <li><strong>The trainee is building spatial judgement.</strong> Millimetre-scale awareness of the tip relative to the anatomy takes the longest to develop. That is what a training surface has to teach.</li>
+            <li><strong>Commodity hardware unlocks reach.</strong> An Android tablet with paper-printed image targets reaches more trainees in more places than a HoloLens, a wet lab, or an OR rotation.</li>
         </ul>
 
         <h3 class="subsection">2.1 Why marker tracking, not headset SLAM</h3>
-        <p>Vuforia image targets sit at one extreme of the AR tracking spectrum: cheap, robust, deterministic, and obviously markered. Headset SLAM (HoloLens, Quest 3, ARKit) sits at the other: hands-free and operating-room compatible, but expensive and harder to debug. For a tablet training prototype, the marker-tracking trade is the right one.</p>
+        <p>Vuforia image targets sit at one extreme of AR tracking: cheap, robust, deterministic, and obviously markered. Headset SLAM (HoloLens, Quest 3, ARKit) sits at the other: hands-free and operating-room compatible, but expensive and harder to debug. For a tablet training prototype, markers are the right trade.</p>
         <ul class="body-list">
-            <li><strong>Vuforia 6-DOF on a tablet</strong> is robust under typical handheld motion and frame-rate-stable on commodity Android. The trainee does not need to wear anything.</li>
-            <li><strong>Three image targets, redundantly placed.</strong> One on the anatomy, two on the tool. Marker loss on one face of the tool does not break the track, because <code>ToolRigFollower</code> picks the best-visible target each frame and the others are interpolated.</li>
-            <li><strong>Deterministic registration.</strong> A printed marker is a known anchor in the camera frame. There is no SLAM drift to debug, no calibration step at session start, no failure mode where the anatomy slides off the desk.</li>
+            <li><strong>Vuforia 6-DOF on a tablet</strong> is robust under handheld motion and frame-rate-stable on commodity Android. The trainee wears nothing.</li>
+            <li><strong>Three image targets, redundantly placed.</strong> One on the anatomy, two on the tool, so losing one face of the tool does not break the track.</li>
+            <li><strong>Deterministic registration.</strong> A printed marker is a known anchor in the camera frame. No SLAM drift, no calibration at session start, no anatomy sliding off the desk.</li>
         </ul>
 
         <h3 class="subsection">2.2 What is actually new</h3>
-        <p>The marker tracking and the rendering pipeline are off-the-shelf. The contribution is the per-frame spatial reasoning layered on top, and the HUD that makes it actionable for a trainee.</p>
+        <p>The marker tracking and rendering are off-the-shelf. The contribution is the per-frame spatial reasoning on top, and the HUD that makes it actionable for a trainee.</p>
         <ul class="body-list">
-            <li><strong>Per-frame proximity.</strong> <code>Collider.ClosestPoint()</code> against a capsule and sphere approximation of the brain runs at frame rate. The tip-to-anatomy distance is a live number, not a one-shot measurement.</li>
-            <li><strong>Classified safety state with hysteresis.</strong> SAFE, CAUTION, and DANGER thresholds are tunable. Band transitions only commit after the distance has sustained the new band, so the HUD does not flicker when the trainee hovers their pen near a threshold.</li>
-            <li><strong>Trainee-facing HUD, not researcher-facing telemetry.</strong> Bottom-right of the screen carries a large numeric readout and a color-coded zone indicator. Bottom-left carries Reset, Lock, and Measure-mode toggles. The legibility budget is "readable on a tablet under variable lighting," not "complete in a research paper."</li>
+            <li><strong>Per-frame proximity.</strong> The tip-to-anatomy distance is a live number, not a one-shot measurement.</li>
+            <li><strong>Classified safety state with hysteresis.</strong> SAFE, CAUTION, and DANGER thresholds are tunable, and the HUD does not flicker at a boundary.</li>
+            <li><strong>Trainee-facing HUD, not researcher-facing telemetry.</strong> A large numeric readout and a color-coded zone indicator. The legibility budget is "readable on a tablet under variable lighting," not "complete in a research paper."</li>
         </ul>
 
-        <p>Every section below is the engineering that makes those three commitments hold inside the tablet.</p>
+        <p>Everything below makes those three commitments hold inside the tablet.</p>
 
         <!-- ============================================================== -->
         <h2 class="section">3. System</h2>
 
         <h3 class="subsection">3.1 AR anchoring</h3>
         <ul class="body-list">
-            <li><strong>BrainTarget.</strong> Printed base marker. Anchors the 3D brain model in world space.</li>
-            <li><strong>FrontTarget and BackTarget.</strong> Dual markers on opposite faces of the pen tool. Either face is sufficient to recover the tool pose, so a temporarily occluded face does not break the track.</li>
-            <li><strong>6-DOF pose per target</strong> from Vuforia. Spatial relationships between brain and tool remain consistent under typical camera or marker motion.</li>
+            <li><strong>BrainTarget.</strong> Printed base marker that anchors the 3D brain model in world space.</li>
+            <li><strong>FrontTarget and BackTarget.</strong> Dual markers on opposite faces of the pen. Either face recovers the tool pose.</li>
+            <li><strong>6-DOF pose per target</strong> from Vuforia keeps brain-to-tool spatial relationships consistent under typical camera or marker motion.</li>
         </ul>
 
         <h3 class="subsection">3.2 Tool tracking</h3>
         <ul class="body-list">
-            <li><code>ToolRigFollower</code> picks the best-visible marker each frame (highest tracking confidence reported by Vuforia) and smoothly follows its pose into the tool rig.</li>
-            <li>Marker loss is handled with interpolation and graceful reacquisition rather than snapping. The tool rig coasts on its last known velocity for a few frames if both markers vanish.</li>
-            <li>Temporal smoothing on the raw pose suppresses the high-frequency jitter that would otherwise show up at the tool tip when the camera is still.</li>
+            <li><code>ToolRigFollower</code> picks the marker with the highest Vuforia tracking confidence each frame and smoothly follows its pose into the tool rig.</li>
+            <li>Marker loss triggers interpolation and graceful reacquisition, not snapping. If both markers vanish, the rig coasts on its last known velocity for a few frames.</li>
+            <li>Temporal smoothing on the raw pose suppresses high-frequency jitter at the tool tip when the camera is still.</li>
         </ul>
 
         <h3 class="subsection">3.3 Proximity logic</h3>
         <ul class="body-list">
-            <li>The tool tip is a dedicated transform parented to the tool rig at the probe's working point, so the distance query measures from the actual point of interest, not from the marker centroid.</li>
-            <li>The brain is approximated with capsule and sphere colliders. Fast distance queries, sufficient resolution for training scenarios that care about gross proximity, not surface curvature.</li>
-            <li>Distance is computed with <code>Collider.ClosestPoint()</code> every frame and classified against tunable SAFE, CAUTION, and DANGER thresholds.</li>
-            <li>Hysteresis on the threshold crossings: a band transition only commits when the distance has sustained the new band for a configurable hold-time. This is what prevents the HUD from oscillating when the tip is held near a boundary.</li>
+            <li>The tool tip is a dedicated transform at the probe's working point, so distance is measured from the point of interest, not the marker centroid.</li>
+            <li>Capsule and sphere colliders approximate the brain: fast distance queries, enough resolution for training scenarios that care about gross proximity, not surface curvature.</li>
+            <li><code>Collider.ClosestPoint()</code> runs every frame, and the distance is classified against tunable SAFE, CAUTION, and DANGER thresholds.</li>
+            <li>Hysteresis: a band transition commits only when the distance has held the new band for a configurable hold-time.</li>
         </ul>
 
         <h3 class="subsection">3.4 HUD</h3>
         <ul class="body-list">
-            <li><strong>Bottom-left.</strong> Reset, Lock, and Measure-mode toggles. Lock freezes the anatomy in its current placement during a measurement. Measure-mode switches the HUD between live distance and a held-snapshot reading.</li>
-            <li><strong>Bottom-right.</strong> A large numeric distance readout in millimetres, plus a color-coded zone indicator (green for SAFE, amber for CAUTION, red for DANGER).</li>
-            <li><strong>Transparent black panels and high-contrast typography</strong> so the HUD stays readable under the variable lighting of a classroom, a lab bench, or a study desk.</li>
+            <li><strong>Bottom-left.</strong> Reset, Lock, and Measure-mode toggles.</li>
+            <li><strong>Bottom-right.</strong> A large distance readout in millimetres, plus a color-coded zone indicator (green for SAFE, amber for CAUTION, red for DANGER).</li>
+            <li><strong>Transparent black panels and high-contrast typography</strong> keep the HUD readable under classroom, lab-bench, or study-desk lighting.</li>
         </ul>
 
         <h3 class="subsection">3.5 Gesture controls</h3>
         <ul class="body-list">
-            <li><strong>Pinch-to-scale</strong> on the anatomy model so the trainee can match the visualization to the marker arrangement on their desk.</li>
-            <li><strong>Drag-to-rotate</strong> around the marker axis for inspecting the anatomy from different angles without moving the camera.</li>
-            <li><strong>Lock toggle</strong> to freeze the current placement during a measurement, so a careful approach is not disturbed by accidental input.</li>
-            <li><strong>Measure-mode toggle</strong> to switch the HUD between the live distance reading and a held-snapshot reading captured at the moment of the toggle.</li>
+            <li><strong>Pinch-to-scale</strong> matches the anatomy model to the marker arrangement on the desk.</li>
+            <li><strong>Drag-to-rotate</strong> around the marker axis inspects the anatomy from different angles without moving the camera.</li>
+            <li><strong>Lock</strong> freezes the current placement during a measurement, so accidental input cannot disturb a careful approach.</li>
+            <li><strong>Measure-mode</strong> switches the HUD between the live distance and a snapshot held at the moment of the toggle.</li>
         </ul>
 
         <!-- ============================================================== -->
         <h2 class="section">4. Evaluation</h2>
-        <p>Validated qualitatively on Android tablet hardware. The system holds tracking under typical handheld motion, the distance reading updates at frame rate, and the zone transitions remain stable thanks to the hysteresis layer. No quantitative trainee study yet. This is a proof-of-concept for proximity-aware AR interaction on commodity tablets, not a validated training instrument.</p>
+        <p>Validated qualitatively on Android tablet hardware, as a proof-of-concept for proximity-aware AR on commodity tablets, not a validated training instrument.</p>
         <ul class="body-list">
-            <li><strong>Vuforia tracking holds</strong> under the typical motion of a seated trainee at a desk with the markers within roughly 30 cm of the camera, in normal indoor lighting.</li>
-            <li><strong>Distance reading updates at frame rate</strong> on the target Android tablet, with no observable lag between probe motion and HUD update.</li>
-            <li><strong>Zone transitions are stable</strong> across the typical SAFE-to-CAUTION and CAUTION-to-DANGER hover ranges. The hysteresis hold-time prevents the band from oscillating when the tip is held near a threshold.</li>
+            <li><strong>Vuforia tracking holds</strong> under the typical motion of a seated trainee, with the markers within roughly 30 cm of the camera in normal indoor lighting.</li>
+            <li><strong>Distance updates at frame rate</strong> on the target Android tablet, with no observable lag between probe motion and HUD.</li>
+            <li><strong>Zone transitions are stable</strong> across the typical SAFE-to-CAUTION and CAUTION-to-DANGER hover ranges, held steady by the hysteresis hold-time.</li>
             <li><strong>Multi-touch gestures</strong> (pinch, drag, lock, measure-mode) behave as expected across the four configurations exercised during development.</li>
         </ul>
 
-        <p>This is a self-contained training prototype on a single tablet, not a clinical evaluation. It is not a surgical guidance system, not an OR-ready instrument, and not on an FDA track. The contribution is the proximity-plus-safety-state loop on commodity hardware, not a benchmark number against any clinical AR system. Quantitative validation against a trainee cohort is the obvious next step.</p>
+        <p>This is a single-tablet training prototype, not a clinical evaluation: not a surgical guidance system, not an OR-ready instrument, not on an FDA track. The contribution is the proximity-plus-safety-state loop on commodity hardware, not a benchmark number against any clinical AR system.</p>
 
         <!-- ============================================================== -->
         <h2 class="section">5. Conclusion and Implications</h2>
-        <p>A tablet AR prototype that closes the proximity loop is a concrete step toward more accessible surgical training. If even a fraction of the spatial-judgement learning curve that a trainee normally builds on cadavers, simulators, or expensive headset-based platforms can be moved earlier in training onto a $400 Android tablet with paper markers, the downstream effect is more reps before the first patient, more consistent feedback across the cohort, and a lower threshold for a teaching surgeon to drop in and supervise. The design choices that matter most in this build (marker tracking instead of SLAM, hysteresis on zone transitions, trainee-facing HUD instead of researcher telemetry) are the parts that make it usable as a training surface rather than as a research demo.</p>
+        <p>A tablet AR prototype that closes the proximity loop is a concrete step toward more accessible surgical training. Moving even a fraction of the spatial-judgement learning curve, usually built on cadavers, simulators, or expensive headsets, earlier onto a $400 Android tablet with paper markers means more reps before the first patient, more consistent feedback across the cohort, and a lower threshold for a teaching surgeon to drop in and supervise. Marker tracking, hysteresis, and a trainee-facing HUD make this a training surface, not a research demo.</p>
 
-        <h3 class="subsection">5.1 Limitations</h3>
+        <h3 class="subsection">5.1 Limitations and future work</h3>
         <ul class="body-list">
-            <li><strong>Whole-brain colliders only.</strong> The current capsule and sphere approximation classifies "distance to brain," not "distance to a specific anatomical region." A 3 mm warning to the motor cortex specifically would require per-region colliders driven by a segmented anatomy mesh.</li>
-            <li><strong>Single tool geometry.</strong> The safety thresholds were tuned for the specific pen-and-marker tool used in development. Different instrument geometries would need their own calibration.</li>
-            <li><strong>Marker tracking constrains operating context.</strong> The system requires line-of-sight to the image targets in normal indoor lighting. Heavily textured backgrounds, occluded markers, or surgical-suite lighting are out of scope.</li>
-            <li><strong>No quantitative trainee study.</strong> The build has been validated for engineering correctness on the tablet; training efficacy against existing modalities like cadaver labs or commercial simulators is unproven.</li>
-            <li><strong>Proof-of-concept scope.</strong> The prototype is positioned as a training surface, not as a regulated medical device, and does not provide intraoperative guidance.</li>
-        </ul>
-
-        <h3 class="subsection">5.2 Future Work</h3>
-        <p>The limitations map directly onto the next stage of the build.</p>
-        <ul class="body-list">
-            <li><strong>Anatomical segmentation.</strong> Replace whole-brain colliders with per-region colliders driven by an MRI-segmented anatomy mesh, enabling region-specific distance warnings ("3 mm from the motor cortex," "8 mm from the optic chiasm").</li>
-            <li><strong>Per-tool calibration.</strong> Lookup table of instrument geometries to safety thresholds, configurable from the HUD at session start, so the same tablet supports more than one training scenario.</li>
-            <li><strong>Markerless tracking.</strong> Port to HoloLens or a SLAM-capable tablet for hands-free use during deliberate practice, while keeping the marker path for low-cost classroom deployment.</li>
-            <li><strong>Trajectory logging.</strong> Record every tip pose during a session for post-hoc review, comparison against a reference trajectory, and quantitative skill-progression tracking.</li>
-            <li><strong>Cohort study.</strong> Validate proximity-aware AR training against a standard simulator on a trainee cohort, the single biggest step from "engineering prototype" to "training claim."</li>
+            <li><strong>Whole-brain colliders only.</strong> The system measures "distance to brain," not to a specific region. Per-region colliders from an MRI-segmented anatomy mesh would enable warnings like "3 mm from the motor cortex" or "8 mm from the optic chiasm."</li>
+            <li><strong>Single tool geometry.</strong> Thresholds were tuned for one pen-and-marker tool. A lookup of instrument geometries to thresholds, set from the HUD at session start, would let one tablet support several training scenarios.</li>
+            <li><strong>Marker tracking constrains context.</strong> It needs line-of-sight to the targets in normal indoor lighting; occluded markers and surgical-suite lighting are out of scope. A HoloLens or SLAM-tablet port would allow hands-free practice.</li>
+            <li><strong>No quantitative trainee study.</strong> Training efficacy against cadaver labs or commercial simulators is unproven. A cohort study against a standard simulator, with per-session trajectory logging, is the biggest step from "engineering prototype" to "training claim."</li>
         </ul>
 
         <!-- ============================================================== -->

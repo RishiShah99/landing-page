@@ -11,9 +11,10 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="project.css">
+    <link rel="stylesheet" href="../base.css?v=20261024b">
+    <link rel="stylesheet" href="project.css?v=20261024b">
     <script defer src="../shared.js"></script>
     <script defer src="project.js"></script>
 </head>
@@ -23,129 +24,120 @@
 
         <div class="eyebrow">2024</div>
 
-        <h1 class="title">Real-time gesture control of a 3D-printed robotic <span class="accent">hand</span>.</h1>
+        <h1 class="title">Real-time gesture control of a 3D-printed robotic hand.</h1>
 
-        <div class="chips">
-            <span class="chip">Computer Vision</span>
-            <span class="chip">Robotics</span>
-            <span class="chip">Embedded Systems</span>
-        </div>
 
         <p class="subtitle">21 MediaPipe hand landmarks per frame, a finger-state classifier that reduces them to a five-bit command, a tight serial protocol, and five servos on an Arduino driving a custom 3D-printed hand. Webcam in, mirrored motion out, no GPU.</p>
 
         <!-- ============================================================== -->
         <h2 class="section">1. Abstract</h2>
-        <p>A real-time gesture-control loop that maps a user's finger positions onto a custom 3D-printed robotic hand. Computer vision via MediaPipe Hands extracts 21 landmarks per frame, a per-finger classifier reduces those landmarks to a five-bit up-or-down command, a deterministic serial protocol carries the command to an Arduino, and five servos with antagonistic cable actuation drive a printed PLA hand that mirrors the gesture.</p>
+        <p>A real-time gesture-control loop that maps a user's finger positions onto a custom 3D-printed robotic hand. MediaPipe Hands extracts 21 landmarks per frame, a per-finger classifier reduces them to a five-bit up-or-down command, a deterministic serial protocol carries it to an Arduino, and five servos with antagonistic cable actuation drive a printed PLA hand that mirrors the gesture.</p>
 
-        <p>The implementation is deliberately spare. No GPU. No deep model beyond MediaPipe's bundled networks. No continuous angle tracking; just five binary fingers. The five-character serial protocol (<code>$TTTTT</code>) is small enough that the buffer flushes every frame so the firmware always acts on the latest hand state rather than queuing stale commands. An external 5 V supply with decoupling capacitors absorbs the current spike when all five servos move at once, which is what kept the Arduino from brown-out resetting on the first hardware iteration.</p>
+        <p>The implementation is deliberately spare. No GPU. No deep model beyond MediaPipe's bundled networks. No continuous angle tracking, just five binary fingers. The serial buffer flushes every frame, so the firmware always acts on the latest hand state rather than queued stale commands.</p>
 
-        <p>The point of the project is the loop, not any single piece. Vision, classification, serial, firmware, and mechanical actuation chained end to end on commodity hardware. As an early portfolio piece this is also the project where the discipline of writing each layer simply enough that the next one can trust it became the rule for everything that came after.</p>
+        <p>The point is the loop, not any single piece: vision, classification, serial, firmware, and actuation chained end to end on commodity hardware. This early project is where writing each layer simply enough for the next to trust became the rule for everything after.</p>
 
         <ul class="body-list">
             <li><strong>21 hand landmarks per frame</strong> via MediaPipe Hands at <strong>30+ FPS</strong> on a standard CPU. No GPU required.</li>
-            <li><strong>Binary five-finger classification</strong> from tip-versus-joint landmark comparisons. Continuous angle tracking was tried first and produced jitter that the actuators could not follow; binary state classification stabilised the loop.</li>
-            <li><strong>Tight serial protocol.</strong> <code>$TTTTT</code> with five binary digits at 9600 baud. The <code>$</code> delimiter lets the Arduino recover message boundaries on partial reads.</li>
+            <li><strong>Binary five-finger classification</strong> from tip-versus-joint landmark comparisons, which stabilised the loop.</li>
+            <li><strong>Tight serial protocol.</strong> <code>$TTTTT</code> with five binary digits at 9600 baud.</li>
             <li><strong>Five servos, one per finger,</strong> with antagonistic cable plus elastic-band actuation that mimics the flexor and extensor pairing in a biological hand.</li>
-            <li><strong>External 5 V supply with 100 microfarad decoupling</strong> near each servo cluster. The Arduino regulator alone cannot source the roughly 2.5 A peak when all five servos move simultaneously, and the caps suppress brown-out resets from the current spike.</li>
+            <li><strong>External 5 V supply with 100 microfarad decoupling</strong> near each servo cluster, because the Arduino regulator alone cannot source the roughly 2.5 A peak when all five servos move simultaneously.</li>
         </ul>
 
         <!-- ============================================================== -->
         <h2 class="section">2. Introduction</h2>
-        <p>Robotic teleoperation usually means joysticks or expensive motion-capture rigs. Both put a cognitive layer between intent and motion. The user thinks in gestures and translates them, in real time, into something the rig understands. The translation is the friction. MediaPipe brings precise hand tracking to a webcam, and Arduino brings cheap servo control to anyone with a soldering iron; the combination removes most of the cost barrier that kept gesture-controlled robotics in research labs.</p>
+        <p>Robotic teleoperation usually means joysticks or expensive motion-capture rigs, which make the user translate gestures into something the rig understands. That translation is the friction. MediaPipe brings precise hand tracking to a webcam and Arduino brings cheap servo control to anyone with a soldering iron, removing most of the cost barrier that kept gesture-controlled robotics in research labs.</p>
         <ul class="body-list">
-            <li><strong>Gesture is the most natural control surface for a hand.</strong> Mapping a user's fingers to a robotic hand's fingers preserves the user's mental model directly. The user does not learn the rig; the rig follows the user.</li>
-            <li><strong>The pieces are now commodity.</strong> Webcams, MediaPipe, Arduino, hobby servos, and PLA-printed mechanical parts are each cheap and well-documented in isolation. Stitching them into a working loop is the work.</li>
-            <li><strong>The discipline is what carries.</strong> Each layer in the loop has to be simple enough that the next layer can trust it. Continuous angles tempted the classifier; binary states made the firmware reliable. The constraint propagates.</li>
+            <li><strong>Gesture is the most natural control surface for a hand.</strong> Mapping fingers to fingers preserves the user's mental model. The user does not learn the rig; the rig follows the user.</li>
+            <li><strong>The pieces are now commodity.</strong> Webcams, MediaPipe, Arduino, hobby servos, and PLA-printed parts are each cheap and well-documented in isolation. Stitching them into a working loop is the work.</li>
         </ul>
 
         <h3 class="subsection">2.1 Why binary state, not continuous angles</h3>
-        <p>The first attempt tracked joint angles continuously and mapped them to servo positions linearly. The result was visibly jittery: MediaPipe's landmark estimates carry a few pixels of frame-to-frame noise, which becomes a few degrees of servo command at the rate the camera ran. The servos cannot keep up with rapid small commands, and the human eye reads the result as buzzing. Collapsing each finger to a binary up-or-down state, decided by comparing tip and joint landmarks, removed the noise floor entirely. The gesture vocabulary shrinks (32 distinct hand poses instead of a continuum) but every pose in the smaller set is recognisable and reproducible.</p>
+        <p>The first attempt mapped continuously tracked joint angles linearly to servo positions, and the result was visibly jittery. MediaPipe's landmarks carry a few pixels of frame-to-frame noise, which became a few degrees of servo command at the camera's rate, and the servos could not keep up with rapid small commands. Collapsing each finger to a binary up-or-down state, decided by comparing tip and joint landmarks, removed the noise floor entirely. The vocabulary shrinks to 32 distinct hand poses instead of a continuum, but every pose is recognisable and reproducible.</p>
         <ul class="body-list">
-            <li><strong>The signal-to-noise problem is the architecture's problem.</strong> A classifier downstream cannot fix what is upstream noise; collapsing to a discrete state lifts the signal above the noise floor at the source.</li>
-            <li><strong>The actuator's slew rate is the second constraint.</strong> Hobby servos move at roughly 60 degrees per 0.1 seconds. A continuous command stream above that rate is wasted; a discrete command stream at that rate is exactly what the hardware can follow.</li>
-            <li><strong>The gesture set stays useful.</strong> Fist, open hand, peace sign, point, thumbs-up, and the rest of the 32-pose space are what most gesture-controlled interfaces actually need.</li>
+            <li><strong>Noise is the architecture's problem.</strong> A downstream classifier cannot fix upstream noise; a discrete state lifts the signal above the noise floor at the source.</li>
+            <li><strong>The actuator's slew rate is the second constraint.</strong> Hobby servos move roughly 60 degrees per 0.1 seconds. A continuous command stream above that rate is wasted; a discrete stream at that rate is exactly what the hardware can follow.</li>
+            <li><strong>The gesture set stays useful.</strong> The 32-pose space covers what most gesture-controlled interfaces actually need.</li>
         </ul>
 
         <h3 class="subsection">2.2 What is actually new</h3>
-        <p>MediaPipe is from Google. Arduino is Arduino. The 3D-printed cable-actuated hand geometry is borrowed from the open-source prosthetics community. The contribution is the end-to-end loop closed cheaply, and the design choices (binary classification, antagonistic actuation, external supply with decoupling) that make the loop reliable under commodity-hardware constraints.</p>
+        <p>MediaPipe is from Google. Arduino is Arduino. The cable-actuated hand geometry is borrowed from the open-source prosthetics community. The contribution is the end-to-end loop, closed cheaply and reliably on commodity hardware.</p>
         <ul class="body-list">
-            <li><strong>End-to-end loop on a webcam and an Arduino.</strong> No GPU, no specialised tracking hardware, no industrial servos. The full vision-to-actuator chain runs on parts a student can buy in an afternoon.</li>
-            <li><strong>Antagonistic cable plus elastic-band actuation.</strong> One servo per finger pulls the cable; the elastic provides return force. The biological flexor-extensor pairing replicated mechanically rather than with two servos per finger.</li>
-            <li><strong>Power discipline as a first-class layer.</strong> External 5 V supply, decoupling capacitors near each servo cluster. The hardware iteration that taught this lesson is part of why the project ships at all.</li>
+            <li><strong>End-to-end loop on a webcam and an Arduino.</strong> No GPU, no specialised tracking hardware, no industrial servos.</li>
+            <li><strong>Antagonistic cable plus elastic-band actuation.</strong> One servo pulls; the elastic returns. Flexor-extensor pairing without two servos per finger.</li>
+            <li><strong>Power discipline as a first-class layer.</strong> The hardware iteration that taught it is part of why the project ships at all.</li>
         </ul>
 
-        <p>Every section below is the engineering of one layer in the loop.</p>
+        <p>Each section below is one layer in the loop.</p>
 
         <!-- ============================================================== -->
         <h2 class="section">3. System</h2>
 
         <h3 class="subsection">3.1 Vision pipeline</h3>
         <ul class="body-list">
-            <li><strong>MediaPipe Hands</strong> runs a two-stage palm detector followed by landmark localisation, producing 21 keypoints per hand with (x, y, z) coordinates per frame.</li>
-            <li><strong>Mirror flip on capture</strong> so that the user's right hand controls the rig's right side. The cognitive cost of mirrored teleoperation is real; the camera flip removes it.</li>
-            <li><strong>BGR to RGB conversion</strong> before MediaPipe (OpenCV reads BGR, MediaPipe expects RGB). Landmark complexity is set to level 1, the speed-versus-accuracy midpoint, because the classifier downstream only needs landmark relationships, not millimetre precision.</li>
-            <li><strong>Visual overlay</strong> draws the bounding box, the 21 landmark dots, and the current finger-state indicators on the webcam feed. The overlay is for debugging misdetections, not for the user; it stays on during development and off during demos.</li>
+            <li><strong>MediaPipe Hands</strong> runs a two-stage palm detector then landmark localisation, producing 21 keypoints per hand with (x, y, z) coordinates per frame.</li>
+            <li><strong>Mirror flip on capture</strong> so the user's right hand controls the rig's right side, removing the cognitive cost of mirrored teleoperation.</li>
+            <li><strong>BGR to RGB conversion</strong> before MediaPipe (OpenCV reads BGR, MediaPipe expects RGB). Landmark complexity is level 1, the speed-versus-accuracy midpoint; the classifier needs landmark relationships, not millimetre precision.</li>
+            <li><strong>Debug overlay</strong> draws the bounding box, landmarks, and finger states on the feed. Off during demos.</li>
         </ul>
 
         <h3 class="subsection">3.2 Finger-state classifier</h3>
-        <p>Per-finger binary up-or-down decided from landmark geometry. No machine learning model, no trained classifier, just direct comparisons that exploit how the 21 landmarks are laid out.</p>
+        <p>No trained model, just direct comparisons that exploit how the 21 landmarks are laid out.</p>
         <ul class="body-list">
-            <li><strong>Thumb</strong> uses landmark 4 versus 3, compared horizontally. The thumb is perpendicular to the other fingers, so the vertical comparison the index through pinky use does not apply to it.</li>
-            <li><strong>Index, middle, ring, and pinky</strong> use tip-landmark <em>y</em> versus PIP-joint <em>y</em>. Tip above joint means the finger is extended; tip below means flexed.</li>
-            <li><strong>Intermediate poses default to "down"</strong> to prevent flicker. A finger that is genuinely half-extended is rare in normal gestures, and rounding to flexed is more visually stable than oscillating.</li>
+            <li><strong>Thumb</strong> compares landmark 4 versus 3 horizontally. It sits perpendicular to the other fingers, so their vertical comparison does not apply.</li>
+            <li><strong>Index, middle, ring, and pinky</strong> compare tip-landmark <em>y</em> with PIP-joint <em>y</em>. Tip above joint means extended; tip below means flexed.</li>
+            <li><strong>Intermediate poses default to "down"</strong> to prevent flicker. Half-extended fingers are rare in normal gestures, and rounding to flexed is more stable than oscillating.</li>
         </ul>
 
         <h3 class="subsection">3.3 Serial protocol</h3>
-        <p>Five-character payload <code>$TTTTT</code>, where each <code>T</code> is the ASCII digit <code>0</code> or <code>1</code>. The <code>$</code> delimiter lets the firmware locate message boundaries even on partial reads, and the serial buffer is flushed before each transmit so the firmware always acts on the latest hand state.</p>
+        <p>Five-character payload <code>$TTTTT</code>, where each <code>T</code> is the ASCII digit <code>0</code> or <code>1</code>. The <code>$</code> delimiter lets the firmware locate message boundaries even on partial reads.</p>
         <ul class="body-list">
-            <li><strong>Fist is <code>$00000</code>.</strong> Open hand is <code>$11111</code>. Peace sign is <code>$01100</code>. The protocol is small enough to be readable in the serial monitor while debugging.</li>
-            <li><strong>9600 baud.</strong> Minimal payload size keeps end-to-end latency well under the threshold at which mirroring stops feeling responsive.</li>
-            <li><strong>Buffer flush per transmit.</strong> The earlier iteration queued commands and produced visible lag when the user moved rapidly; flushing was the fix.</li>
+            <li><strong>Fist is <code>$00000</code>.</strong> Open hand is <code>$11111</code>. Peace sign is <code>$01100</code>. Readable in the serial monitor while debugging.</li>
+            <li><strong>9600 baud.</strong> The minimal payload keeps latency well under the point where mirroring stops feeling responsive.</li>
+            <li><strong>Buffer flush per transmit.</strong> An earlier iteration queued commands and lagged visibly when the user moved rapidly. Flushing was the fix.</li>
         </ul>
 
         <h3 class="subsection">3.4 Firmware</h3>
         <ul class="body-list">
             <li><strong>Arduino Uno</strong> reads the serial port continuously, watches for the <code>$</code> delimiter, parses the next five characters, and writes 0 or 180 degrees to each servo via PWM.</li>
-            <li><strong>Servos on digital pins 2 through 6.</strong> One per finger. The pin assignment is hardcoded because the cable runs in the mechanical hand are physically wired to specific servos.</li>
-            <li><strong>External 5 V supply</strong> rated for at least 3 A. The Arduino regulator alone cannot source the roughly 2.5 A peak when all five servos move at once.</li>
-            <li><strong>100 microfarad decoupling capacitors</strong> near each servo cluster suppress brown-out resets from the current spike. This was learned by failing first: the early build kept rebooting itself mid-gesture, and the caps fixed it.</li>
+            <li><strong>Servos on digital pins 2 through 6,</strong> one per finger, hardcoded because the hand's cable runs are physically wired to specific servos.</li>
+            <li><strong>External 5 V supply</strong> rated for at least 3 A, with <strong>100 microfarad decoupling capacitors</strong> near each servo cluster to suppress brown-out resets from the current spike. Learned by failing first: the early build kept rebooting mid-gesture until the caps went in.</li>
         </ul>
 
         <h3 class="subsection">3.5 Mechanical hand</h3>
-        <p>Articulated finger segments designed in Fusion 360 and printed in PLA. Each finger has its own cable run from a palm-mounted servo, with elastic bands providing return force. The flexor-extensor pairing in a biological hand is replicated mechanically with one servo plus one elastic instead of two servos per finger. One degree of freedom per finger keeps the mechanical design simple and the gesture vocabulary recognisable to the user from across a room.</p>
+        <p>Articulated finger segments designed in Fusion 360 and printed in PLA. Each finger has its own cable run from a palm-mounted servo, with elastic bands providing return force. One degree of freedom per finger keeps the mechanics simple and the gestures recognisable from across a room.</p>
 
         <!-- ============================================================== -->
         <h2 class="section">4. Evaluation</h2>
-        <p>Evaluation is qualitative and demo-driven, in keeping with what an early portfolio CV project can validate. Numbers below are measured on the build's own setup, not against any external benchmark for gesture-controlled robotic teleoperation.</p>
+        <p>Evaluation is qualitative and demo-driven, measured on the build's own setup, not an external teleoperation benchmark.</p>
         <ul class="body-list">
-            <li><strong>30+ FPS detection</strong> on a standard CPU with the integrated webcam; 60+ FPS observed on a CUDA-capable GPU, though no GPU is required for the loop to feel responsive.</li>
-            <li><strong>Sub-perceptible end-to-end latency</strong> on the standard test gestures. The mirroring feels live rather than delayed, which is the only useful subjective threshold for teleoperation.</li>
-            <li><strong>Recognisable gestures with no per-user calibration.</strong> Fist, open hand, peace sign, point, thumbs-up all classify reliably across hand sizes and skin tones without retraining MediaPipe.</li>
-            <li><strong>Primary failure modes identified.</strong> Poor lighting (histogram equalisation helps), partial occlusion (temporal smoothing fills brief drops), and rapid motion exceeding the servo slew rate (roughly 60 degrees per 0.1 seconds on hobby servos, which is the hardware ceiling).</li>
+            <li><strong>30+ FPS detection</strong> on a standard CPU with the integrated webcam; 60+ FPS observed on a CUDA-capable GPU.</li>
+            <li><strong>Sub-perceptible end-to-end latency</strong> on the standard test gestures. Mirroring feels live, the only useful subjective threshold for teleoperation.</li>
+            <li><strong>Recognisable gestures with no per-user calibration.</strong> Fist, open hand, peace sign, point, and thumbs-up classify reliably across hand sizes and skin tones without retraining MediaPipe.</li>
+            <li><strong>Primary failure modes identified.</strong> Poor lighting (histogram equalisation helps), partial occlusion (temporal smoothing fills brief drops), and motion faster than the servo slew rate, which is the hardware ceiling.</li>
         </ul>
 
-        <p>These numbers are honest about the harness. The frame rate is on the integrated camera and CPU of the development laptop; mileage will vary on weaker hardware. The "recognisable gesture" claim is qualitative across a few dozen hand poses, not a quantitative accuracy figure across a controlled dataset. Read the project as an early end-to-end systems exercise, not as a benchmark contribution to gesture-recognition research.</p>
+        <p>Frame rates are from the development laptop's integrated camera and CPU. The gesture claim is qualitative across a few dozen hand poses, not a quantitative accuracy figure. Read this as an early end-to-end systems exercise, not a gesture-recognition benchmark.</p>
 
         <!-- ============================================================== -->
         <h2 class="section">5. Conclusion and Implications</h2>
-        <p>The same loop generalises far beyond hand-shadow puppets. Prosthetic control where amputees translate residual gestures into actuator commands without expensive EMG electrodes. Hazardous-environment teleoperation where lowering operator training overhead matters more than peak precision. Surgical training rigs where natural hand input replaces master-and-slave manipulators. Accessible robotics education where students can wire a complete vision-to-actuator pipeline in a weekend. In each case the safety-critical consequence is the same: a teleoperation loop that runs on commodity webcam and microcontroller hardware, with each layer simple enough that the failure modes are observable rather than buried, is the kind that can be debugged by the people who deploy it.</p>
-
-        <h3 class="subsection">5.1 Limitations</h3>
+        <p>The same loop generalises far beyond hand-shadow puppets.</p>
         <ul class="body-list">
-            <li><strong>Binary state per finger.</strong> The 32-pose vocabulary covers most useful gestures but misses anything that depends on partial flexion (a precision pinch, a relaxed grip).</li>
-            <li><strong>Open-loop control.</strong> The hand does not sense whether the motion succeeded. A jammed cable or a slipped servo is not detected from the rig itself.</li>
-            <li><strong>Single hand, one degree of freedom per finger.</strong> No wrist control, no thumb opposition, no finger spread. The mechanical design trades expressiveness for reliability at this stage.</li>
-            <li><strong>Lighting dependence.</strong> MediaPipe degrades in low light, which propagates immediately into classifier flicker. The build assumes normal indoor lighting.</li>
-            <li><strong>Tethered to the host.</strong> The serial cable from the host to the Arduino is the current connection. Untethered operation requires a wireless link that has not been added yet.</li>
+            <li><strong>Prosthetic control.</strong> Amputees translate residual gestures into actuator commands without expensive EMG electrodes.</li>
+            <li><strong>Hazardous-environment teleoperation.</strong> Lower operator training overhead matters more than peak precision.</li>
+            <li><strong>Surgical training rigs.</strong> Natural hand input replaces master-and-slave manipulators.</li>
+            <li><strong>Accessible robotics education.</strong> Students wire a complete vision-to-actuator pipeline in a weekend.</li>
         </ul>
+        <p>In each case the safety-critical consequence is the same: a teleoperation loop on commodity hardware, with each layer simple enough that failure modes are observable rather than buried, can be debugged by the people who deploy it.</p>
 
-        <h3 class="subsection">5.2 Future Work</h3>
+        <h3 class="subsection">5.1 Limitations and future work</h3>
         <ul class="body-list">
-            <li><strong>Continuous angle control</strong> using MediaPipe's (x, y, z) for proportional servo positions instead of binary up-or-down. Requires a temporal smoothing filter that the binary classifier did not need.</li>
-            <li><strong>Stereo or depth camera</strong> (RealSense) for true 3D joint reconstruction and out-of-plane gesture support.</li>
-            <li><strong>Wireless link</strong> via ESP32 over Wi-Fi or Bluetooth, replacing the serial tether and unlocking remote teleoperation use cases.</li>
-            <li><strong>Force feedback.</strong> Current sensing on the servos and fingertip pressure sensors closing the loop back to a haptic glove on the user's hand.</li>
-            <li><strong>Wrist and thumb opposition</strong> as the next mechanical degrees of freedom, expanding the gesture vocabulary beyond five-finger flexion.</li>
+            <li><strong>Binary state per finger.</strong> The 32-pose vocabulary misses partial flexion (a precision pinch, a relaxed grip). Next: continuous angle control from MediaPipe's (x, y, z) with temporal smoothing, and a stereo or depth camera (RealSense) for true 3D joint reconstruction.</li>
+            <li><strong>Open-loop control.</strong> A jammed cable or slipped servo goes undetected. Servo current sensing and fingertip pressure sensors could close the loop back to a haptic glove.</li>
+            <li><strong>Single hand, one degree of freedom per finger.</strong> No wrist control, thumb opposition, or finger spread; wrist and thumb opposition come next.</li>
+            <li><strong>Lighting dependence.</strong> MediaPipe degrades in low light, which propagates straight into classifier flicker.</li>
+            <li><strong>Tethered to the host</strong> by the serial cable. An ESP32 link over Wi-Fi or Bluetooth would unlock remote teleoperation.</li>
         </ul>
 
         <!-- ============================================================== -->

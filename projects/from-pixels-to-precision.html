@@ -11,9 +11,10 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="project.css">
+    <link rel="stylesheet" href="../base.css?v=20261024b">
+    <link rel="stylesheet" href="project.css?v=20261024b">
     <script defer src="../shared.js"></script>
     <script defer src="project.js"></script>
 </head>
@@ -23,23 +24,18 @@
 
         <div class="eyebrow">2023</div>
 
-        <h1 class="title">Real-time surgical tool <span class="accent">segmentation</span> from live operating-room footage.</h1>
+        <h1 class="title">Real-time surgical tool segmentation from live operating-room footage.</h1>
 
-        <div class="chips">
-            <span class="chip">Surgical Vision</span>
-            <span class="chip">Healthcare</span>
-            <span class="chip">Deep Learning</span>
-        </div>
 
         <p class="subtitle">A U-Net trained on 300 hand-labeled frames captured through a Modus V exoscope at Synaptive Medical and Robarts Research Institute, segmenting tools from tissue at ~95% DICE in under 0.12 s per frame.</p>
 
         <!-- ============================================================== -->
         <h2 class="section">1. Abstract</h2>
-        <p>A convolutional segmentation network that traces surgical instruments out of background tissue, frame by frame, on real operating-room footage rather than phantoms or simulated images. Trained on a dataset hand-built from a live procedure: 300 frames, captured through a <strong>Modus V exoscope</strong> on representative tissue, each one segmented by hand in ITK-SNAP into a binary tool-versus-tissue mask. Validated against a fully held-out surgical video, and benchmarked across four lighting and tool-count scenarios that span the realistic range of intraoperative conditions.</p>
+        <p>A convolutional segmentation network that traces surgical instruments out of background tissue, frame by frame, on real operating-room footage rather than phantoms or simulated images. Trained on 300 hand-labeled frames from a <strong>Modus V exoscope</strong>, then validated on a fully held-out surgical video across four lighting and tool-count scenarios.</p>
 
-        <p>The model is a <strong>U-Net</strong> (Ronneberger et al., 2015), picked because skip connections preserve the fine spatial detail that downsampling otherwise destroys, which is the part of the network that actually has to land the tool boundary. Encoder, decoder, skip connections. Adam with binary cross-entropy. Roughly two hours of training on a single GPU. Fluorescent-blue frames are converted to grayscale before training: the network learns the tool more cleanly from intensity than from hue, a finding that fell out of the data work rather than the architecture.</p>
+        <p>The model is a <strong>U-Net</strong> (Ronneberger et al., 2015), picked because its skip connections preserve the fine spatial detail that lands the tool boundary. Fluorescent-blue frames are converted to grayscale first: the network learns the tool more cleanly from intensity than from hue.</p>
 
-        <p>The novelty is not the architecture. It is the data, the partnership, and the deployment context. 300 hand-labeled frames from a real Synaptive Modus V exoscope on real tissue, not Cholec80 phantoms or synthetic renders. Coverage of regular illumination and fluorescence-guided surgery in the same model. A working real-time inference loop running on commodity hardware, demonstrated against held-out video that the network never saw during training.</p>
+        <p>The novelty is not the architecture. It is the data, the partnership, and the deployment context: real exoscope footage on real tissue, not Cholec80 phantoms or synthetic renders; regular and fluorescence-guided imaging in one model; and a real-time inference loop on commodity hardware, demonstrated on video the network never saw.</p>
 
         <ul class="body-list">
             <li><strong>~95% DICE</strong> on the canonical single-tool, regular-illumination case.</li>
@@ -55,70 +51,69 @@
                     <source src="../images/tool_segmentation.mp4" type="video/mp4">
                 </video>
             </div>
-            <figcaption>Figure 1. Live segmentation overlay on held-out surgical video. Tool boundaries traced frame by frame at under 0.12 s per image.</figcaption>
+            <figcaption>Figure 1. Live segmentation overlay on held-out surgical video, traced frame by frame at under 0.12 s per image.</figcaption>
         </figure>
 
         <!-- ============================================================== -->
         <h2 class="section">2. Introduction</h2>
-        <p>Minimally invasive surgery is the procedure where the surgeon is asked to operate through a keyhole. The camera replaces direct sight, depth perception collapses to a 2D feed, and the instrument tip routinely leaves and reenters the visible field as it moves. Existing literature attributes roughly 30% of complications in this setting to in-procedure misrecognition: tools confused with tissue, edges lost under fluorescence, occlusion read as background.</p>
+        <p>Minimally invasive surgery asks the surgeon to operate through a keyhole. The camera replaces direct sight, depth perception collapses to a 2D feed, and the instrument tip routinely leaves and reenters the field. Existing literature attributes roughly 30% of complications in this setting to in-procedure misrecognition: tools confused with tissue, edges lost under fluorescence, occlusion read as background.</p>
         <ul class="body-list">
-            <li><strong>The surgeon's view is already lossy.</strong> A real-time overlay that traces the tool boundary at video rate gives back information the human eye is losing to camera distortion and shadow.</li>
+            <li><strong>The surgeon's view is already lossy.</strong> A real-time overlay that traces the tool boundary gives back information lost to camera distortion and shadow.</li>
             <li><strong>Tool segmentation is the load-bearing primitive.</strong> Skill scoring, instrument tracking, autonomous assistance, and post-operative review all start from "where is the tool, pixel by pixel."</li>
-            <li><strong>The training set is the bottleneck, not the model.</strong> Public surgical-vision datasets skew toward laparoscopic or phantom footage. A model trained on real tissue, real lighting, and real fluorescence ends up in a different regime.</li>
+            <li><strong>The training set is the bottleneck, not the model.</strong> Public surgical-vision datasets skew toward laparoscopic or phantom footage.</li>
         </ul>
 
         <h3 class="subsection">2.1 Why a U-Net</h3>
-        <p>U-Net is the natural pick for small biomedical datasets, which is precisely the regime here (300 frames after manual labeling, not 30,000). It was designed for exactly this constraint: per-pixel classification with limited training data, where the architecture itself has to compensate for what the data does not have.</p>
+        <p>U-Net was designed for exactly this regime: per-pixel classification on small biomedical datasets (300 frames, not 30,000), where the architecture has to compensate for what the data lacks.</p>
         <ul class="body-list">
-            <li><strong>Encoder, decoder, skip connections.</strong> The encoder extracts hierarchical context through successive convolutions and pooling. The decoder upsamples back to input resolution via transpose convolutions. Skip connections at each level carry the high-frequency spatial detail that pooling would otherwise discard.</li>
-            <li><strong>The skips are what land the tool boundary.</strong> Without them the network can identify "there is a tool here" but the predicted mask drifts off the actual edge by several pixels. With them, the boundary stays sharp. This matters in surgical overlay because the surgeon is looking at the edge, not the centroid.</li>
-            <li><strong>Tiny parameter count for a segmentation network.</strong> The architecture is shallow enough to train end-to-end on a single GPU in roughly two hours, which kept the iteration loop tight during the data and lighting experiments.</li>
+            <li><strong>The skips land the tool boundary.</strong> They carry the high-frequency detail that pooling would discard. Without them the mask drifts several pixels off the actual edge; with them the boundary stays sharp, and the surgeon is looking at the edge, not the centroid.</li>
+            <li><strong>Tiny parameter count for a segmentation network.</strong> It trains end to end on a single GPU in roughly two hours, which kept iteration tight during the data and lighting experiments.</li>
         </ul>
 
         <h3 class="subsection">2.2 What is actually new</h3>
-        <p>The architecture is from 2015. The contribution is in the dataset, the lighting range, and the partnership context that made both possible.</p>
+        <p>The architecture is from 2015. The contribution is the dataset, the lighting range, and the partnership that made both possible.</p>
         <ul class="body-list">
-            <li><strong>300 frames from a real Modus V exoscope on real tissue.</strong> Captured during experimental procedures on pig brain tissue, representative of the lighting and focal regime in a real operating room. Not Cholec80. Not phantom data. Hand-labeled in ITK-SNAP into NIfTI and PNG binary masks, every segmentation double-checked.</li>
-            <li><strong>Both regular and fluorescence-guided imaging in the same model.</strong> Fluorescent-blue frames are converted to grayscale before training, because the tool boundary is sharper in intensity than in hue. That conversion step is what makes a single network handle both lighting modes without retraining; the finding came out of the data work, not the architecture.</li>
-            <li><strong>Industry and clinical collaboration as part of the build.</strong> Synaptive Medical (Toronto) provided the exoscope and the procedural context. Robarts Research Institute (Western University) provided the tissue and the clinical guidance. The model exists because the partnership produced training data that no public dataset has.</li>
+            <li><strong>300 frames from a real Modus V exoscope on real tissue.</strong> Captured during experimental procedures on pig brain tissue, representative of operating-room lighting and focus. Not Cholec80. Not phantom data.</li>
+            <li><strong>Regular and fluorescence-guided imaging in one model.</strong> Grayscale conversion lets a single network handle both lighting modes without retraining (§3.2).</li>
+            <li><strong>Industry and clinical collaboration as part of the build.</strong> Synaptive Medical and Robarts Research Institute produced training data no public dataset has.</li>
         </ul>
 
-        <p>Every section below is the engineering that lives on top of those three. The architecture is the smallest piece.</p>
+        <p>Everything below is engineering on top of those three. The architecture is the smallest piece.</p>
 
         <!-- ============================================================== -->
         <h2 class="section">3. System</h2>
 
         <h3 class="subsection">3.1 Architecture</h3>
-        <p>Standard U-Net. Three downsampling blocks (64, 128, 256 channels), a single 512-channel bottleneck, three upsampling blocks (256, 128, 64), and a final 1×1 convolution that produces the per-pixel tool probability. Skip connections at each level concatenate the encoder feature map with the decoder feature map at matching resolution. Adam, binary cross-entropy on the binary mask, single GPU.</p>
+        <p>Standard U-Net. Three downsampling blocks (64, 128, 256 channels), a single 512-channel bottleneck, three upsampling blocks (256, 128, 64), and a final 1×1 convolution that produces the per-pixel tool probability. Skip connections concatenate encoder and decoder feature maps at matching resolution.</p>
 
         <figure>
             <div class="figure-card">
                 <img src="../images/figures/pixels_fig2_unet.png" alt="U-Net diagram showing encoder downsampling through 64, 128, 256 channel blocks into a 512-channel bottleneck, decoder upsampling back through 256, 128, 64, with dashed skip connections at each level carrying boundary detail to the matching decoder block.">
             </div>
-            <figcaption>Figure 2. The architecture in one picture. Three encoder stages, a single bottleneck, three decoder stages, and the skip paths that preserve tool-edge detail through the upsampling pass.</figcaption>
+            <figcaption>Figure 2. Three encoder stages, a single bottleneck, three decoder stages, and the skip paths that preserve tool-edge detail through upsampling.</figcaption>
         </figure>
 
         <h3 class="subsection">3.2 Data</h3>
-        <p>300 frames sampled from a procedural recording captured through the Modus V exoscope on representative pig brain tissue. Each frame hand-segmented in ITK-SNAP into a binary tool / background mask, then exported in both NIfTI (for downstream tooling) and PNG (for the training pipeline). Every segmentation reviewed twice for ground-truth precision before going into the training set.</p>
+        <p>300 frames sampled from the Modus V recording. Each frame was hand-segmented in ITK-SNAP into a binary tool / background mask, exported as NIfTI (for downstream tooling) and PNG (for training), and reviewed twice before entering the training set.</p>
         <ul class="body-list">
-            <li><strong>Fluorescent-blue frames converted to grayscale in MATLAB</strong> before training. The blue channel carries most of the fluorescent signal but very little tool-boundary information; the intensity channel carries the boundary cleanly. The network learned the tool more reliably from intensity than from the raw RGB.</li>
-            <li><strong>Adam optimizer, binary cross-entropy loss.</strong> Roughly two hours to train on a single GPU.</li>
-            <li><strong>No augmentation beyond grayscale conversion on the fluorescent split.</strong> The dataset is small enough that aggressive augmentation risked overfitting to synthetic artifacts rather than real intraoperative variation.</li>
+            <li><strong>Fluorescent-blue frames converted to grayscale in MATLAB.</strong> The blue channel carries the fluorescent signal but little tool-boundary information; intensity carries the boundary cleanly.</li>
+            <li><strong>Adam optimizer, binary cross-entropy loss.</strong></li>
+            <li><strong>No augmentation beyond grayscale conversion on the fluorescent split.</strong> On a dataset this small, aggressive augmentation risked overfitting to synthetic artifacts rather than real intraoperative variation.</li>
         </ul>
 
         <h3 class="subsection">3.3 Test protocol</h3>
-        <p>Evaluation runs on a fully held-out surgical video, captured separately from the training procedure and never seen by the network during training. Frames are extracted, passed through the model individually, and the predicted masks recompiled into a side-by-side overlay against the original footage. Four scenarios are tested with 20 random images each:</p>
+        <p>Evaluation runs on a fully held-out surgical video, captured separately and never seen in training. Frames are segmented individually and recompiled into a side-by-side overlay against the original footage. Four scenarios, 20 random images each:</p>
         <ul class="body-list">
             <li>Regular illumination, one tool.</li>
             <li>Fluorescent blue, one tool.</li>
             <li>Regular illumination, two tools.</li>
             <li>Fluorescent blue, two tools.</li>
         </ul>
-        <p>The canonical case (regular, one tool) is the closest analogue to a standard intraoperative view and the primary headline number. The other three scenarios test how the model degrades as the input departs from that canonical regime.</p>
+        <p>The canonical case (regular, one tool) is the closest analogue to a standard intraoperative view and the headline number. The other three test how the model degrades away from it.</p>
 
         <!-- ============================================================== -->
         <h2 class="section">4. Evaluation</h2>
-        <p>Held-out surgical video, never seen during training. 20 random frames per scenario. Side-by-side overlay against the original used as the qualitative inspection mode, DICE on the binary mask as the quantitative metric.</p>
+        <p>DICE on the binary mask is the quantitative metric; the side-by-side overlay is the qualitative check.</p>
 
         <figure>
             <div class="figure-card">
@@ -129,39 +124,30 @@
 
         <ul class="body-list">
             <li><strong>~95% DICE</strong> on the canonical single-tool, regular-illumination case.</li>
-            <li><strong>Under 0.12 s per 600 × 800 image</strong>, about 500 frames per minute on commodity GPU. Slower than 30 FPS live video, fast enough for surgical replay and near real-time overlay.</li>
-            <li><strong>Fluorescent blue, post-grayscale conversion, reaches comparable accuracy</strong> to regular illumination on the single-tool case. The grayscale conversion is what made fluorescence tractable for a single network.</li>
-            <li><strong>Accuracy degrades on multi-tool frames</strong>, with fluorescent-blue two-tool being the predicted worst case.</li>
-            <li><strong>Primary failure mode is motion blur at tool edges.</strong> Sharp boundary loss propagates into false positives and false negatives along the predicted mask edge.</li>
+            <li><strong>Under 0.12 s per 600 × 800 image</strong>: fast enough for surgical replay and near real-time overlay.</li>
+            <li><strong>Fluorescent blue reaches comparable accuracy</strong> to regular illumination on the single-tool case after grayscale conversion.</li>
+            <li><strong>Accuracy degrades on multi-tool frames</strong>, with fluorescent-blue two-tool the predicted worst case.</li>
+            <li><strong>Motion blur at tool edges is the primary failure mode</strong>, propagating into false positives and false negatives along the predicted mask edge.</li>
         </ul>
 
-        <p>The 95% number is the canonical case on n = 20 random frames from a single held-out video, single seed, single procedural source. It is not a leaderboard claim against published surgical-vision benchmarks (those are scored on different datasets with different label conventions). Read it as "this model works at video-realistic accuracy on data from this Modus V procedure," not as a SOTA result.</p>
+        <p>The 95% number is the canonical case on n = 20 random frames from a single held-out video, single seed, single procedural source. It is not a leaderboard claim against published surgical-vision benchmarks. Read it as "this model works at video-realistic accuracy on data from this Modus V procedure," not as a SOTA result.</p>
 
         <!-- ============================================================== -->
         <h2 class="section">5. Conclusion and Implications</h2>
-        <p>A real-time tool overlay trained on real surgical footage, rather than on phantoms or synthetic renders, is a concrete step toward safer minimally invasive procedures. If even a fraction of the 30% misrecognition share of intraoperative complications gets recovered by an overlay that reliably traces tool boundaries, the downstream effect is fewer nerve injuries, fewer collateral tissue insults, and fewer follow-on operations. The same architecture, retrained on appropriate data, generalises beyond tool segmentation into tumor delineation, organ boundaries for surgical planning, and quantitative tracking of disease progression on CT and MRI volumes. The build that matters most here is the data pipeline that made any of it trainable on a real surgical recording.</p>
+        <p>A real-time tool overlay trained on real surgical footage, rather than phantoms or synthetic renders, is a concrete step toward safer minimally invasive procedures. If an overlay that reliably traces tool boundaries recovers even a fraction of the 30% misrecognition share of intraoperative complications, the result is fewer nerve injuries, fewer collateral tissue insults, and fewer follow-on operations. Retrained on appropriate data, the same architecture extends to tumor delineation, organ boundaries for surgical planning, and quantitative tracking of disease progression on CT and MRI volumes.</p>
 
-        <h3 class="subsection">5.1 Limitations</h3>
+        <h3 class="subsection">5.1 Limitations and future work</h3>
         <ul class="body-list">
-            <li><strong>Single procedural source.</strong> All 300 training frames come from one Modus V recording on one tissue type. Generalisation to other instruments, anatomies, and procedures is unproven.</li>
-            <li><strong>n = 20 random frames per scenario, single seed.</strong> The 95% DICE number on the canonical case is a point estimate, not a variance-bounded benchmark.</li>
-            <li><strong>Motion blur dominates the error.</strong> There is no temporal model in the pipeline; each frame is segmented independently of its neighbours.</li>
-            <li><strong>Ground-truth quality is bounded by manual ITK-SNAP segmentations.</strong> Two reviews per frame mitigate this, but it is still a hand-labeled ceiling.</li>
-            <li><strong>Inference is near real-time, not video rate.</strong> 0.12 s per frame is comfortable for surgical replay and reduced-rate overlay. Live 30 FPS use would require kernel-level optimisation or a smaller backbone.</li>
-        </ul>
-
-        <h3 class="subsection">5.2 Future Work</h3>
-        <p>The limitations map directly onto the next phase of the build.</p>
-        <ul class="body-list">
-            <li><strong>Multi-source dataset</strong> spanning procedures, instruments, anatomies, and lighting conditions, captured under the same labeling protocol.</li>
-            <li><strong>Temporal consistency</strong> via a recurrent or video-aware head, to absorb motion blur and stabilise the mask across consecutive frames.</li>
-            <li><strong>Instance segmentation</strong> for multi-tool scenes with occlusion, replacing the current binary mask with per-instrument labels.</li>
-            <li><strong>Latency reduction</strong> through a leaner backbone or quantised inference to close the gap to 30 FPS live video.</li>
+            <li><strong>Single procedural source.</strong> All 300 frames come from one Modus V recording on one tissue type, so generalisation to other instruments, anatomies, and procedures is unproven. Next: a multi-source dataset under the same labeling protocol.</li>
+            <li><strong>Point estimate, hand-labeled ceiling.</strong> The 95% DICE is not variance-bounded, and ground truth is capped by manual ITK-SNAP labels despite two reviews per frame.</li>
+            <li><strong>Motion blur dominates the error.</strong> Each frame is segmented independently. Next: a recurrent or video-aware head to stabilise the mask across consecutive frames.</li>
+            <li><strong>Binary mask on multi-tool scenes.</strong> Next: instance segmentation with per-instrument labels for occluded multi-tool frames.</li>
+            <li><strong>Near real-time, not video rate.</strong> Live 30 FPS needs kernel-level optimisation, a leaner backbone, or quantised inference.</li>
         </ul>
 
         <!-- ============================================================== -->
         <h2 class="section">6. Acknowledgments</h2>
-        <p>Surgical footage and procedural context provided by <strong>Synaptive Medical Inc.</strong> The Modus V exoscope captured every frame in the training set. Tissue and clinical guidance provided by <strong>Robarts Research Institute</strong> at Western University. Recognized with a <strong>Bronze Medal at the Canada-Wide Science Fair</strong>.</p>
+        <p>Surgical footage and procedural context provided by <strong>Synaptive Medical Inc.</strong>, whose Modus V exoscope captured every frame in the training set. Tissue and clinical guidance provided by <strong>Robarts Research Institute</strong> at Western University. Recognized with a <strong>Bronze Medal at the Canada-Wide Science Fair</strong>.</p>
 
         <p>The architecture is U-Net from <a class="inline" href="https://arxiv.org/abs/1505.04597" target="_blank" rel="noopener">Ronneberger et al., 2015</a>.</p>
 

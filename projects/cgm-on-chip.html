@@ -11,9 +11,10 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="project.css">
+    <link rel="stylesheet" href="../base.css?v=20261024b">
+    <link rel="stylesheet" href="project.css?v=20261024b">
     <script defer src="../shared.js"></script>
     <script defer src="project.js"></script>
 </head>
@@ -23,23 +24,18 @@
 
         <div class="eyebrow">2026</div>
 
-        <h1 class="title">Continuous glucose <span class="accent">monitoring</span> on a $4 microcontroller.</h1>
+        <h1 class="title">Continuous glucose monitoring on a $4 microcontroller.</h1>
 
-        <div class="chips">
-            <span class="chip">Machine Learning</span>
-            <span class="chip">Embedded Systems</span>
-            <span class="chip">Healthcare</span>
-        </div>
 
         <p class="subtitle">A linear-attention sequence model, an autograd engine, a multi-threaded trainer, and an on-device inference kernel. Written from scratch in 5,500 lines of C++17 and shipped to an ESP32-S3.</p>
 
         <!-- ============================================================== -->
         <h2 class="section">1. Abstract</h2>
-        <p>A recent linear-attention architecture, reimplemented from scratch in pure C++ with its own autograd engine, trained on real clinical data, and run on a $4 microcontroller to predict hypoglycemia 60 minutes ahead. Everything in the repository is built from the C++17 standard library: no PyTorch, no TensorFlow, no Eigen, no BLAS, no OpenMP. The shipped artifact is a trained model whose FP32 inference kernel runs on an ESP32-S3 in 20% of its RAM, raising a hypoglycemia alarm an hour before onset, verified to agree with the FP64 training reference to 8 decimal places.</p>
+        <p>A recent linear-attention architecture, reimplemented from scratch in pure C++ with its own autograd engine, trained on real clinical data, and run on a $4 microcontroller to predict hypoglycemia 60 minutes ahead. Everything is built from the C++17 standard library: no PyTorch, TensorFlow, Eigen, BLAS, OpenMP or NumPy. The shipped FP32 inference kernel runs on an ESP32-S3 in 20% of its RAM and agrees with the FP64 training reference.</p>
 
-        <p>Two linear-recurrent backbones are studied. <strong>S4D</strong> (diagonal structured state-space, Gu et al. 2022) was picked because glucose dynamics are slow and long-range, and its diagonal complex-pole formulation captures circadian and post-meal behaviour at tiny parameter count. <strong>OSDN</strong> (online spectral delta network, <a class="inline" href="https://arxiv.org/abs/2605.13473" target="_blank" rel="noopener">arXiv:2605.13473</a>, May 2026) was picked as the second backbone: a recent DeltaNet-family linear-attention variant that should be faster than S4D in principle, and is faithfully reproduced from the paper's math here for the first time outside the authors' codebase.</p>
+        <p>Two linear-recurrent backbones are compared. <strong>S4D</strong> (diagonal structured state-space, Gu et al. 2022) fits slow, long-range glucose dynamics at tiny parameter count. <strong>OSDN</strong> (online spectral delta network, <a class="inline" href="https://arxiv.org/abs/2605.13473" target="_blank" rel="noopener">arXiv:2605.13473</a>, May 2026) is a recent DeltaNet-family variant that should be faster in principle, reproduced from the paper's math.</p>
 
-        <p>The novelty is the path, not the architectures. This is the first pure-C++ stdlib reproduction of a DeltaNet-family model, the first end-to-end training of either model through a hand-rolled scalar autograd, and the first bit-equivalent port of either to a $4 microcontroller, gated by a triple-redundant FP32 / FP64 correctness proof through <code>make check</code>.</p>
+        <p>The novelty is the path, not the architectures: the first pure-C++ stdlib reproduction of a DeltaNet-family model, the first end-to-end training of either model through a hand-rolled scalar autograd, and the first bit-equivalent port of either to a $4 microcontroller, gated by <code>make check</code>.</p>
 
         <ul class="body-list">
             <li><strong>~5,500 lines of pure C++17.</strong> Autograd engine, optimizer, trainer, data pipeline, two models, on-disk weight format, embedded inference kernel, triple-redundant correctness proof.</li>
@@ -55,86 +51,86 @@
                     <source src="../images/cgm_on_chip.mp4" type="video/mp4">
                 </video>
             </div>
-            <figcaption>Figure 1. The whole project in 90 seconds. Trained model running on an ESP32-S3, raising a hypoglycemia alarm from live glucose input over the serial protocol.</figcaption>
+            <figcaption>Figure 1. The project in 90 seconds: the trained model on an ESP32-S3, raising a hypoglycemia alarm from live glucose input over serial.</figcaption>
         </figure>
 
         <!-- ============================================================== -->
         <h2 class="section">2. Introduction</h2>
-        <p>Closed-loop insulin systems live or die by the latency and reliability of their glucose forecast. In practice the forecast usually lives on a phone or in the cloud, both of which add round-trip latency and a failure surface that matters for someone whose blood sugar is dropping.</p>
+        <p>Closed-loop insulin systems live or die by the latency and reliability of their glucose forecast. That forecast usually lives on a phone or in the cloud, adding round-trip latency and a failure surface for someone whose blood sugar is dropping.</p>
         <ul class="body-list">
-            <li><strong>Dead phone, lost network, cloud outage.</strong> Each one breaks the alarm path. Moving the model onto the sensor itself removes that surface.</li>
-            <li><strong>$4 of silicon is the price ceiling that lets safer continuous monitoring reach more people.</strong> Cheaper to ship is the part of the healthcare story that gets harder, not easier, with cloud-dependent designs.</li>
-            <li><strong>The open question:</strong> can a model small enough to live on a $4 microcontroller, written without any of the conveniences of a modern ML stack, still match the accuracy of full-fat baselines?</li>
+            <li><strong>Dead phone, lost network, cloud outage.</strong> Each one breaks the alarm path. Moving the model onto the sensor removes that surface.</li>
+            <li><strong>$4 of silicon is the price ceiling that lets safer continuous monitoring reach more people.</strong></li>
+            <li><strong>The open question:</strong> can a model small enough for a $4 microcontroller, written without a modern ML stack, still match full-fat baselines?</li>
         </ul>
 
         <h3 class="subsection">2.1 Why a linear-attention sequence model</h3>
-        <p>Both architectures studied here belong to the <strong>linear-attention</strong> family. They maintain a recurrent state of fixed size that absorbs the entire history of a window, so inference cost is constant in window length. A transformer at the same accuracy would not fit on an ESP32-S3; a linear-attention model can.</p>
+        <p>Both architectures keep a fixed-size recurrent state that absorbs the whole window, so inference cost is constant in window length. A transformer at the same accuracy would not fit on an ESP32-S3; a linear-attention model can.</p>
         <ul class="body-list">
-            <li><strong>S4D</strong> unrolls a continuous-time state-space model with complex poles, learned per channel. The diagonal structure keeps parameters tiny (562 in the shipped configuration). The complex arithmetic is what captures oscillatory behaviour like circadian rhythm and post-meal spike-and-decay. Glucose data is exactly the long-horizon, low-dimensional, slowly-varying regime structured state-space models were built for, which is why it was the natural starting point.</li>
-            <li><strong>OSDN</strong> replaces the state-space layer with an <em>online delta rule</em>: a learned associative memory whose write step is preconditioned by a closed-form spectral update. The full forward pass is real-valued, so it sidesteps the complex-arithmetic overhead that gives S4D its parameter cost. The paper appeared in May 2026 with no open implementation outside the authors' codebase, which made it the obvious second backbone to stress-test the pipeline against and to compare to S4D on identical scaffolding.</li>
+            <li><strong>S4D</strong> unrolls a continuous-time state-space model with complex poles learned per channel. The diagonal structure keeps parameters tiny (562 shipped); the complex arithmetic captures circadian rhythm and post-meal spike-and-decay. Glucose is exactly the long-horizon, low-dimensional, slowly varying regime it was built for.</li>
+            <li><strong>OSDN</strong> replaces the state-space layer with an <em>online delta rule</em>: a learned associative memory whose write step is preconditioned by a closed-form spectral update. Its forward pass is real-valued, sidestepping the complex-arithmetic overhead behind S4D's parameter cost. Published in May 2026 with no independent implementation, it was the obvious second backbone to stress-test the pipeline.</li>
         </ul>
 
         <h3 class="subsection">2.2 What is actually new</h3>
         <p>The two architectures are existing math. The novelty is the build, and three findings fall out of it.</p>
         <ul class="body-list">
-            <li><strong>Pure C++17 stdlib, end to end.</strong> Both the autograd engine and the OSDN forward / backward are written from primitives. No PyTorch, no TensorFlow, no Eigen, no BLAS, no OpenMP, no NumPy at any point. A scalar reverse-mode <code>Value</code> graph, an explicit-stack topological backward, a hand-rolled fork-join trainer, and a header-only inference kernel that is the same physical file in the host test and the firmware.</li>
-            <li><strong>First DeltaNet-family reproduction outside the OSDN authors' codebase.</strong> Faithfully implementing the §4.2 d-update revealed a deployment-breaking omission. The paper drops a box-projection clamp on the preconditioner from its Algorithm 1 pseudocode "for clarity"; without that clamp, FP32 inference silently produces NaN on trained weights. The clamp costs roughly 0.07 test AUROC versus an unclamped run, but it is the only configuration that survives float32 on the device. The full finding is in §3.2.</li>
-            <li><strong>First bit-equivalent port to a $4 microcontroller.</strong> The same C++ header that runs the host autograd's forward pass also runs on the ESP32-S3, and a triple-redundant correctness proof (training autograd, an independently written reference network, and the FP32 kernel) is asserted to agree at <strong>|diff| = 7.97 × 10⁻⁷</strong>, held bit for bit through every hardening commit by <code>make check</code>. The hardware path is not bolted on at the end; it is part of the build's contract.</li>
+            <li><strong>Pure C++17 stdlib, end to end.</strong> The autograd engine, trainer, and OSDN forward / backward are written from primitives, with nothing imported at any point.</li>
+            <li><strong>First DeltaNet-family reproduction outside the OSDN authors' codebase.</strong> Implementing the §4.2 d-update faithfully exposed a deployment-breaking omission in the paper's pseudocode (§3.2).</li>
+            <li><strong>First bit-equivalent port to a $4 microcontroller.</strong> One C++ header runs on host and device, proven in §3.5. The hardware path is part of the build's contract, not bolted on at the end.</li>
         </ul>
 
-        <p>Every layer below is something most stacks would simply <code>import</code>. The work was building the whole thing from primitives, then proving the on-chip path agrees with the training-time math.</p>
+        <p>Every layer below is something most stacks would simply <code>import</code>.</p>
 
         <!-- ============================================================== -->
         <h2 class="section">3. System</h2>
 
         <h3 class="subsection">3.1 The math engine</h3>
-        <p>A scalar reverse-mode automatic differentiation engine (<code>src/value.{hpp,cpp}</code>, 268 lines). Every arithmetic operation is a heap node that records a closure for pushing gradients backward.</p>
+        <p>A scalar reverse-mode automatic differentiation engine (<code>src/value.{hpp,cpp}</code>, 268 lines). Every arithmetic operation is a heap node recording a closure that pushes gradients backward.</p>
         <ul class="body-list">
             <li><code>backward()</code> runs an explicit-stack topological traversal. Plain recursion overflows the stack on a 144-step graph.</li>
-            <li>Extended to complex numbers (<code>src/complex_value.{hpp,cpp}</code>) so the S4D model's complex hidden state backpropagates through the same engine. In a normal stack this is <code>torch.autograd</code>.</li>
-            <li>Verified by a finite-difference gradient checker (<code>src/grad_check.cpp</code>, 284 lines): 12 primitives across 61 test points, with analytical fallbacks at singularities and regression points that must pass after each fix. Normally this is <code>torch.autograd.gradcheck</code>.</li>
+            <li>Extended to complex numbers (<code>src/complex_value.{hpp,cpp}</code>) so S4D's complex hidden state backpropagates through the same engine. In a normal stack this is <code>torch.autograd</code>.</li>
+            <li>Verified by a finite-difference gradient checker (<code>src/grad_check.cpp</code>, 284 lines): 12 primitives across 61 test points, with analytical fallbacks at singularities.</li>
         </ul>
 
         <h3 class="subsection">3.2 The models</h3>
         <ul class="body-list">
-            <li><strong>S4D</strong> (<code>src/s4d.{hpp,cpp}</code>, 108 lines), the model the project began with: a diagonal state-space layer with complex poles and hybrid ZOH / Euler discretization, backpropagating through the complex-value engine.</li>
-            <li><strong>OSDN</strong> (<code>src/osdn.{hpp,cpp}</code>, 218 lines), implemented from the §4.2 online-preconditioned delta rule in <a class="inline" href="https://arxiv.org/abs/2605.13473" target="_blank" rel="noopener">arXiv:2605.13473</a>, built directly from the paper's math.</li>
+            <li><strong>S4D</strong> (<code>src/s4d.{hpp,cpp}</code>, 108 lines): a diagonal state-space layer with complex poles and hybrid ZOH / Euler discretization, backpropagating through the complex-value engine.</li>
+            <li><strong>OSDN</strong> (<code>src/osdn.{hpp,cpp}</code>, 218 lines), built directly from the §4.2 online-preconditioned delta rule in <a class="inline" href="https://arxiv.org/abs/2605.13473" target="_blank" rel="noopener">arXiv:2605.13473</a>.</li>
         </ul>
-        <p><strong>An implementation finding worth noting.</strong> The paper's §4.2 Equation (4) includes a box-projection step on the preconditioner, <code>d ← clamp(d, 0.5, 2.0)</code>. The Algorithm 1 pseudocode leaves it out, noting it is omitted "for clarity." Implement the pseudocode as written and FP32 inference silently produces NaN on trained weights, because the preconditioner drifts out of its stable band. Restoring the clamp fixes it. The interesting part: the clamp costs roughly 0.07 test AUROC (an unclamped run scores higher on paper), yet the clamped model is the only one that survives float32 on the device. The deployable number is the one reported here.</p>
-        <p>Both models share the same wrapper network, same 7-channel input, same trainer, same patient-disjoint split, and the same threshold methodology, so any comparison between them measures the recurrent backbone rather than scaffolding.</p>
+        <p><strong>An implementation finding.</strong> The paper's §4.2 Equation (4) includes a box-projection on the preconditioner, <code>d ← clamp(d, 0.5, 2.0)</code>; Algorithm 1 omits it "for clarity." Implement the pseudocode as written and FP32 inference silently produces NaN on trained weights, because the preconditioner drifts out of its stable band. The clamp costs roughly 0.07 test AUROC versus an unclamped run, yet it is the only configuration that survives float32 on the device. The deployable number is the one reported here.</p>
+        <p>Both models share the wrapper network, 7-channel input, trainer, patient-disjoint split, and threshold methodology, so any comparison measures the recurrent backbone, not scaffolding.</p>
 
         <h3 class="subsection">3.3 The training infrastructure</h3>
-        <p>A hand-built fork-join thread pool on raw <code>std::thread</code>, <code>std::mutex</code>, and <code>std::condition_variable</code> (<code>src/cgm_train.cpp</code>, roughly 997 lines), driving synchronous data-parallel training.</p>
+        <p>A hand-built fork-join thread pool on raw <code>std::thread</code>, <code>std::mutex</code>, and <code>std::condition_variable</code> (<code>src/cgm_train.cpp</code>, roughly 997 lines) drives synchronous data-parallel training.</p>
         <ul class="body-list">
-            <li>Each worker holds its own network replica and its own parameter nodes. Batches are round-robin sharded across workers.</li>
-            <li>Per-worker gradients are summed back into the master before each Adam step. This is the pattern PyTorch hides behind <code>DataParallel</code>, written by hand because scalar-<code>Value</code> parameter nodes cannot be shared across threads (each carries a per-thread gradient accumulator).</li>
-            <li><strong>Adam with NaN-gradient rejection.</strong> Skip the update rather than poison the moment estimates, which never recover once they absorb a non-finite value.</li>
-            <li><strong>Hardened JSON resume parser.</strong> A stateful character scanner that replaced a brittle reader which threw out of <code>main()</code> on malformed input.</li>
+            <li>Each worker holds its own network replica and parameter nodes; batches are round-robin sharded.</li>
+            <li>Per-worker gradients are summed into the master before each Adam step: PyTorch's <code>DataParallel</code>, written by hand because scalar-<code>Value</code> parameter nodes cannot be shared across threads.</li>
+            <li><strong>Adam with NaN-gradient rejection.</strong> Skips the update rather than poisoning the moment estimates, which never recover from a non-finite value.</li>
+            <li><strong>Hardened JSON resume parser.</strong> A stateful character scanner replacing a brittle reader that threw out of <code>main()</code> on malformed input.</li>
         </ul>
 
         <h3 class="subsection">3.4 The data</h3>
-        <p>Ohio T1DM (obtained under a data-use agreement), parsed and windowed from scratch (<code>src/cgm_data.cpp</code>, 373 lines). Seven channels per window: glucose, first and second glucose differences, sine and cosine of time-of-day, insulin-on-board, and carbs-on-board (both with exponential-decay pharmacokinetics).</p>
+        <p>Ohio T1DM (obtained under a data-use agreement), parsed and windowed from scratch (<code>src/cgm_data.cpp</code>, 373 lines). Seven channels per window: glucose, its first and second differences, sine and cosine of time-of-day, insulin-on-board, and carbs-on-board (both with exponential-decay pharmacokinetics).</p>
 
         <figure>
             <div class="figure-card">
                 <img src="../images/figures/fig2_input_channels.png" alt="Seven input channels stacked over a 12-hour window: glucose, first and second glucose differences, sine and cosine of time-of-day, insulin-on-board, and carbs-on-board.">
             </div>
-            <figcaption>Figure 2. What the model sees. Each window is seven channels of physiology and pharmacokinetics, written from raw CSV without pandas or scikit-learn.</figcaption>
+            <figcaption>Figure 2. What the model sees: seven channels of physiology and pharmacokinetics per window, built from raw CSV without pandas or scikit-learn.</figcaption>
         </figure>
 
         <ul class="body-list">
             <li><strong>Patient-disjoint splits</strong> verified twice.</li>
             <li><strong>Normalization</strong> computed on the training fold only.</li>
             <li><strong>Classification threshold</strong> selected on validation at a fixed specificity, then frozen for test, so test labels never enter model selection.</li>
-            <li>No pandas, no scikit-learn. Every column is a hand-managed vector.</li>
+            <li>Every column is a hand-managed vector.</li>
         </ul>
 
         <h3 class="subsection">3.5 Paper to silicon, proven</h3>
-        <p>A header-only FP32 inference kernel (<code>src/osdn_inference.h</code>, 297 lines): allocation-free, stack-only, and <em>the same physical file</em> compiled into both the host test and the firmware. Its correctness is enforced by <strong>three independent implementations of the same OSDN math</strong>, the training autograd, an independently written reference network, and the FP32 kernel, asserted to agree at <strong>|diff| = 7.96795993 × 10⁻⁷</strong>, held bit for bit through the entire hardening sequence by <code>make check</code>.</p>
+        <p>A header-only FP32 inference kernel (<code>src/osdn_inference.h</code>, 297 lines): allocation-free, stack-only, and <em>the same physical file</em> compiled into both the host test and the firmware. <strong>Three independent implementations of the OSDN math</strong> (the training autograd, an independently written reference network, and the FP32 kernel) agree at <strong>|diff| = 7.96795993 × 10⁻⁷</strong>, held bit for bit through the entire hardening sequence by <code>make check</code>.</p>
         <p>The ESP32-S3 firmware (roughly 716 lines) is a complete on-device alarm.</p>
         <ul class="body-list">
             <li>Serial protocol for glucose, bolus, and meal events.</li>
-            <li>On-device feature recomputation matching the trainer byte for byte. The firmware feature module is tested by compiling the actual production code into a host binary and checking it against a double-precision reference (<code>src/features_host_test.cpp</code>, maximum difference 4.8 × 10⁻⁷).</li>
+            <li>On-device feature recomputation matching the trainer byte for byte, tested by compiling the production code into a host binary against a double-precision reference (<code>src/features_host_test.cpp</code>, maximum difference 4.8 × 10⁻⁷).</li>
             <li><strong>Fail-open clinical alarm.</strong> A non-finite logit raises the alarm rather than silently passing, because "I don't know" must surface on a medical predictor.</li>
         </ul>
 
@@ -147,13 +143,13 @@
 
         <!-- ============================================================== -->
         <h2 class="section">4. Evaluation</h2>
-        <p>Patient-disjoint Ohio T1DM. Validation = {584, 588}, test = {591, 596}. 8 train, 2 validation, 2 test. Identical wrapper network across both architectures: 7-channel input, H = 16, lookback = 144 (~12 hours), horizon = 12 (~60 minutes ahead), stride = 12, seed = 42.</p>
+        <p>Patient-disjoint Ohio T1DM. Validation = {584, 588}, test = {591, 596}. 8 train, 2 validation, 2 test. Identical wrapper across both architectures: 7-channel input, H = 16, lookback = 144 (~12 hours), horizon = 12 (~60 minutes ahead), stride = 12, seed = 42.</p>
 
         <figure>
             <div class="figure-card">
                 <img src="../images/figures/fig3_results.png" alt="Bar chart comparing S4D and OSDN on validation AUROC, test AUROC, recall at specificity 0.80, and milliseconds per window.">
             </div>
-            <figcaption>Figure 4. S4D versus OSDN on the held-out test split. Same wrapper, same data, same trainer. Only the recurrent backbone differs.</figcaption>
+            <figcaption>Figure 4. S4D versus OSDN on the held-out test split. Only the recurrent backbone differs.</figcaption>
         </figure>
 
         <table class="results">
@@ -187,48 +183,21 @@
             </tbody>
         </table>
 
-        <p>Same split, same 7-channel features, same trainer, same threshold methodology. On this task the S4D model scores higher on test AUROC (0.9113 vs 0.7669), recall (0.918 vs 0.718), and post-bolus recall (0.919 vs 0.676), at roughly matched specificity (0.67 vs 0.68) and lower per-window inference cost.</p>
-        <p>FP32 device kernel agreement with the FP64 host autograd: <strong>|diff| = 7.97 × 10⁻⁷</strong> (tolerance 1 × 10⁻⁴; this is agreement within float rounding, not a deterministic byte match). Read the validation-to-test gaps rather than the point estimates: with <strong>n = 2 test patients</strong>, absolute AUROC is high-variance. Full caveats below.</p>
+        <p>S4D scores higher on test AUROC (0.9113 vs 0.7669), recall (0.918 vs 0.718), and post-bolus recall (0.919 vs 0.676), at roughly matched specificity (0.67 vs 0.68) and lower per-window inference cost.</p>
+        <p>FP32 device kernel agreement with the FP64 host autograd: <strong>|diff| = 7.97 × 10⁻⁷</strong> (tolerance 1 × 10⁻⁴; agreement within float rounding, reported to 8 digits for drift detection, not a deterministic byte match). With <strong>n = 2 test patients</strong>, absolute AUROC is high-variance: read the validation-to-test gaps, not the point estimates.</p>
 
         <!-- ============================================================== -->
         <h2 class="section">5. Conclusion and Implications</h2>
         <p>A glucose forecaster that runs on the sensor itself removes a whole class of failure modes from closed-loop insulin delivery: dead phones, lost networks, cloud outages. The math says it is achievable at $4 of silicon. Cheaper to ship means safer continuous monitoring can reach more people, and "more people" is the part of the healthcare story that gets harder, not easier, with cloud-dependent designs.</p>
 
-        <h3 class="subsection">5.1 Limitations</h3>
-
-        <p><strong>Statistical and data regime.</strong></p>
+        <h3 class="subsection">5.1 Limitations and future work</h3>
         <ul class="body-list">
-            <li><strong>n = 2 test patients.</strong> AUROC at this size is high-variance; a fold swap can move it several points. Trust the validation-to-test gap (OSDN 15.5 pp, S4D 4.0 pp), not the point estimate.</li>
-            <li><strong>Custom split, not the canonical Marling and Bunescu BGLP split.</strong> These numbers are not directly comparable to the Ohio T1DM leaderboard.</li>
-            <li><strong>Single seed (42).</strong> No seed-variance bound on any reported number.</li>
-            <li><strong>Validation is reused for early stopping and threshold selection</strong>, a tight loop at n = 2.</li>
-            <li><strong>Global, not per-patient, normalization.</strong> Per-patient z-scoring would change the numbers and might close part of the gap.</li>
-            <li><strong>AUROC is rank-based without explicit tie-handling</strong> (<code>auroc_approx</code>); it differs from scikit-learn by a tie-dependent amount.</li>
-            <li><strong>Window stride is 12, not 1</strong>, so training windows are fewer and non-overlapping.</li>
+            <li><strong>n = 2 test patients on a custom split.</strong> AUROC is high-variance and not comparable to the canonical Marling and Bunescu BGLP leaderboard; trust the validation-to-test gap (OSDN 15.5 pp, S4D 4.0 pp). Next: leave-one-patient-out cross-validation across all 12 patients.</li>
+            <li><strong>Single seed (42), global normalization.</strong> Next: multi-seed runs for a variance bound, and per-patient normalization to test how much of the gap is distribution shift between individuals.</li>
+            <li><strong>Protocol shortcuts.</strong> Validation is reused for early stopping and threshold selection; AUROC is rank-based without tie-handling (<code>auroc_approx</code>); window stride is 12, not 1.</li>
+            <li><strong>"From the paper" covers the OSDN d-update kernel only.</strong> The wrapper (per-row <code>sigmoid(log_lambda)</code> decay, LayerNorm on the K-readout, per-channel residual, <code>tanh</code> input embedding) is not vanilla OSDN and is identical across both runs. S4D's 14-point lead is a direct report, not a state-of-the-art claim.</li>
+            <li><strong>Narrow kernel envelope, no hardware replay yet.</strong> <code>n_layers &gt;= 2</code> with <code>K = 16</code> produces NaN in FP32; the shipped <code>n_layers=1, K=8</code> sits inside the verified envelope. Next: replay a held-out patient's trace into the ESP32-S3 over serial and confirm the on-chip alarm fires against host expectations.</li>
         </ul>
-
-        <p><strong>Architecture and method.</strong></p>
-        <ul class="body-list">
-            <li><strong>The "from the paper" claim covers the OSDN d-update kernel specifically.</strong> The surrounding network adds standard wrapper components (a per-row <code>sigmoid(log_lambda)</code> decay, LayerNorm on the K-readout, a per-channel residual, and a <code>tanh</code> input embedding), none of which are part of vanilla OSDN, and all kept identical across the S4D and OSDN runs so the comparison reflects the backbone.</li>
-            <li><strong>S4D scores higher than OSDN here by 14 AUROC points.</strong> This is a from-scratch reproduction and a direct report of what the runs produced, not a claim that either architecture is state-of-the-art on this task.</li>
-            <li><strong>The verified kernel envelope is narrow.</strong> <code>n_layers &gt;= 2</code> with <code>K = 16</code> produces NaN in FP32 (documented in-kernel). The shipped configuration (<code>n_layers=1, K=8</code>) sits inside the verified envelope.</li>
-        </ul>
-
-        <p><strong>Engineering and deployment.</strong></p>
-        <ul class="body-list">
-            <li><strong>No on-device hardware validation yet.</strong> The firmware compiles for and deploys to the ESP32-S3, and the kernel is verified bit-equivalent to the trainer host-side; end-to-end physical replay is future work.</li>
-            <li><strong>"Bit-equivalence" means FP32 / FP64 agreement within rounding</strong> (7.97 × 10⁻⁷ at tolerance 1 × 10⁻⁴), reported to 8 digits for drift detection, not a claim of identical bits.</li>
-        </ul>
-
-        <h3 class="subsection">5.2 Future Work</h3>
-        <p>The limitations above map directly onto the second stage of this project.</p>
-        <ul class="body-list">
-            <li><strong>Leave-one-patient-out cross-validation across all 12 patients</strong>, replacing the fixed 2-patient test fold. The single biggest fix: it turns the high-variance n = 2 point estimate into a mean with a spread across every patient, and it is the natural way to make the S4D-versus-OSDN gap robust rather than fold-dependent.</li>
-            <li><strong>Multi-seed runs</strong> to put a variance bound on every reported number.</li>
-            <li><strong>Per-patient normalization</strong>, to test how much of the validation-to-test gap is distribution shift between individuals.</li>
-            <li><strong>On-device hardware validation:</strong> replay a held-out patient's glucose trace into the ESP32-S3 over the serial protocol and confirm the on-chip alarm fires against host expectations, closing the loop from trained weights to a physical device.</li>
-        </ul>
-        <p>The pipeline absorbs these without structural change. The split policy, normalization, and evaluation are already isolated behind the trainer's configuration, so stage two is a matter of running the existing machinery across more folds and seeds rather than rebuilding it.</p>
 
         <!-- ============================================================== -->
         <h2 class="section">6. Acknowledgments</h2>

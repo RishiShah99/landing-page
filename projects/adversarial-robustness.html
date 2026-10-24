@@ -11,9 +11,10 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="project.css">
+    <link rel="stylesheet" href="../base.css?v=20261024b">
+    <link rel="stylesheet" href="project.css?v=20261024b">
     <script defer src="../shared.js"></script>
     <script defer src="project.js"></script>
 </head>
@@ -23,85 +24,78 @@
 
         <div class="eyebrow">2025</div>
 
-        <h1 class="title">Architecture-driven adversarial <span class="accent">robustness</span>.</h1>
+        <h1 class="title">Architecture-driven adversarial robustness.</h1>
 
-        <div class="chips">
-            <span class="chip">ML Research</span>
-            <span class="chip">Adversarial Robustness</span>
-            <span class="chip">Computer Vision</span>
-        </div>
 
         <p class="subtitle">An enhanced CORnet-S with three biology-inspired modules: a learnable retinal prefilter, gated recurrent feedback, and variance-aware denoise scaling. 97.82% robustness on MNIST under PGD, with no adversarial training.</p>
 
         <!-- ============================================================== -->
         <h2 class="section">1. Abstract</h2>
-        <p>An architectural alternative to adversarial training, evaluated against four attack families on MNIST, CIFAR-100, and ImageNet100. The point is concrete: defenses that ship into a safety-critical perception system (medical-imaging triage, autonomous-vehicle perception, biometric authentication) need to be deployable from a clean-trained model. Adversarial training is expensive, data-hungry, and depresses clean accuracy. An architectural defense ships from the same training pipeline that produced the clean model, with no robustness-versus-accuracy tradeoff and no additional epochs.</p>
+        <p>An architectural alternative to adversarial training, evaluated against four attack families on MNIST, CIFAR-100, and ImageNet100. Defenses that ship into a safety-critical perception system (medical-imaging triage, autonomous-vehicle perception, biometric authentication) need to deploy from a clean-trained model. Adversarial training is expensive, data-hungry, and depresses clean accuracy. An architectural defense ships from the same pipeline that produced the clean model, with no robustness-versus-accuracy tradeoff and no additional epochs.</p>
 
-        <p><strong>CORnet-S</strong> (DiCarlo lab, MIT) is the baseline because its V1 to V2 to V4 to IT hierarchy already aligns with the primate ventral stream, which gives any biology-derived additions a natural place to live. Three modules are added on top, each drawn from a property of the visual system that adversarial training is otherwise trying to learn from data. A <strong>learnable retinal prefilter</strong> strips the high-frequency artifacts that carry most of an adversarial perturbation's signal. <strong>Gated recurrent blocks</strong> unroll 2 to 4 times per forward pass and suppress the unstable activations characteristic of an adversarial example. A <strong>variance-aware denoise-scaling</strong> layer amplifies stable channels and damps high-variance ones, keying directly on the 3 to 5 times variance signature that distinguishes adversarial inputs from clean ones.</p>
+        <p><strong>CORnet-S</strong> (DiCarlo lab, MIT) is the baseline because its V1 to V2 to V4 to IT hierarchy already aligns with the primate ventral stream. Three modules go on top. A <strong>learnable retinal prefilter</strong> strips the high-frequency artifacts that carry most of a perturbation's signal. <strong>Gated recurrent blocks</strong> unroll 2 to 4 times per forward pass and suppress unstable activations. A <strong>variance-aware denoise-scaling</strong> layer amplifies stable channels and damps high-variance ones, keying on the 3 to 5 times variance signature of adversarial inputs.</p>
 
-        <p>The novelty is the architectural path, not the modules. Adversarial training is the standard answer to robustness, and it costs 10 to 100 times the training compute and a documented robustness-versus-clean-accuracy tradeoff. The bet here is that the same robustness can be built into the network's structure, not into its training data. The result is 97.82% PGD robustness on MNIST, +12 pp over the CORnet-S baseline, with clean accuracy untouched and no adversarial example ever shown during training.</p>
+        <p>The novelty is the architectural path, not the modules. The bet: the same robustness can be built into the network's structure, not its training data.</p>
 
         <ul class="body-list">
             <li><strong>97.82% PGD robustness on MNIST</strong>, +12 pp over baseline CORnet-S, with zero adversarial training.</li>
-            <li><strong>Consistent gains across attack families:</strong> FGSM +8 pp, PGD +12 pp, CW +9 pp, Patch +7 pp. The architectural defense is not attack-specific.</li>
-            <li><strong>Clean accuracy preserved</strong> across all three datasets: 99.2% MNIST, 76.4% CIFAR-100, 82.1% ImageNet100. No observable robustness-versus-clean tradeoff.</li>
-            <li><strong>~15% inference-time overhead</strong> versus baseline CORnet-S; +2.3M parameters. Modest cost for the gain.</li>
-            <li><strong>Architectural by construction.</strong> The model never sees an adversarial example during training. The defense drops into the clean training pipeline as a set of layer-level replacements.</li>
+            <li><strong>Consistent gains across attack families:</strong> FGSM +8 pp, PGD +12 pp, CW +9 pp, Patch +7 pp.</li>
+            <li><strong>Clean accuracy preserved</strong> across all three datasets: 99.2% MNIST, 76.4% CIFAR-100, 82.1% ImageNet100.</li>
+            <li><strong>~15% inference-time overhead</strong> versus baseline CORnet-S; +2.3M parameters.</li>
+            <li><strong>Architectural by construction.</strong> The model never sees an adversarial example; the defense drops into the clean training pipeline as layer-level replacements.</li>
         </ul>
 
         <!-- ============================================================== -->
         <h2 class="section">2. Introduction</h2>
-        <p>Adversarial training works, but it is expensive (10 to 100 times longer training), data-hungry, and tends to depress clean accuracy. The result is a robustness-versus-accuracy tradeoff that has shaped the field's default assumptions. This work asks a different question: can the same robustness be built into the <em>architecture</em>, leaving the training procedure untouched?</p>
+        <p>Adversarial training works, but at a price. This work asks a different question: can the same robustness be built into the <em>architecture</em>, leaving the training procedure untouched?</p>
         <ul class="body-list">
-            <li><strong>Adversarial training is a cost line.</strong> 10 to 100 times the training compute, plus a separate evaluation harness, plus the discipline to refresh the attack distribution as new attacks land. None of that is free.</li>
-            <li><strong>Clean accuracy pays the bill.</strong> Standard adversarial training depresses clean accuracy a few points on most benchmarks. For deployments that mostly see clean inputs in production, that tradeoff is uncomfortable.</li>
-            <li><strong>Biology already solved a version of this.</strong> The primate visual system is remarkably resilient to noise, and the resilience does not come from being trained on noisy data. It comes from the structure of the retina-LGN-cortex pathway.</li>
+            <li><strong>Adversarial training is a cost line.</strong> 10 to 100 times the training compute, a separate evaluation harness, and an attack distribution to refresh as new attacks land.</li>
+            <li><strong>Clean accuracy pays the bill.</strong> Standard adversarial training costs a few clean-accuracy points on most benchmarks, an uncomfortable trade for deployments that mostly see clean inputs.</li>
+            <li><strong>Biology already solved a version of this.</strong> The primate visual system resists noise without training on noisy data. The resilience comes from the structure of the retina-LGN-cortex pathway.</li>
         </ul>
 
         <h3 class="subsection">2.1 Why an architectural defense, not adversarial training</h3>
-        <p>The standard argument for adversarial training is that it makes the model see the threat distribution. The standard argument against is everything in the bullet list above. An architectural defense sidesteps both: the model never sees an adversarial example, but the network's structure is built so that the kind of input that fools a vanilla classifier is also the kind of input that gets suppressed by the new layers.</p>
+        <p>Instead of showing the model adversarial examples, the network is built so that inputs that fool a vanilla classifier get suppressed by the new layers.</p>
         <ul class="body-list">
-            <li><strong>CORnet-S as the substrate.</strong> The model's V1, V2, V4, IT hierarchy is biologically aligned. Any biology-derived additions live where their analogues live in the brain, which keeps the additions interpretable rather than ad hoc.</li>
-            <li><strong>Three properties of biological vision.</strong> Retinal preprocessing that strips high-frequency artifacts, recurrent cortical feedback that lets ambiguous stimuli get a second look, and adaptive neural suppression that down-weights unstable activations. Each property corresponds to a module added in this build.</li>
-            <li><strong>Differentiable, not gradient-masked.</strong> All three modules are end-to-end differentiable and the model exposes a clean gradient at training time. Gradient-masking defenses look strong in unaware-attack evaluations and collapse under adaptive attack; the modules here avoid that failure mode by design.</li>
+            <li><strong>CORnet-S as the substrate.</strong> Its V1, V2, V4, IT hierarchy is biologically aligned, so each addition lives where its analogue lives in the brain, keeping the design interpretable rather than ad hoc.</li>
+            <li><strong>Three properties of biological vision.</strong> Retinal preprocessing, recurrent cortical feedback that gives ambiguous stimuli a second look, and adaptive suppression of unstable activations. Each maps to one module.</li>
+            <li><strong>Differentiable, not gradient-masked.</strong> All three modules are end-to-end differentiable and expose a clean gradient. Gradient-masking defenses look strong against unaware attacks and collapse under adaptive attack; these modules avoid that failure mode by design.</li>
         </ul>
 
         <h3 class="subsection">2.2 What is actually new</h3>
-        <p>The CORnet-S backbone is from the DiCarlo lab. The attack library is TorchAttacks. The datasets are public. The contribution is the three biology-derived modules and the evidence that they can deliver the headline number without adversarial training.</p>
+        <p>The CORnet-S backbone is from the DiCarlo lab, the attacks from TorchAttacks, the datasets public. The contribution is the three modules and the evidence that they deliver the headline number without adversarial training.</p>
         <ul class="body-list">
-            <li><strong>Three biology-derived modules in one network.</strong> Retinal prefilter, recurrent gating, variance-aware scaling. Each one is small, differentiable, and ablated independently. The defense is the composition of all three, not any single piece in isolation.</li>
-            <li><strong>No adversarial examples in training.</strong> The defense is purchased entirely through architectural changes. Training is the same clean-image protocol used to fit the baseline CORnet-S, with the same loss, same data, same hyperparameters.</li>
-            <li><strong>Cross-attack consistency, not attack-specific patches.</strong> Gains hold across FGSM, PGD, CW, and patch attacks. A defense that only helps against the attack it was tuned on is not an architectural property; this one earns the architectural label.</li>
+            <li><strong>Three biology-derived modules in one network.</strong> Each is small and ablated independently. The defense is their composition, not any single piece.</li>
+            <li><strong>No adversarial examples in training.</strong> Training is the same clean-image protocol used for the baseline CORnet-S: same loss, same data, same hyperparameters.</li>
+            <li><strong>Cross-attack consistency, not attack-specific patches.</strong> A defense that only helps against the attack it was tuned on is not architectural; gains here hold across all four families.</li>
         </ul>
 
-        <p>Every section below is the engineering that holds those three commitments up under each attack family.</p>
+        <p>The sections below are the engineering behind those three commitments.</p>
 
         <!-- ============================================================== -->
         <h2 class="section">3. System</h2>
 
         <h3 class="subsection">3.1 Learnable retinal prefilter</h3>
-        <p>A lightweight learnable denoising stage sits in front of CORnet-S's feedforward path: the artificial analogue of the retina. Adversarial perturbations live disproportionately in high-frequency spatial bands, and the prefilter learns to attenuate exactly that band while preserving the low-frequency content that carries class identity.</p>
+        <p>A lightweight learnable denoising stage sits in front of CORnet-S's feedforward path: the artificial analogue of the retina. Adversarial perturbations live disproportionately in high-frequency spatial bands, and the prefilter learns to attenuate that band while preserving the low-frequency content that carries class identity.</p>
         <ul class="body-list">
-            <li><strong>Differentiable by design.</strong> No fixed Gaussian or median filter, no rounded-output non-differentiable step. The prefilter's frequency response is learned end-to-end through standard backpropagation, so an adaptive attack sees a clean gradient and the prefilter is not a gradient-masking defense.</li>
-            <li><strong>Adaptive frequency response.</strong> The filter learns where the artifacts live for each dataset rather than committing to a single band ahead of training.</li>
-            <li><strong>Roughly 2% forward-pass overhead.</strong> The prefilter is the cheapest of the three modules.</li>
-            <li><strong>Ablation:</strong> removing the prefilter drops robustness by 8 to 10 pp across all three datasets, holding the rest of the architecture constant.</li>
+            <li><strong>Learned, not fixed.</strong> No Gaussian or median filter, no non-differentiable rounding step. The frequency response is learned end to end for each dataset rather than committed to a band ahead of training.</li>
+            <li><strong>Roughly 2% forward-pass overhead</strong>, the cheapest of the three modules.</li>
+            <li><strong>Ablation:</strong> removing the prefilter drops robustness by 8 to 10 pp across all three datasets.</li>
         </ul>
 
         <h3 class="subsection">3.2 Gated recurrent blocks</h3>
-        <p>The residual connections inside CORnet-S are replaced with gated recurrent units that unroll 2 to 4 times per forward pass. Sigmoid gates decide which features persist across iterations; high-variance activations characteristic of adversarial noise are gated out, stable activations propagate.</p>
+        <p>The residual connections inside CORnet-S are replaced with gated recurrent units that unroll 2 to 4 times per forward pass. Sigmoid gates decide which features persist: high-variance activations characteristic of adversarial noise are gated out, stable ones propagate.</p>
         <ul class="body-list">
-            <li><strong>Temporal depth.</strong> Recurrence introduces a temporal dimension that single-step attacks must navigate. A perturbation that fools the network on the first unroll must also fool it on subsequent unrolls, which is a more stringent condition than the single-pass attack assumes.</li>
-            <li><strong>Hidden state carries forward.</strong> The gated state carries information across iterations, creating per-iteration dependencies that a single-pass adversarial gradient cannot fully exploit.</li>
-            <li><strong>Ablation:</strong> removing recurrence drops robustness by 12 to 15 pp across the three datasets. The largest single contribution of the three modules.</li>
+            <li><strong>Temporal depth.</strong> The hidden state carries across iterations, so a perturbation that fools the first unroll must also fool the later ones, a stricter condition than a single-pass attack assumes.</li>
+            <li><strong>Ablation:</strong> removing recurrence drops robustness by 12 to 15 pp across the three datasets, the largest single contribution of the three modules.</li>
         </ul>
 
         <h3 class="subsection">3.3 Variance-aware denoise-scaling</h3>
-        <p>A learnable per-channel scalar adjusts feature emphasis based on the variance of each channel's activation across the recurrent iterations. Stable channels (low across-iteration variance) get amplified; high-variance channels get suppressed.</p>
+        <p>A learnable per-channel scalar sets feature emphasis from each channel's activation variance across the recurrent iterations. Stable channels get amplified; high-variance channels get suppressed.</p>
         <ul class="body-list">
-            <li><strong>The signal it keys on.</strong> Adversarial examples produce 3 to 5 times higher feature variance than clean images at the same layer, measured across the recurrent unrolls. That gap is the signal the scaling layer uses to discriminate.</li>
-            <li><strong>Soft scaling, not hard thresholding.</strong> A continuous scaling preserves gradient flow at training time and avoids the gradient-shattering pathology that a hard threshold would introduce.</li>
-            <li><strong>Particularly effective against PGD.</strong> By attenuating high-variance features, the scaling layer weakens the very gradient signal that the iterative PGD attack relies on to converge. The PGD gain (+12 pp) is the largest of the four attacks measured.</li>
+            <li><strong>The signal it keys on.</strong> Adversarial examples produce 3 to 5 times higher feature variance than clean images at the same layer, measured across the recurrent unrolls.</li>
+            <li><strong>Soft scaling, not hard thresholding.</strong> Continuous scaling preserves gradient flow and avoids the gradient shattering a hard threshold would introduce.</li>
+            <li><strong>Particularly effective against PGD.</strong> Attenuating high-variance features weakens the gradient signal iterative PGD relies on to converge. The PGD gain (+12 pp) is the largest of the four attacks measured.</li>
         </ul>
 
         <!-- ============================================================== -->
@@ -112,7 +106,7 @@
             <div class="figure-card">
                 <img src="../images/figures/robust_fig2_cross_attack.png" alt="Horizontal bar chart of the gain in percentage points over baseline CORnet-S, on MNIST, across four attack families: FGSM +8, PGD +12, CW +9, Patch +7.">
             </div>
-            <figcaption>Figure 1. Gain over baseline CORnet-S across attack families, on MNIST. The defense is consistent across attack types rather than tuned to any one of them.</figcaption>
+            <figcaption>Figure 1. Gain over baseline CORnet-S across attack families, on MNIST. Consistent across attack types, not tuned to any one of them.</figcaption>
         </figure>
 
         <table class="results">
@@ -159,36 +153,24 @@
         </table>
 
         <ul class="body-list">
-            <li><strong>Cross-dataset.</strong> 97.82% MNIST, 89.3% CIFAR-100, 84.7% ImageNet100 under PGD. The architectural gain holds across input distributions rather than landing only in the toy regime.</li>
-            <li><strong>Cross-architecture.</strong> Against ResNet-18 the gain is +5 to +8 pp under iterative attacks (PGD, CW). Against AlexNet the gain is +15 to +20 pp across the board, which says more about AlexNet than about the defense.</li>
-            <li><strong>Transfer.</strong> A model trained on CIFAR-100 retains roughly 85% of its robustness when evaluated on ImageNet100. The architectural defense is at least partly distribution-independent.</li>
+            <li><strong>Cross-dataset.</strong> The PGD gain holds on CIFAR-100 and ImageNet100, not only in the toy regime.</li>
+            <li><strong>Cross-architecture.</strong> +5 to +8 pp over ResNet-18 under iterative attacks (PGD, CW). +15 to +20 pp over AlexNet across the board, which says more about AlexNet than about the defense.</li>
+            <li><strong>Transfer.</strong> A model trained on CIFAR-100 retains roughly 85% of its robustness on ImageNet100, so the defense is at least partly distribution-independent.</li>
         </ul>
 
-        <p>The numbers above come from this project's evaluation protocol on a single training seed per dataset, with attacks generated by TorchAttacks at the listed <code>&epsilon;</code> values. They are not a leaderboard claim against RobustBench, AutoAttack, or any other standardized adversarial-robustness benchmark, and they are not a SOTA claim. Adaptive attacks specifically designed against the three modules in this architecture have not been tested, and a defense without an adaptive-attack evaluation is by convention an upper bound, not a deployable robustness floor. Read the numbers as evidence of the architectural-versus-adversarial-training tradeoff direction, not as a benchmark result.</p>
+        <p>These numbers come from a single training seed per dataset under this project's protocol. They are not a leaderboard or SOTA claim against RobustBench, AutoAttack, or any other standardized benchmark. Adaptive attacks designed against these three modules have not been tested, and a defense without an adaptive-attack evaluation is by convention an upper bound, not a deployable robustness floor. Read them as evidence of the tradeoff direction, not a benchmark result.</p>
 
         <!-- ============================================================== -->
         <h2 class="section">5. Conclusion and Implications</h2>
-        <p>Adversarial robustness does not have to be purchased with adversarial training. The same biology that gives the primate visual system its resilience (retinal preprocessing, cortical recurrence, variance-aware suppression) can be implemented as architectural primitives that defend a network without ever showing it an adversarial example. The practical consequence is concrete: a clean-trained model can ship into a safety-critical setting (medical-imaging triage, autonomous-vehicle perception, biometric authentication) with robustness that does not cost weeks of additional training and does not erode clean accuracy. The deployment story that matters here is not "we beat the leaderboard"; it is "the defense drops into the existing training pipeline." For any team running a clean classifier in production that needs to add robustness without changing the data pipeline or the training budget, that distinction is the load-bearing one.</p>
+        <p>Adversarial robustness does not have to be purchased with adversarial training. The biology behind the primate visual system's resilience (retinal preprocessing, cortical recurrence, variance-aware suppression) can be built as architectural primitives that defend a network without ever showing it an adversarial example. A clean-trained model can then ship into a safety-critical setting (medical-imaging triage, autonomous-vehicle perception, biometric authentication) with robustness that costs neither weeks of additional training nor clean accuracy. The deployment story is not "we beat the leaderboard"; it is "the defense drops into the existing training pipeline," the load-bearing distinction for any team that must add robustness without changing its data pipeline or training budget.</p>
 
-        <h3 class="subsection">5.1 Limitations</h3>
+        <h3 class="subsection">5.1 Limitations and future work</h3>
         <ul class="body-list">
-            <li><strong>No adaptive-attack evaluation.</strong> The four attack families exercised here are off-the-shelf from TorchAttacks, not adaptive attacks designed against the three modules in this architecture. A defense without an adaptive-attack evaluation is by convention an upper bound. Closing this gap is the single highest-priority next step.</li>
-            <li><strong>Not benchmarked under RobustBench or AutoAttack.</strong> Numbers are from this project's evaluation harness, not from a standardized leaderboard protocol. Direct comparisons against published defenses are not warranted.</li>
-            <li><strong>Single training seed per dataset.</strong> No seed-variance bound on any reported number. Multi-seed runs are needed to put a confidence interval on the cross-attack gain numbers.</li>
-            <li><strong>ImageNet100, not full ImageNet.</strong> The 100-class subset is a tractable proxy for the full benchmark, not a replacement.</li>
-            <li><strong>Architecture family.</strong> The defense was developed on top of CORnet-S. Whether the three modules transfer to a non-biological backbone (ResNet, ViT, ConvNeXt) is unmeasured.</li>
-            <li><strong>~15% inference overhead and +2.3M parameters.</strong> Modest, but not free. Edge deployment with tight latency budgets would need to weigh the overhead against the robustness gain.</li>
-        </ul>
-
-        <h3 class="subsection">5.2 Future Work</h3>
-        <p>The limitations above map directly onto the next stage of the work.</p>
-        <ul class="body-list">
-            <li><strong>Adaptive-attack evaluation.</strong> White-box attacks designed against the prefilter, the recurrence, and the variance-aware scaling layer specifically. The single biggest test of whether the architectural defense holds.</li>
-            <li><strong>RobustBench and AutoAttack integration.</strong> Standardized evaluation under the conventions the field accepts, so the numbers become comparable against published defenses.</li>
-            <li><strong>Multi-seed runs and full ImageNet.</strong> Variance-bounded gains and the canonical benchmark, so the cross-dataset claim is no longer an extrapolation from ImageNet100.</li>
-            <li><strong>Backbone transfer.</strong> Attach the three modules to a ResNet or a ViT and measure whether the defense is a CORnet-S idiosyncrasy or a general architectural pattern.</li>
-            <li><strong>Hybrid pipelines.</strong> Architectural defense plus a small amount of adversarial training, to see whether the two compose additively or saturate.</li>
-            <li><strong>Brain-Score evaluation.</strong> Confirm that the additions preserve neural predictivity, so the biological framing is not just aesthetic.</li>
+            <li><strong>No adaptive-attack evaluation.</strong> The highest-priority next step: white-box attacks designed against the prefilter, the recurrence, and the variance-aware scaling layer specifically.</li>
+            <li><strong>Single seed, no RobustBench or AutoAttack.</strong> Direct comparisons against published defenses are not warranted. Next: multi-seed confidence intervals and standardized evaluation.</li>
+            <li><strong>ImageNet100 and CORnet-S only.</strong> Next: full ImageNet, and the three modules on a ResNet, ViT, or ConvNeXt to test whether the defense is a CORnet-S idiosyncrasy or a general architectural pattern.</li>
+            <li><strong>~15% inference overhead and +2.3M parameters.</strong> Modest, but edge deployment with tight latency budgets would need to weigh it against the gain.</li>
+            <li><strong>Open questions.</strong> Whether a small amount of adversarial training composes additively with the architectural defense or saturates, and whether Brain-Score confirms the additions preserve neural predictivity, so the biological framing is not just aesthetic.</li>
         </ul>
 
         <!-- ============================================================== -->

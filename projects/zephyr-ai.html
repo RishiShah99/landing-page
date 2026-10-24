@@ -11,9 +11,10 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="project.css">
+    <link rel="stylesheet" href="../base.css?v=20261024b">
+    <link rel="stylesheet" href="project.css?v=20261024b">
     <script defer src="../shared.js"></script>
     <script defer src="project.js"></script>
 </head>
@@ -23,59 +24,52 @@
 
         <div class="eyebrow">2024</div>
 
-        <h1 class="title">A dual-interface personal AI <span class="accent">assistant</span>.</h1>
+        <h1 class="title">A dual-interface personal AI assistant.</h1>
 
-        <div class="chips">
-            <span class="chip">Personal AI</span>
-            <span class="chip">Productivity</span>
-            <span class="chip">Multi-LLM</span>
-        </div>
 
         <p class="subtitle">Press <code>Ctrl+Alt+Z</code> for an instant popup. Launch the Electron dashboard for the full workspace. Both surfaces talk to one Flask API and one SQLite memory store, so the assistant feels like one tool no matter where it is invoked from.</p>
 
         <!-- ============================================================== -->
         <h2 class="section">1. Abstract</h2>
-        <p>Personal AI assistants usually force a tradeoff. A lightweight popup is fast but cannot do much. A heavy desktop app can do everything but takes too long to open for the small task that triggered the impulse to ask. Zephyr ships both, sharing one backend so memory and integrations stay consistent across surfaces. Quick command, popup. Complex management, dashboard. The user never feels like the assistant has two minds.</p>
+        <p>Personal AI assistants force a tradeoff. A popup is fast but shallow. A desktop app does everything but opens too slowly for the small task that prompted the question. Zephyr ships both over one backend, so memory and integrations stay consistent. Quick command, popup. Complex management, dashboard. The assistant never has two minds.</p>
 
-        <p>The implementation is a three-tier architecture. A <strong>Tkinter popup</strong> on a system-wide hotkey (<code>Ctrl+Alt+Z</code>) for instant capture. A <strong>Flask API</strong> on localhost that owns all state. An <strong>Electron + React dashboard</strong> for the full workspace: conversation history, memory browser, project board, settings. The popup and the dashboard never talk to each other; both speak only to the API. SQLite holds persistent memory, integrations sit behind their own endpoints, and a multi-LLM router fronts Groq Llama 3.1 8B, OpenAI, and Gemini so a single provider outage does not take the assistant down.</p>
+        <p>A <strong>Tkinter popup</strong> on a system-wide hotkey (<code>Ctrl+Alt+Z</code>) handles instant capture. A <strong>Flask API</strong> on localhost owns all state. An <strong>Electron + React dashboard</strong> holds the full workspace. SQLite holds persistent memory, and a multi-LLM router fronts Groq Llama 3.1 8B, OpenAI, and Gemini so one provider outage does not take the assistant down.</p>
 
-        <p>The novelty is the surface design, not the LLM. Multi-LLM routing exists, SQLite-backed memory exists, system-tray apps exist. The contribution is the discipline that keeps two interfaces backed by one backend feel like a single product: the API is the only abstraction boundary, every integration is a single Python module that registers two functions, and the dashboard treats popup activity as just another client of the same endpoints.</p>
+        <p>The novelty is the surface design, not the LLM. Multi-LLM routing, SQLite-backed memory and system-tray apps all exist. The contribution is the discipline that makes two interfaces over one backend feel like one product.</p>
 
         <ul class="body-list">
-            <li><strong>Three-tier architecture.</strong> Tkinter popup, Flask API on <code>localhost:5000</code>, Electron + React dashboard. One backend, two interfaces, zero direct UI-to-UI traffic.</li>
-            <li><strong>Sub-100 ms memory lookups</strong> from SQLite across thousands of stored facts, with relevance scoring that prioritises recent and frequently-accessed entries.</li>
-            <li><strong>Multi-LLM router with provider fallback.</strong> Groq Llama 3.1 8B is the default for speed. OpenAI and Gemini back it up automatically when the primary is unavailable.</li>
-            <li><strong>Streaming responses to both surfaces</strong> via the same Flask endpoint. Perceived latency is dominated by network, not by the architecture.</li>
-            <li><strong>Plugin-style integrations.</strong> A new handler is one Python module with a <code>can_handle()</code> and an <code>execute()</code>. No core changes, no router edits.</li>
-            <li><strong>Spotify, Google Calendar, WeatherAPI, and local file search</strong> as first-party integrations, all behind their own routed endpoints.</li>
+            <li><strong>Three-tier architecture.</strong> Tkinter popup, Flask API on <code>localhost:5000</code>, Electron + React dashboard. Zero direct UI-to-UI traffic.</li>
+            <li><strong>Sub-100 ms memory lookups</strong> from SQLite across thousands of stored facts, scored to favour recent and frequently accessed entries.</li>
+            <li><strong>Multi-LLM router with provider fallback.</strong> Groq Llama 3.1 8B by default for speed; OpenAI and Gemini take over automatically when it is unavailable.</li>
+            <li><strong>Streaming responses to both surfaces</strong> through the same Flask endpoint.</li>
+            <li><strong>Plugin-style integrations.</strong> Spotify, Google Calendar, WeatherAPI and local file search, each a Python module with a <code>can_handle()</code> and an <code>execute()</code>. No core changes, no router edits.</li>
         </ul>
 
         <!-- ============================================================== -->
         <h2 class="section">2. Introduction</h2>
-        <p>Voice assistants on phones are fast but shallow. Desktop AI apps are deep but slow to launch and slow to navigate. The user's tasks do not fit either shape cleanly; they span the same memory, but they want different interfaces depending on what they are doing.</p>
+        <p>Phone voice assistants are fast but shallow; desktop AI apps are deep but slow to launch. Real tasks span one memory but want different interfaces.</p>
         <ul class="body-list">
-            <li><strong>Quick tasks need a fast capture surface.</strong> "Remind me to email the registrar tomorrow." The cognitive cost of opening a dashboard, navigating to the right pane, and clicking through forms kills the impulse before the thought reaches the keyboard.</li>
-            <li><strong>Complex tasks need a workspace.</strong> "Pull up everything we logged about the rehab study, group by week, export to markdown." A popup is the wrong shape for that kind of exploration; a dashboard is the right one.</li>
-            <li><strong>Both tasks share memory.</strong> The assistant cannot have two personas. What you tell the popup must be available to the dashboard, and vice versa, without manual sync.</li>
+            <li><strong>Quick tasks need a fast capture surface.</strong> "Remind me to email the registrar tomorrow." Opening a dashboard kills the impulse before the thought reaches the keyboard.</li>
+            <li><strong>Complex tasks need a workspace.</strong> "Pull up everything we logged about the rehab study, group by week, export to markdown." That is dashboard work, not popup work.</li>
+            <li><strong>Both share memory.</strong> What you tell the popup must reach the dashboard, and vice versa, without manual sync.</li>
         </ul>
 
         <h3 class="subsection">2.1 Why three tiers, not two</h3>
-        <p>The naive design is one process that ships both UIs. That fails as soon as either UI wants to update independently, run on a different machine, or be replaced by a third client (a mobile companion, a Slack bot, a voice device). The three-tier split puts the API in the middle as the only stable contract, and each UI becomes a thin client of that contract. Cost: an extra process. Benefit: the assistant can grow without rebuilding state management each time.</p>
+        <p>One process shipping both UIs breaks once either UI must update independently, run on another machine, or make room for a third client (a mobile companion, a Slack bot, a voice device). Three tiers make the API the only stable contract. Cost: an extra process. Benefit: the assistant grows without rebuilding state management.</p>
         <ul class="body-list">
-            <li><strong>The API is the abstraction boundary.</strong> All state lives in the Flask server. The popup is a UI, not a backend with a UI on top of it.</li>
-            <li><strong>The popup and dashboard never share code beyond the API contract.</strong> Tkinter and Electron speak the same JSON over HTTP, and that is all they have in common.</li>
-            <li><strong>New surfaces are cheap.</strong> A mobile companion or a Slack endpoint adds another client of the same API rather than another state owner.</li>
+            <li><strong>The API is the abstraction boundary.</strong> All state lives in the Flask server. The popup is a UI, not a backend with a UI on top.</li>
+            <li><strong>The UIs share only the API contract.</strong> Tkinter and Electron speak the same JSON over HTTP, and nothing else.</li>
         </ul>
 
         <h3 class="subsection">2.2 What is actually new</h3>
-        <p>Tkinter is decades old. Flask is decades old. Electron is a known quantity. The LLM providers are off the shelf. The contribution is the structural design that holds those pieces together into something that feels like one product.</p>
+        <p>Tkinter, Flask, Electron and the LLM providers are all off the shelf. The structure that makes them one product is new.</p>
         <ul class="body-list">
-            <li><strong>Two interfaces, one backend, zero state drift.</strong> Memory written by the popup is visible to the dashboard within a single API roundtrip. There is no sync layer because there is no second source of truth.</li>
-            <li><strong>Provider-agnostic LLM layer.</strong> The router treats Groq, OpenAI, and Gemini as interchangeable for the same task. Falling back across providers does not require the calling code to know it happened.</li>
-            <li><strong>Plugin-shaped integrations.</strong> Every external service (Spotify, Calendar, Weather, file search) is wrapped as a handler that implements two functions. Adding a new one is a single file plus a single import.</li>
+            <li><strong>Two interfaces, one backend, zero state drift.</strong> Popup memory writes reach the dashboard within one API roundtrip. There is no sync layer because there is no second source of truth.</li>
+            <li><strong>Provider-agnostic LLM layer.</strong> Groq, OpenAI, and Gemini are interchangeable for the same task. Calling code never needs to know a fallback happened.</li>
+            <li><strong>Plugin-shaped integrations.</strong> Every external service is a two-function handler. Adding one is a single file plus a single import.</li>
         </ul>
 
-        <p>Every section below is the engineering that makes those three commitments hold across two UI surfaces.</p>
+        <p>Everything below makes those three commitments hold across two UI surfaces.</p>
 
         <!-- ============================================================== -->
         <h2 class="section">3. System</h2>
@@ -83,80 +77,70 @@
         <h3 class="subsection">3.1 Tiny Zephyr (the popup)</h3>
         <ul class="body-list">
             <li><strong>Python + Tkinter</strong> with a dark theme, slide-in animation, and centring on the active monitor.</li>
-            <li><strong>Global hotkey</strong> (<code>Ctrl+Alt+Z</code>) registered system-wide on Windows. Brings the window to focus from any state without stealing window order more than necessary.</li>
-            <li><strong>Auto-hide on focus loss</strong> and a system-tray presence that keeps the hotkey reachable across sessions.</li>
-            <li><strong>Voice input</strong> via microphone routed into the same NLP pipeline as typed input. The popup never branches on input modality past the capture step.</li>
-            <li><strong>Streaming responses with concurrent text-to-speech.</strong> The assistant talks while the text materialises so the perceived latency stays under what the LLM's full generation takes.</li>
+            <li><strong>Global hotkey</strong> (<code>Ctrl+Alt+Z</code>) registered system-wide on Windows. Brings the window to focus from any state.</li>
+            <li><strong>Auto-hide on focus loss</strong>, plus a system-tray presence that keeps the hotkey reachable across sessions.</li>
+            <li><strong>Voice input</strong> feeds the same NLP pipeline as typed input. Nothing branches on modality past capture.</li>
+            <li><strong>Streaming responses with concurrent text-to-speech.</strong> The assistant talks while the text materialises, so perceived latency stays under the LLM's full generation time.</li>
         </ul>
 
         <h3 class="subsection">3.2 Flask API bridge</h3>
-        <p>Runs on <code>localhost:5000</code>, auto-started with Tiny Zephyr but addressable independently. Both UI surfaces speak only to the API; all state lives in this process.</p>
+        <p>Runs on <code>localhost:5000</code>, auto-started with Tiny Zephyr but addressable independently.</p>
         <ul class="body-list">
-            <li><code>POST /command</code> is the natural-language entry point. Routes the input to the right handler, executes, and returns a structured response with both the answer and any side effects (memory writes, integration calls).</li>
-            <li><code>GET / POST / DELETE /memory</code> provides full CRUD over the SQLite memory store, surfaced to both UIs identically.</li>
-            <li><code>GET / POST /projects</code> handles project and idea tracking with tags and status. The dashboard's Kanban board reads from this endpoint; the popup writes to it by phrase ("add project: rewrite the portfolio").</li>
-            <li><strong>Per-integration endpoints</strong> for Spotify control, Weather queries, and Calendar events. Each one is a thin wrapper over the upstream API with the assistant's response shaping bolted on.</li>
-            <li><strong>WebSocket channel</strong> pushes live dashboard updates from popup activity, so a fact captured through the popup appears in the dashboard's memory browser without a refresh.</li>
+            <li><code>POST /command</code> is the natural-language entry point. Routes to the right handler, executes, and returns the answer plus any side effects (memory writes, integration calls).</li>
+            <li><code>GET / POST / DELETE /memory</code> provides full CRUD over the SQLite memory store, identical for both UIs.</li>
+            <li><code>GET / POST /projects</code> tracks projects and ideas with tags and status. The dashboard's Kanban board reads it; the popup writes by phrase ("add project: rewrite the portfolio").</li>
+            <li><strong>Per-integration endpoints</strong> for Spotify, Weather, and Calendar, each a thin wrapper over the upstream API plus response shaping.</li>
+            <li><strong>WebSocket channel</strong> pushes popup activity to the dashboard live, so a captured fact appears in the memory browser without a refresh.</li>
         </ul>
 
         <h3 class="subsection">3.3 Electron dashboard</h3>
         <ul class="body-list">
-            <li><strong>React 18 + Vite + TailwindCSS + Framer Motion</strong>, wrapped in Electron for native desktop integration (tray, autostart, OS notifications).</li>
-            <li><strong>Conversation history</strong> with threaded view, search, filter, and JSON or Markdown export. The same conversation captured through the popup is rendered here without translation.</li>
-            <li><strong>Memory browser</strong> with categorised facts, a tag cloud, manual edit affordances, and bulk cleanup for stale entries.</li>
-            <li><strong>Project board</strong> as a Kanban surface with drag-and-drop reordering, Markdown descriptions, and attachments.</li>
-            <li><strong>Settings panel</strong> for LLM API keys, integration credentials, theme toggles, and hotkey behaviour. All of this writes through the API rather than to local files.</li>
+            <li><strong>React 18 + Vite + TailwindCSS + Framer Motion</strong>, wrapped in Electron for tray, autostart, and OS notifications.</li>
+            <li><strong>Conversation history</strong> with threaded view, search, filter, and JSON or Markdown export. Popup conversations render here without translation.</li>
+            <li><strong>Memory browser</strong> with categorised facts, a tag cloud, manual edits, and bulk cleanup of stale entries.</li>
+            <li><strong>Project board</strong>: Kanban with drag-and-drop reordering, Markdown descriptions, and attachments.</li>
+            <li><strong>Settings panel</strong> for LLM API keys, integration credentials, theme, and hotkey behaviour, all written through the API rather than to local files.</li>
         </ul>
 
         <h3 class="subsection">3.4 Memory and routing</h3>
         <ul class="body-list">
-            <li><strong>SQLite-backed memory</strong> holds learned facts, user preferences, conversation context, and project ideas in a single store.</li>
-            <li><strong>Relevance scoring</strong> on retrieval prioritises recent and frequently-accessed memories, so a months-old captured fact does not crowd out something the user mentioned this morning.</li>
-            <li><strong>Command router</strong> uses a three-tier escalation: exact-match on registered intents, fuzzy match on phrasing, then LLM intent classification when neither lands. The cheap tiers absorb most traffic.</li>
-            <li><strong>Multi-LLM fallback.</strong> Groq Llama 3.1 8B is the default for latency. OpenAI and Gemini back it up. Provider failure triggers automatic re-routing with no user-visible interruption.</li>
+            <li><strong>SQLite-backed memory</strong> holds learned facts, preferences, conversation context, and project ideas in one store.</li>
+            <li><strong>Relevance scoring</strong> favours recent and frequently accessed memories, so a months-old fact does not crowd out something mentioned this morning.</li>
+            <li><strong>Command router</strong> escalates in three tiers: exact match on registered intents, fuzzy match on phrasing, then LLM intent classification. The cheap tiers absorb most traffic.</li>
         </ul>
 
         <h3 class="subsection">3.5 Integrations</h3>
         <ul class="body-list">
-            <li><strong>Spotify</strong> via Spotipy. Play, pause, skip, "what is playing," queue from natural language.</li>
+            <li><strong>Spotify</strong> via Spotipy. Play, pause, skip, "what is playing," and queue from natural language.</li>
             <li><strong>WeatherAPI</strong>. System-location or explicit-city queries with contextual advice ("bring a jacket").</li>
-            <li><strong>Google Calendar.</strong> Event listing and creation with natural-language date parsing ("add a study block tomorrow at 7 pm").</li>
-            <li><strong>Local file search.</strong> "Find my resume," "open project folder" against a configured set of paths, so the assistant can act on local state, not just remote services.</li>
+            <li><strong>Google Calendar.</strong> Event listing and creation with natural-language dates ("add a study block tomorrow at 7 pm").</li>
+            <li><strong>Local file search.</strong> "Find my resume," "open project folder" against configured paths, so the assistant acts on local state too.</li>
         </ul>
 
         <!-- ============================================================== -->
         <h2 class="section">4. Evaluation</h2>
-        <p>Evaluation is functional and personal-use-driven, not benchmark-based. Zephyr is a tool the author uses daily, not a system aimed at a leaderboard; the numbers below are measured on the running install rather than against an external suite.</p>
+        <p>Evaluation is functional, measured on the running daily-use install rather than against a benchmark suite.</p>
         <ul class="body-list">
-            <li><strong>Memory lookups under 100 ms</strong> across thousands of stored facts, validated by direct timing on the API endpoint.</li>
-            <li><strong>Multi-LLM fallback survives provider outages.</strong> When Groq has been unavailable, the router has rolled over to OpenAI without user-visible interruption.</li>
-            <li><strong>Streaming responses materialise before the LLM has finished generating.</strong> The perceived latency floor is the network roundtrip to the provider, not the architecture.</li>
-            <li><strong>Modular handler system.</strong> Each new integration is one Python module with two functions. Adding Spotify, Calendar, and Weather did not require core router changes.</li>
-            <li><strong>Two surfaces, one memory.</strong> A fact captured through the popup is visible in the dashboard's memory browser within the next render, validated by direct observation during use.</li>
+            <li><strong>Memory lookups under 100 ms</strong> across thousands of stored facts, timed directly on the API endpoint.</li>
+            <li><strong>Fallback survives provider outages.</strong> When Groq has been unavailable, the router has rolled over to OpenAI without user-visible interruption.</li>
+            <li><strong>Streaming responses materialise before the LLM finishes generating.</strong> The perceived latency floor is the network roundtrip to the provider, not the architecture.</li>
+            <li><strong>Modular handlers.</strong> Adding Spotify, Calendar, and Weather required no core router changes.</li>
+            <li><strong>Two surfaces, one memory.</strong> A fact captured through the popup appears in the dashboard's memory browser by the next render, observed during use.</li>
         </ul>
 
-        <p>The numbers above are measurements of this build's behaviour on its own protocol, not comparisons against another assistant. Personal-AI assistants do not have a settled benchmark suite the way ML models do, and Zephyr's design point (two interfaces, one backend, persistent memory) is not directly comparable to single-surface assistants like the OS-native ones. Read the results as evidence that the three-tier architecture works as a daily-use tool, not as a leaderboard claim.</p>
+        <p>These measure this build on its own protocol, not against another assistant. Personal assistants have no settled benchmark suite, and Zephyr's two-surface design is not directly comparable to single-surface OS-native assistants. Read them as evidence of a working daily tool, not a leaderboard claim.</p>
 
         <!-- ============================================================== -->
         <h2 class="section">5. Conclusion and Implications</h2>
-        <p>The right interface for an AI assistant depends on the task, not the assistant. By splitting popup and dashboard but unifying state behind an API, Zephyr lets the user pick the interaction mode without giving up coherence. The downstream consequence is that any future surface (mobile companion, voice device, Slack bot, terminal client) becomes another client of the same backend rather than a fork of the assistant. The architecture also positions the build to absorb local LLMs (Ollama, llama.cpp, LM Studio) without redesign; the API becomes the abstraction boundary, and the provider behind it is interchangeable. For a personal tool that has to live in the user's daily workflow without becoming yet another app to manage, that boundary is the load-bearing one.</p>
+        <p>The right interface depends on the task, not the assistant. Splitting popup and dashboard while unifying state behind an API lets the user pick the mode without losing coherence. Any future surface (mobile companion, voice device, Slack bot, terminal client) becomes another client, not a fork. Local LLMs (Ollama, llama.cpp, LM Studio) slot in without redesign. For a personal tool that must live in the daily workflow without becoming another app to manage, that boundary is the load-bearing one.</p>
 
-        <h3 class="subsection">5.1 Limitations</h3>
+        <h3 class="subsection">5.1 Limitations and future work</h3>
         <ul class="body-list">
-            <li><strong>Windows-only at present.</strong> The hotkey, tray, and OS-notification paths use Windows-specific APIs. macOS and Linux are reachable but unbuilt.</li>
-            <li><strong>Single instance only.</strong> Two copies of the popup conflict on the global hotkey and on port 5000. There is no multi-user mode.</li>
-            <li><strong>Cloud LLM dependence for the deep features.</strong> Offline mode covers file operations and cached memory; reasoning-heavy queries still require an upstream provider.</li>
-            <li><strong>No end-to-end encryption on memory at rest.</strong> SQLite sits on local disk in plaintext; that is acceptable for a single-user local tool, not for a multi-device sync scenario.</li>
-            <li><strong>Integrations cover what the author uses.</strong> Spotify, Calendar, Weather, and file search are first-party, but a user with a different stack would need to write their own handler module.</li>
-        </ul>
-
-        <h3 class="subsection">5.2 Future Work</h3>
-        <ul class="body-list">
-            <li><strong>macOS and Linux ports.</strong> <code>pynput</code> for hotkeys, AppKit and GTK for the platform-specific shims, identical Flask backend.</li>
-            <li><strong>Local LLM support via Ollama or llama.cpp</strong> for fully offline operation. The multi-LLM router already abstracts the provider, so this is a new backend, not a redesign.</li>
-            <li><strong>Optional encrypted cloud sync</strong> with a React Native mobile companion as the first additional surface.</li>
-            <li><strong>Plugin marketplace</strong> with sandboxed third-party handlers, so users can extend the integration set without forking the core.</li>
-            <li><strong>Voice-only mode</strong> on top of the existing speech-to-text path, for a hands-free workflow.</li>
+            <li><strong>Windows-only.</strong> Hotkey, tray, and notifications use Windows-specific APIs. macOS and Linux ports need <code>pynput</code> for hotkeys and AppKit and GTK shims over the identical Flask backend.</li>
+            <li><strong>Single instance only.</strong> Two popups conflict on the global hotkey and on port 5000. There is no multi-user mode.</li>
+            <li><strong>Cloud LLMs power the deep features.</strong> Offline mode covers file operations and cached memory. Ollama or llama.cpp support would make it fully offline as a new backend, not a redesign.</li>
+            <li><strong>Plaintext memory at rest.</strong> Acceptable for a single-user local tool, not for multi-device sync. Next: optional encrypted cloud sync, with a React Native mobile companion as the first additional surface.</li>
+            <li><strong>Integrations cover the author's stack.</strong> Others write their own handler today; a plugin marketplace with sandboxed third-party handlers would end forking the core.</li>
         </ul>
 
         <!-- ============================================================== -->
