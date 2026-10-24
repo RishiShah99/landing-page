@@ -1,0 +1,114 @@
+/* ============================================
+   BASE: shared by the homepage and every project page.
+   One typeface (Newsreader) and one type scale, defined once.
+   Loaded before style.css / projects/project.css, which only
+   lay out their own components with these tokens.
+   ============================================ */
+
+:root {
+    /* Backgrounds */
+    --paper:        #f0efeb;
+    --paper-card:   #ffffff;
+    --paper-sunk:   #e6e4de;
+
+    /* Ink */
+    --ink:          #1d1a16;
+    --ink-body:     #2b2620;
+    --ink-muted:    #6b6359;
+    --ink-faint:    #8e857a;
+
+    /* Lines */
+    --rule:         #dddad2;
+    --rule-strong:  #c8c4bb;
+    --hairline:     0 0 0 1px rgba(29, 26, 22, 0.08);
+
+    /* Accent: warm gold */
+    --accent:       #b18639;
+    --accent-soft:  rgba(177, 134, 57, 0.22);
+
+    /* The one typeface. Mono is reserved for code. */
+    --font:         'Newsreader', Georgia, 'Times New Roman', serif;
+    --font-mono:    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+    /* The type scale: every size on the site comes from here */
+    --fs-title:     38px;   /* name, project title */
+    --fs-h2:        24px;   /* section headings */
+    --fs-h3:        19.5px; /* tile, paper, role and subsection titles */
+    --fs-lead:      19.5px; /* subtitles */
+    --fs-body:      18px;   /* body copy, bullets */
+    --fs-secondary: 17px;   /* descriptions, tabs, table cells */
+    --fs-meta:      15px;   /* dates, captions, authors, back link */
+
+    /* Layout */
+    --col-max:      720px;
+    --gutter:       32px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    background: var(--paper);
+}
+
+body {
+    font-family: var(--font);
+    font-size: var(--fs-body);
+    line-height: 1.65;
+    color: var(--ink-body);
+    background: var(--paper);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3 {
+    font-weight: 600;
+    color: var(--ink);
+}
+
+strong { font-weight: 600; color: var(--ink); }
+
+::selection { background: var(--accent-soft); color: var(--ink); }
+::-moz-selection { background: var(--accent-soft); color: var(--ink); }
+
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: var(--paper); }
+::-webkit-scrollbar-thumb { background: var(--rule-strong); border-radius: 5px; border: 2px solid var(--paper); }
+::-webkit-scrollbar-thumb:hover { background: var(--ink-faint); }
+
+.container {
+    max-width: calc(var(--col-max) + 2 * var(--gutter));
+    margin: 0 auto;
+    padding-left: var(--gutter);
+    padding-right: var(--gutter);
+}
+
+/* Fade overlay for page transitions (driven by shared.js) */
+.page-transition-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--paper);
+    z-index: 99999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+@media (max-width: 768px) {
+    :root {
+        --gutter:   22px;
+        --fs-title: 32px;
+        --fs-h2:    21.5px;
+        --fs-lead:  18px;
+        --fs-body:  17.5px;
+    }
+}
+
+@media (max-width: 480px) {
+    :root { --fs-title: 29px; }
+}
