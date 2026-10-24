@@ -7,7 +7,7 @@ Outputs:
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import rcParams
+from matplotlib import rcParams, font_manager
 from matplotlib.patches import Circle
 
 PAPER       = "#f0efeb"
@@ -27,9 +27,17 @@ ROSE_SOFT   = "#ecc9c9"
 
 OUT_DIR = os.path.dirname(os.path.abspath(__file__))
 
+# The site sets everything in Newsreader; the static TTFs ship in ./fonts so the
+# figures render identically on any machine. "serif" and "sans-serif" both
+# resolve to Newsreader, so every family= call below lands on the one typeface.
+for _ttf in sorted(os.listdir(os.path.join(OUT_DIR, "fonts"))):
+    if _ttf.endswith(".ttf"):
+        font_manager.fontManager.addfont(os.path.join(OUT_DIR, "fonts", _ttf))
+
 rcParams.update({
     "font.family": "serif",
-    "font.serif":  ["EB Garamond", "Georgia", "Times New Roman", "DejaVu Serif"],
+    "font.serif":  ["Newsreader", "DejaVu Serif"],
+    "font.sans-serif": ["Newsreader", "DejaVu Serif"],
     "font.size": 11,
     "axes.edgecolor": INK,
     "axes.labelcolor": INK,

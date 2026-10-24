@@ -9,6 +9,7 @@ Cream paper palette to match the rest of the portfolio. Generates:
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+from matplotlib import font_manager
 import numpy as np
 
 
@@ -22,10 +23,14 @@ MUTED = "#8a7f6a"
 
 
 def setup_rc():
+    # The site sets everything in Newsreader; the static TTFs ship in ./fonts.
+    for ttf in sorted((Path(__file__).parent / "fonts").glob("*.ttf")):
+        font_manager.fontManager.addfont(str(ttf))
     plt.rcParams.update(
         {
             "font.family": "serif",
-            "font.serif": ["EB Garamond", "Garamond", "DejaVu Serif"],
+            "font.serif": ["Newsreader", "DejaVu Serif"],
+            "font.sans-serif": ["Newsreader", "DejaVu Serif"],
             "font.size": 12,
             "axes.titlesize": 13,
             "axes.labelsize": 12,

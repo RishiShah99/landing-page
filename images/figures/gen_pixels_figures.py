@@ -8,7 +8,7 @@ Outputs:
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import rcParams
+from matplotlib import rcParams, font_manager
 from matplotlib.patches import FancyBboxPatch, FancyArrowPatch, Rectangle
 
 PAPER       = "#f0efeb"
@@ -26,9 +26,17 @@ SAGE_INK    = "#2f4a36"
 
 OUT_DIR = os.path.dirname(os.path.abspath(__file__))
 
+# The site sets everything in Newsreader; the static TTFs ship in ./fonts so the
+# figures render identically on any machine. "serif" and "sans-serif" both
+# resolve to Newsreader, so every family= call below lands on the one typeface.
+for _ttf in sorted(os.listdir(os.path.join(OUT_DIR, "fonts"))):
+    if _ttf.endswith(".ttf"):
+        font_manager.fontManager.addfont(os.path.join(OUT_DIR, "fonts", _ttf))
+
 rcParams.update({
     "font.family": "serif",
-    "font.serif":  ["EB Garamond", "Georgia", "Times New Roman", "DejaVu Serif"],
+    "font.serif":  ["Newsreader", "DejaVu Serif"],
+    "font.sans-serif": ["Newsreader", "DejaVu Serif"],
     "font.size": 11,
     "axes.edgecolor": INK,
     "axes.labelcolor": INK,
@@ -153,17 +161,17 @@ def fig_unet():
                     arrowprops=dict(arrowstyle="->", color=ACCENT, lw=1.5))
 
     # input / output annotations
-    ax.text(enc_x[0], levels_y[0] + heights[0]/2 + 0.35,
+    ax.text(enc_x[0], levels_y[0] + heights[0]/2 + 0.44,
             "input", ha="center", fontsize=11, color=INK_MUTED,
             family="serif", style="italic")
-    ax.text(enc_x[0], levels_y[0] + heights[0]/2 + 0.05,
+    ax.text(enc_x[0], levels_y[0] + heights[0]/2 + 0.13,
             "600 × 800 frame", ha="center", fontsize=9.5,
             color=INK_FAINT, family="serif")
 
-    ax.text(dec_x[2], levels_y[0] + heights[0]/2 + 0.35,
+    ax.text(dec_x[2], levels_y[0] + heights[0]/2 + 0.44,
             "output", ha="center", fontsize=11, color=INK,
             family="serif", style="italic", fontweight="bold")
-    ax.text(dec_x[2], levels_y[0] + heights[0]/2 + 0.05,
+    ax.text(dec_x[2], levels_y[0] + heights[0]/2 + 0.13,
             "binary tool mask", ha="center", fontsize=9.5,
             color=INK_FAINT, family="serif")
 
@@ -212,16 +220,19 @@ def fig_latency():
                    zorder=0)
         ax.text(x_ref, 1.18, label, ha="center", va="bottom",
                 fontsize=9, color=INK_FAINT, family="serif",
-                style="italic", rotation=0)
+                style="italic", rotation=0,
+                bbox=dict(facecolor=PAPER_CARD, edgecolor="none", pad=1.5))
 
     ax.text(per_frame_ms + 6, 0.5,
             f"~{per_frame_ms} ms per 600 × 800 frame",
             va="center", fontsize=12.5, color=INK,
-            fontweight="bold", family="sans-serif")
+            fontweight="bold", family="sans-serif",
+            bbox=dict(facecolor=PAPER_CARD, edgecolor="none", pad=1.5))
     ax.text(per_frame_ms + 6, 0.18,
             f"≈ {throughput} frames per minute on commodity GPU",
             va="center", fontsize=10.5, color=INK_MUTED,
-            style="italic", family="serif")
+            style="italic", family="serif",
+            bbox=dict(facecolor=PAPER_CARD, edgecolor="none", pad=1.5))
 
     ax.set_yticks([])
     ax.set_xticks([0, 33, 67, 120, 200, 250])

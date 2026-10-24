@@ -6,7 +6,7 @@ All figures saved as PNG at 2x retina to images/figures/.
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import rcParams
+from matplotlib import rcParams, font_manager
 from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
 
 # ---------- Palette ----------
@@ -26,9 +26,17 @@ SAGE_INK    = "#2f4a36"
 OUT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # ---------- Global style ----------
+# The site sets everything in Newsreader; the static TTFs ship in ./fonts so the
+# figures render identically on any machine. "serif" and "sans-serif" both
+# resolve to Newsreader, so every family= call below lands on the one typeface.
+for _ttf in sorted(os.listdir(os.path.join(OUT_DIR, "fonts"))):
+    if _ttf.endswith(".ttf"):
+        font_manager.fontManager.addfont(os.path.join(OUT_DIR, "fonts", _ttf))
+
 rcParams.update({
     "font.family": "serif",
-    "font.serif":  ["EB Garamond", "Georgia", "Times New Roman", "DejaVu Serif"],
+    "font.serif":  ["Newsreader", "DejaVu Serif"],
+    "font.sans-serif": ["Newsreader", "DejaVu Serif"],
     "font.size": 11,
     "axes.edgecolor": INK,
     "axes.labelcolor": INK,
@@ -159,7 +167,8 @@ def fig_input_features():
         ax.plot(t, y, color=color, linewidth=1.5)
         ax.fill_between(t, y, y.min(), color=color, alpha=0.10)
         ax.set_ylabel(label, fontsize=10, color=INK, rotation=0,
-                      ha="right", va="center", labelpad=8, family="serif")
+                      ha="right", va="center", labelpad=8,
+                      family=["Newsreader", "DejaVu Serif"])  # Δ falls back to DejaVu
         ax.tick_params(left=False, labelleft=False)
         for spine in ("top","right","left"):
             ax.spines[spine].set_visible(False)
