@@ -30,7 +30,7 @@
     <meta name="twitter:description" content="Wrote the first native Blackwell training backward for the gated-linear-recurrence family, and a 12-gate verifier that found a contract violation in 62.1% of the LLM-generated GPU kernels a public system had accepted. Also: a C++17 PyTorch in 5,500 lines on a $4 chip, and surgical-vision AI at 95% tool-segmentation accuracy.">
     <meta name="twitter:image" content="https://shahrishi.com/images/user.jpg">
 
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23f0efeb'/><text x='50' y='72' font-family='Georgia,serif' font-size='72' font-weight='700' fill='%231d1a16' text-anchor='middle'>R</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23f0efeb'/><text x='50' y='72' font-family='Newsreader,Georgia,Times New Roman,serif' font-size='74' font-weight='600' fill='%231d1a16' text-anchor='middle'>R</text></svg>">
 
     <!-- Prevent flash: set cream background before stylesheet loads -->
     <style>
@@ -39,28 +39,29 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="base.css?v=20261024b">
+    <link rel="stylesheet" href="style.css?v=20261024b">
     <script defer src="https://kit.fontawesome.com/17ea408dcc.js" crossorigin="anonymous"></script>
     <script defer src="shared.js"></script>
 </head>
 <body>
-    <!-- Header Section -->
-    <div id="header">
-        <div class="container">
+    <div class="container">
+        <!-- Header -->
+        <header id="header" class="reveal" style="--i: 0">
             <div class="header-content-compact">
                 <div class="header-info">
-                    <h1>Rishi <span class="accent">Shah</span></h1>
-                    <p class="subtitle">Developing machine learning systems.</p>
+                    <h1>Rishi Shah</h1>
+                    <p class="subtitle">Developing ML and Kernel Systems.</p>
                     <div class="contact-links">
-                        <a href="https://github.com/RishiShah99"><i class="fa-brands fa-github"></i></a>
-                        <a href="https://www.linkedin.com/in/rishi-shah-7915a7309/"><i class="fa-brands fa-linkedin"></i></a>
-                        <a href="https://x.com/Rishi_Shah99"><i class="fa-brands fa-x-twitter"></i></a>
-                        <a href="https://www.kaggle.com/shahrish99"><i class="fa-brands fa-kaggle"></i></a>
-                        <a href="https://scholar.google.com/citations?user=vznGcXoAAAAJ&amp;hl=en"><i class="fa-brands fa-google-scholar"></i></a>
-                        <a href="https://orcid.org/0009-0009-1048-3433"><i class="fa-brands fa-orcid"></i></a>
-                        <a href="mailto:rishishah994@gmail.com"><i class="fa-solid fa-envelope"></i></a>
+                        <a href="https://github.com/RishiShah99" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+                        <a href="https://www.linkedin.com/in/rishi-shah-7915a7309/" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+                        <a href="https://x.com/Rishi_Shah99" aria-label="X"><i class="fa-brands fa-x-twitter"></i></a>
+                        <a href="https://www.kaggle.com/shahrish99" aria-label="Kaggle"><i class="fa-brands fa-kaggle"></i></a>
+                        <a href="https://scholar.google.com/citations?user=vznGcXoAAAAJ&amp;hl=en" aria-label="Google Scholar"><i class="fa-brands fa-google-scholar"></i></a>
+                        <a href="https://orcid.org/0009-0009-1048-3433" aria-label="ORCID"><i class="fa-brands fa-orcid"></i></a>
+                        <a href="mailto:rishishah994@gmail.com" aria-label="Email"><i class="fa-solid fa-envelope"></i></a>
                         <a href="images/Rishi_Shah_Resume.pdf" download="Rishi's Resume.pdf">Resume</a>
                     </div>
                 </div>
@@ -68,180 +69,106 @@
                     <img src="images/user.jpg" alt="Rishi Shah" fetchpriority="high" decoding="async">
                 </div>
             </div>
-        </div>
-    </div>
+        </header>
 
-    <!-- About Section -->
-    <div id="about">
-        <div class="container">
-            <div class="about-content">
-                <h2 class="section-title">About</h2>
-                <ul class="about-points">
-                    <li>Schulich Leader Scholar at McMaster University, one of Canada's top 50 entrepreneurial engineers that was awarded $120,000.</li>
-                    <li>Wrote the first native Blackwell (tcgen05) training backward for the gated-linear-recurrence family (Mamba-2, GLA, KDA, Gated DeltaNet).</li>
-                    <li>Designed a novel training objective for latent world models that nearly doubles valid prediction time with one loss term and zero added parameters.</li>
-                    <li>Trained the supervised and reasoning layers of a labor-prediction model at E3A Healthcare that outperforms the clinical SOTA by 3x.</li>
-                    <li>Worked with Ford, MathWorks, and Dana at the McMaster Automotive Resource Centre on ML for battery optimization in their products, cutting battery voltage-model error by 84%.</li>
-                    <li>Built a novel linear-attention sequence model from scratch in C++17, trained on clinical data to predict hypoglycemia 60 minutes ahead, and proved its kernel runs bit-identically on a $4 chip.</li>
-                    <li>Engineered a biologically inspired recurrent vision model that outperformed MIT's CORNet-S in adversarial robustness across MNIST, CIFAR, and ImageNet100.</li>
-                    <li>Worked with Synaptive Medical and surgeons to develop a surgical-vision system trained on live operating-room data, achieving 95% tool segmentation accuracy for real-time surgical guidance.</li>
-                </ul>
-            </div>
-        </div>
-    </div>
+        <!-- About -->
+        <section id="about" class="section reveal" style="--i: 1">
+            <h2 class="section-title">About</h2>
+            <ul class="about-points">
+                <li>Schulich Leader Scholar at McMaster University, one of Canada's top 50 entrepreneurial engineers that was awarded $120,000.</li>
+                <li>Wrote the first native Blackwell (tcgen05) training backward for the gated-linear-recurrence family (Mamba-2, GLA, KDA, Gated DeltaNet).</li>
+                <li>Designed a novel training objective for latent world models that nearly doubles valid prediction time with one loss term and zero added parameters.</li>
+                <li>Trained the supervised and reasoning layers of a labor-prediction model at E3A Healthcare that outperforms the clinical SOTA by 3x.</li>
+                <li>Worked with Ford, MathWorks, and Dana at the McMaster Automotive Resource Centre on ML for battery optimization in their products, cutting battery voltage-model error by 84%.</li>
+            </ul>
+        </section>
 
-    <!-- Portfolio Section: Projects / Papers / Work Experience -->
-    <div id="portfolio">
-        <div class="container">
+        <!-- Portfolio: Projects / Experience / Papers -->
+        <section id="portfolio" class="section reveal" style="--i: 2">
             <div class="section-tabs" role="tablist" aria-label="Portfolio sections">
                 <button class="tab active" data-tab="projects" role="tab" aria-selected="true">Projects</button>
+                <button class="tab" data-tab="experience" role="tab" aria-selected="false">Experience</button>
                 <button class="tab" data-tab="papers" role="tab" aria-selected="false">Papers</button>
-                <button class="tab" data-tab="experience" role="tab" aria-selected="false">Work Experience</button>
             </div>
 
             <div id="panel-projects" class="tab-panel active" role="tabpanel">
-            <div class="work-grid-2col">
-                <div class="work" onclick="window.location.href='projects/lethe.html'">
-                    <img src="images/project-12.jpg" alt="Lethe" fetchpriority="high" decoding="async">
-                    <div class="work-content">
-                        <div class="work-year">2026</div>
-                        <h3>Lethe</h3>
+                <div class="work-grid">
+                    <a class="work" href="projects/lethe.html">
+                        <div class="work-media"><img src="images/project-12.jpg" alt="Lethe" loading="lazy" decoding="async"></div>
+                        <h3>Lethe<span class="work-year">2026</span></h3>
                         <p>KernelBench's original correctness test passes 1,487 AI-written GPU kernels that Lethe's verifier flags as wrong. Also wrote the first native Blackwell (tcgen05) training backward for the linear-attention family.</p>
-                    </div>
-                </div>
-                <div class="work" onclick="window.location.href='projects/rdr.html'">
-                    <img src="images/project-13.jpg" alt="RDR" fetchpriority="high" decoding="async">
-                    <div class="work-content">
-                        <div class="work-year">2026</div>
-                        <h3>RDR</h3>
+                    </a>
+                    <a class="work" href="projects/rdr.html">
+                        <div class="work-media"><img src="images/project-13.jpg" alt="RDR" loading="lazy" decoding="async"></div>
+                        <h3>RDR<span class="work-year">2026</span></h3>
                         <p>One loss term nearly doubles a world model's valid prediction time, with zero added parameters.</p>
-                    </div>
-                </div>
-                <div class="work" onclick="window.location.href='projects/cgm-on-chip.html'">
-                    <img src="images/project-10.jpg" alt="CGM-on-Chip" fetchpriority="high" decoding="async">
-                    <div class="work-content">
-                        <div class="work-year">2026</div>
-                        <h3>CGM-on-Chip</h3>
+                    </a>
+                    <a class="work" href="projects/cgm-on-chip.html">
+                        <div class="work-media"><img src="images/project-10.jpg" alt="CGM-on-Chip" loading="lazy" decoding="async"></div>
+                        <h3>CGM-on-Chip<span class="work-year">2026</span></h3>
                         <p>Predicts hypoglycemia 60 minutes ahead on a $4 chip, built from scratch in C++17.</p>
-                    </div>
-                </div>
-                <div class="work" onclick="window.location.href='projects/from-pixels-to-precision.html'">
-                    <img src="images/project-1.png" alt="From Pixels to Precision" fetchpriority="high" decoding="async">
-                    <div class="work-content">
-                        <div class="work-year">2023</div>
-                        <h3>From Pixels to Precision</h3>
+                    </a>
+                    <a class="work" href="projects/from-pixels-to-precision.html">
+                        <div class="work-media"><img src="images/project-1.png" alt="From Pixels to Precision" loading="lazy" decoding="async"></div>
+                        <h3>From Pixels to Precision<span class="work-year">2023</span></h3>
                         <p>Surgical-vision AI built with Synaptive Medical that segments surgical tools at 95% accuracy.</p>
-                    </div>
-                </div>
-                <div class="work" onclick="window.location.href='projects/adversarial-robustness.html'">
-                    <img src="images/project-2.png" alt="Adversarial Robustness" loading="lazy" decoding="async">
-                    <div class="work-content">
-                        <div class="work-year">2025</div>
-                        <h3>Adversarial Robustness Research</h3>
+                    </a>
+                    <a class="work" href="projects/adversarial-robustness.html">
+                        <div class="work-media"><img src="images/project-2.png" alt="Adversarial Robustness" loading="lazy" decoding="async"></div>
+                        <h3>Adversarial Robustness Research<span class="work-year">2025</span></h3>
                         <p>A bio-inspired vision model that beats MIT's CORNet-S on adversarial robustness, with no adversarial training.</p>
-                    </div>
-                </div>
-                <div class="work" onclick="window.location.href='projects/sentinel.html'">
-                    <img src="images/project-8.png" alt="Sentinel" loading="lazy" decoding="async">
-                    <div class="work-content">
-                        <div class="work-year">2025</div>
-                        <h3>Sentinel</h3>
+                    </a>
+                    <a class="work" href="projects/sentinel.html">
+                        <div class="work-media"><img src="images/project-8.png" alt="Sentinel" loading="lazy" decoding="async"></div>
+                        <h3>Sentinel<span class="work-year">2025</span></h3>
                         <p>Catches Arduino and ESP32 hardware bugs as you type; Best Developer Tool at Hack Western 12.</p>
-                    </div>
-                </div>
-                <div class="work" onclick="window.location.href='projects/adaptvr.html'">
-                    <img src="images/project-11.jpg" alt="AdaptVR" loading="lazy" decoding="async">
-                    <div class="work-content">
-                        <div class="work-year">2026</div>
-                        <h3>AdaptVR</h3>
+                    </a>
+                    <a class="work" href="projects/adaptvr.html">
+                        <div class="work-media"><img src="images/project-11.jpg" alt="AdaptVR" loading="lazy" decoding="async"></div>
+                        <h3>AdaptVR<span class="work-year">2026</span></h3>
                         <p>Hand-tracked VR rehab for muscular dystrophy patients, built for Meta Quest 2.</p>
-                    </div>
-                </div>
-                <div class="work" onclick="window.location.href='projects/monkey-see-monkey-do.html'">
-                    <img src="images/project-7.jpg" alt="Adaptive Learning Robot" loading="lazy" decoding="async">
-                    <div class="work-content">
-                        <div class="work-year">2025</div>
-                        <h3>Adaptive Learning Robot</h3>
+                    </a>
+                    <a class="work" href="projects/monkey-see-monkey-do.html">
+                        <div class="work-media"><img src="images/project-7.jpg" alt="Adaptive Learning Robot" loading="lazy" decoding="async"></div>
+                        <h3>Adaptive Learning Robot<span class="work-year">2025</span></h3>
                         <p>Robot arms that learn new skills from plain-English instructions, Top 32 of 256 at Hack the North.</p>
-                    </div>
-                </div>
-                <div class="work" onclick="window.location.href='projects/zephyr-ai.html'">
-                    <img src="images/project-5.png" alt="Zephyr" loading="lazy" decoding="async">
-                    <div class="work-content">
-                        <div class="work-year">2024</div>
-                        <h3>Zephyr AI Assistant</h3>
+                    </a>
+                    <a class="work" href="projects/zephyr-ai.html">
+                        <div class="work-media"><img src="images/project-5.png" alt="Zephyr" loading="lazy" decoding="async"></div>
+                        <h3>Zephyr AI Assistant<span class="work-year">2024</span></h3>
                         <p>A hotkey voice assistant on Llama 3.1 that runs Spotify, calendar, weather and news.</p>
-                    </div>
-                </div>
-                <div class="work" onclick="window.location.href='projects/dermai.html'">
-                    <img src="images/project-6.jpg" alt="DermAI" loading="lazy" decoding="async">
-                    <div class="work-content">
-                        <div class="work-year">2024</div>
-                        <h3>DermAI Medical Assistant</h3>
+                    </a>
+                    <a class="work" href="projects/dermai.html">
+                        <div class="work-media"><img src="images/project-6.jpg" alt="DermAI" loading="lazy" decoding="async"></div>
+                        <h3>DermAI Medical Assistant<span class="work-year">2024</span></h3>
                         <p>Triages skin conditions with a DenseNet121 trained on 19,000+ DermNet images.</p>
-                    </div>
-                </div>
-                <div class="work" onclick="window.location.href='projects/surgical-tool-ar.html'">
-                    <img src="images/project-9.png" alt="SurgicalToolAR" loading="lazy" decoding="async">
-                    <div class="work-content">
-                        <div class="work-year">2024</div>
-                        <h3>SurgicalToolAR</h3>
+                    </a>
+                    <a class="work" href="projects/surgical-tool-ar.html">
+                        <div class="work-media"><img src="images/project-9.png" alt="SurgicalToolAR" loading="lazy" decoding="async"></div>
+                        <h3>SurgicalToolAR<span class="work-year">2024</span></h3>
                         <p>AR that tracks a surgical probe against a brain model and warns as it nears tissue.</p>
-                    </div>
-                </div>
-                <div class="work" onclick="window.location.href='projects/gesture-arm.html'">
-                    <img src="images/project-3.png" alt="Gesture Controlled Robotic Arm" loading="lazy" decoding="async">
-                    <div class="work-content">
-                        <div class="work-year">2024</div>
-                        <h3>Gesture Controlled Robotic Arm</h3>
+                    </a>
+                    <a class="work" href="projects/gesture-arm.html">
+                        <div class="work-media"><img src="images/project-3.jpg" alt="Gesture Controlled Robotic Arm" loading="lazy" decoding="async"></div>
+                        <h3>Gesture Controlled Robotic Arm<span class="work-year">2024</span></h3>
                         <p>A 6-DOF robotic arm that mirrors hand gestures in real time.</p>
-                    </div>
+                    </a>
                 </div>
-            </div>
-            </div>
-
-            <div id="panel-papers" class="tab-panel" role="tabpanel">
-            <div class="paper-list">
-                <div class="paper">
-                    <div class="paper-year">2026 &middot; Preprint</div>
-                    <h3 class="paper-title"><a href="images/Shah_RolloutDecodedReconstruction_2026.pdf" target="_blank" rel="noopener">Rollout-Decoded Reconstruction for Long-Horizon Prediction in Latent World Models</a></h3>
-                    <p class="paper-meta">Rishi Shah, Rishav Shrestha &middot; <a href="https://arxiv.org/abs/2608.25017" target="_blank" rel="noopener">arXiv:2608.25017</a> &middot; DOI <a href="https://doi.org/10.5281/zenodo.22004716" target="_blank" rel="noopener">10.5281/zenodo.22004716</a></p>
-                    <p class="paper-abstract">A latent world model's decoder is trained on states anchored to observations and deployed on the model's own free-running rollout. RDR is one loss term that closes the gap: free-run during training, decode every rollout latent, penalize the error against ground truth. It adds no parameters and costs training-time compute only, so every comparison is a one-flag A/B. On chaotic Kuramoto&ndash;Sivashinsky it raises valid prediction time from 3.87 to 6.97 time units at an identical 193,568 parameters, winning 10 of 10 preregistered configurations.</p>
-                    <div class="paper-links">
-                        <a href="images/Shah_RolloutDecodedReconstruction_2026.pdf" target="_blank" rel="noopener">PDF</a>
-                        <a href="https://arxiv.org/abs/2608.25017" target="_blank" rel="noopener">arXiv</a>
-                        <a href="https://doi.org/10.5281/zenodo.22004716" target="_blank" rel="noopener">DOI</a>
-                        <a href="projects/rdr.html">Project Page</a>
-                    </div>
-                </div>
-                <div class="paper">
-                    <div class="paper-year">2026 &middot; Preprint</div>
-                    <h3 class="paper-title"><a href="images/Shah_ContractGradeVerifierForGPUKernels_2026.pdf" target="_blank" rel="noopener">A Contract-Grade Verifier for LLM-Generated GPU Kernels, and a Native Blackwell Backward for the Gated-Linear-Recurrence Family</a></h3>
-                    <p class="paper-meta">Rishi Shah, Rishav Shrestha &middot; <a href="https://arxiv.org/abs/2608.12700" target="_blank" rel="noopener">arXiv:2608.12700</a> &middot; DOI <a href="https://doi.org/10.5281/zenodo.21563212" target="_blank" rel="noopener">10.5281/zenodo.21563212</a></p>
-                    <p class="paper-abstract">Twelve adversarial gates that check GPU-kernel correctness properly, several of them tolerance-free. Aimed outward, the verifier audited 2,638 LLM-generated kernels a public system had already accepted and found 62.1% carrying a contract violation. The paper also presents the first native Blackwell (tcgen05) training backward for the gated-linear-recurrence family.</p>
-                    <div class="paper-links">
-                        <a href="images/Shah_ContractGradeVerifierForGPUKernels_2026.pdf" target="_blank" rel="noopener">PDF</a>
-                        <a href="https://arxiv.org/abs/2608.12700" target="_blank" rel="noopener">arXiv</a>
-                        <a href="https://doi.org/10.5281/zenodo.21563212" target="_blank" rel="noopener">DOI</a>
-                        <a href="projects/lethe.html">Project Page</a>
-                    </div>
-                </div>
-            </div>
             </div>
 
             <div id="panel-experience" class="tab-panel" role="tabpanel">
                 <div class="timeline">
                     <div class="timeline-entry current">
-                        <div class="timeline-date">May 2026 &ndash; Aug 2026<span class="loc">Shenzhen, China</span></div>
+                        <div class="timeline-date">May &ndash; Aug 2026<span class="loc">Shenzhen, China</span></div>
                         <div class="timeline-body">
                             <h3 class="timeline-role">Machine Learning Engineer</h3>
                             <div class="timeline-org">E3A Healthcare</div>
                             <p>Led the supervised layer and set the architecture direction of a longitudinal model that reads at-home fetal monitoring and returns a full posterior over days until delivery. The model predicts term delivery to within 3 days against 11 days for the clinical SOTA, and halves the obstetric calendar's preterm MAE.</p>
-                        <ul class="timeline-points">
-                            <li>Authored the first design of the cohort mixture-of-experts and its learned gate, and originated the sub-agent architecture now on the model's roadmap.</li>
-                            <li>Built the reasoning layer and the coupled-likelihood objective behind the preterm win, 2.02 days better with the same sign on all ten seeds.</li>
-                            <li>Wrote the evaluation methodology the project now runs on, and put GPU compute in every engineer's hands by automating multi-region GPU cluster provisioning on GCP.</li>
-                        </ul>
+                            <ul class="timeline-points">
+                                <li>Authored the first design of the cohort mixture-of-experts and its learned gate, and originated the sub-agent architecture now on the model's roadmap.</li>
+                                <li>Built the reasoning layer and the coupled-likelihood objective behind the preterm win, 2.02 days better with the same sign on all ten seeds.</li>
+                                <li>Wrote the evaluation methodology the project now runs on, and put GPU compute in every engineer's hands by automating multi-region GPU cluster provisioning on GCP.</li>
+                            </ul>
                         </div>
                     </div>
                     <div class="timeline-entry">
@@ -271,26 +198,42 @@
                 </div>
             </div>
 
-            <div class="copyright">
-                <p>Copyright &copy; 2026 Rishi Shah. All rights reserved.</p>
+            <div id="panel-papers" class="tab-panel" role="tabpanel">
+                <article class="paper">
+                    <h3 class="paper-title"><a href="images/Shah_RolloutDecodedReconstruction_2026.pdf" target="_blank" rel="noopener">Rollout-Decoded Reconstruction for Long-Horizon Prediction in Latent World Models</a></h3>
+                    <p class="paper-meta"><span class="me">Rishi Shah</span>, Rishav Shrestha<span class="sep">&middot;</span>Preprint, 2026</p>
+                    <p class="paper-meta paper-links">
+                        <a href="images/Shah_RolloutDecodedReconstruction_2026.pdf" target="_blank" rel="noopener">PDF</a><span class="sep">&middot;</span><a href="https://arxiv.org/abs/2608.25017" target="_blank" rel="noopener">arXiv:2608.25017</a><span class="sep">&middot;</span><a href="https://doi.org/10.5281/zenodo.22004716" target="_blank" rel="noopener">DOI</a><span class="sep">&middot;</span><a href="projects/rdr.html">Project page</a>
+                    </p>
+                </article>
+                <article class="paper">
+                    <h3 class="paper-title"><a href="images/Shah_ContractGradeVerifierForGPUKernels_2026.pdf" target="_blank" rel="noopener">A Contract-Grade Verifier for LLM-Generated GPU Kernels, and a Native Blackwell Backward for the Gated-Linear-Recurrence Family</a></h3>
+                    <p class="paper-meta"><span class="me">Rishi Shah</span>, Rishav Shrestha<span class="sep">&middot;</span>Preprint, 2026</p>
+                    <p class="paper-meta paper-links">
+                        <a href="images/Shah_ContractGradeVerifierForGPUKernels_2026.pdf" target="_blank" rel="noopener">PDF</a><span class="sep">&middot;</span><a href="https://arxiv.org/abs/2608.12700" target="_blank" rel="noopener">arXiv:2608.12700</a><span class="sep">&middot;</span><a href="https://doi.org/10.5281/zenodo.21563212" target="_blank" rel="noopener">DOI</a><span class="sep">&middot;</span><a href="projects/lethe.html">Project page</a>
+                    </p>
+                </article>
             </div>
-        </div>
+        </section>
+
+        <footer class="copyright">
+            <p>&copy; 2026 Rishi Shah</p>
+        </footer>
     </div>
 
     <script>
-        // Project card click handlers: wires inline onclick into the cream fade transition.
-        // Transition helper and bfcache cleanup live in shared.js.
-        document.querySelectorAll('.work').forEach(workElement => {
-            const originalOnclick = workElement.getAttribute('onclick');
-            if (originalOnclick) {
-                const url = originalOnclick.match(/'([^']+)'/)[1];
-                workElement.removeAttribute('onclick');
-                workElement.addEventListener('click', () => window.navigateToProject(url));
-            }
+        // Project tiles are real links (middle-click and new-tab still work);
+        // a plain click goes through the paper fade in shared.js.
+        document.querySelectorAll('a.work').forEach(tile => {
+            tile.addEventListener('click', e => {
+                if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+                e.preventDefault();
+                window.navigateToProject(tile.getAttribute('href'));
+            });
         });
 
-        // Portfolio tabs: Projects / Papers / Work Experience.
-        // Hash deep-links (#projects, #papers, #experience) select the tab on load.
+        // Portfolio tabs: Projects / Experience / Papers.
+        // Hash deep-links (#projects, #experience, #papers) select the tab on load.
         const tabs = document.querySelectorAll('.section-tabs .tab');
         const panels = document.querySelectorAll('.tab-panel');
         function activateTab(name, updateHash) {
@@ -304,7 +247,7 @@
         }
         tabs.forEach(t => t.addEventListener('click', () => activateTab(t.dataset.tab, true)));
         const initialTab = location.hash.slice(1);
-        if (['projects', 'papers', 'experience'].includes(initialTab)) activateTab(initialTab, false);
+        if (['projects', 'experience', 'papers'].includes(initialTab)) activateTab(initialTab, false);
     </script>
 </body>
 </html>
